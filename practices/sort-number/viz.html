@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MLP Sorter — Study Visualization</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #eff3ff; color: #1a2050; font-family: 'SF Mono', 'Fira Code', monospace; overflow: hidden; }
+    #canvas-container { position: fixed; top: 0; left: 0; right: 360px; height: 100%; }
+    #panel {
+      position: fixed; top: 0; right: 0; width: 360px; height: 100%;
+      background: #fff; border-left: 1.5px solid #dce3f5;
+      padding: 14px 14px; display: flex; flex-direction: column; gap: 11px;
+      overflow-y: auto; z-index: 10; box-shadow: -3px 0 18px rgba(80,100,200,0.07);
+    }
+    #panel::-webkit-scrollbar { width: 4px; }
+    #panel::-webkit-scrollbar-thumb { background: #c8d0ee; border-radius: 2px; }
+    h1 { font-size: 12px; letter-spacing: 3px; color: #4455cc; text-transform: uppercase; font-weight: 700; }
+    .arch-badge { display: flex; gap: 3px; align-items: center; flex-wrap: wrap; margin-top: 5px; }
+    .arch-chip { font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 700; letter-spacing: 0.5px; }
+    .arch-arrow { font-size: 9px; color: #b0b8d8; }
+    .section { display: flex; flex-direction: column; gap: 6px; }
+    .section-title {
+      font-size: 9px; letter-spacing: 2px; color: #8898cc; text-transform: uppercase;
+      border-bottom: 1px solid #eef0f8; padding-bottom: 3px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .n-controls { display: flex; align-items: center; gap: 5px; }
+    .n-btn {
+      width: 22px; height: 22px; padding: 0; font-size: 14px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      background: #eef1ff; border: 1.5px solid #c8d4f0; border-radius: 4px;
+      color: #4455cc; cursor: pointer; transition: all 0.12s; line-height: 1;
+    }
+    .n-btn:hover { background: #dde3ff; }
+    .n-label { font-size: 10px; color: #8898cc; min-width: 34px; text-align: center; }
+    .input-fields { display: flex; flex-direction: column; gap: 4px; }
+    .input-row { display: grid; grid-template-columns: 20px 1fr; gap: 0 7px; align-items: center; }
+    .input-row label { font-size: 11px; color: #8090c0; text-align: center; font-weight: 700; }
+    input[type=number] {
+      background: #f5f7ff; border: 1.5px solid #d0d8f0; border-radius: 4px; color: #1a2050;
+      padding: 5px 10px; font-family: inherit; font-size: 13px; width: 100%;
+    }
+    input[type=number]:focus { outline: none; border-color: #6677dd; background: #fff; }
+    button {
+      background: #eef1ff; border: 1.5px solid #c8d4f0; border-radius: 4px; color: #4455cc;
+      padding: 6px 12px; font-family: inherit; font-size: 10px; cursor: pointer;
+      letter-spacing: 1.5px; text-transform: uppercase; transition: all 0.15s; width: 100%; font-weight: 600;
+    }
+    button:hover { background: #dde3ff; border-color: #8899dd; }
+    button.active { background: #4455cc; color: #fff; border-color: #4455cc; }
+    .btn-row { display: flex; gap: 6px; }
+    .btn-row button { font-size: 9px; padding: 5px 8px; }
+    .result-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .box { background: #f8f9ff; border: 1.5px solid #e0e6f8; border-radius: 4px; padding: 8px 11px; }
+    .box-label { font-size: 8px; color: #8898cc; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 3px; }
+    .box-value { font-size: 12px; color: #2233aa; font-weight: 700; word-break: break-all; }
+    .loss-row { display: flex; justify-content: space-between; align-items: baseline; }
+    .loss-val { color: #4455cc; font-size: 13px; font-weight: 700; }
+    .epoch-val { color: #a0aad0; font-size: 9px; }
+    #loss-canvas { width: 100%; height: 56px; border-radius: 4px; background: #f8f9ff; border: 1px solid #e8ecf8; margin-top: 3px; }
+    .status { font-size: 9px; color: #9090b8; line-height: 1.5; }
+    /* Trace */
+    .trace-content { display: flex; flex-direction: column; gap: 3px; }
+    .trace-step {
+      display: flex; justify-content: space-between; align-items: baseline;
+      padding: 4px 8px; background: #f8f9ff; border: 1px solid #eaecf8; border-radius: 3px;
+    }
+    .ts-op { color: #4455bb; font-weight: 700; font-size: 10px; }
+    .ts-info { color: #7080b0; text-align: right; font-size: 9px; }
+    .ts-out { color: #1144cc; font-weight: 700; }
+    .ts-dim { color: #b0b8d0; font-size: 8px; }
+    .ts-dead { color: #cc3333; }
+    /* Heatmap */
+    .hm-wrap { display: flex; flex-direction: column; gap: 5px; }
+    .hm-row { display: flex; align-items: flex-start; gap: 6px; }
+    .hm-lbl { font-size: 9px; color: #8898cc; width: 32px; flex-shrink: 0; padding-top: 2px; }
+    .hm-grid { display: flex; flex-wrap: wrap; gap: 2px; }
+    .hm-cell {
+      width: 13px; height: 13px; border-radius: 2px; background: #e4e8f5;
+      cursor: default; transition: background 0.15s; position: relative;
+    }
+    .hm-cell:hover::after {
+      content: attr(data-v); position: absolute; top: -20px; left: 50%;
+      transform: translateX(-50%); background: #2233aa; color: #fff;
+      font-size: 8px; padding: 1px 4px; border-radius: 2px; white-space: nowrap; z-index: 200;
+    }
+    /* Output bars */
+    .out-bars { display: flex; flex-direction: column; gap: 3px; }
+    .ob-row { display: flex; align-items: center; gap: 5px; font-size: 9px; }
+    .ob-lbl { width: 30px; color: #8090c0; font-weight: 700; }
+    .ob-bg { flex: 1; height: 6px; background: #e8ecf8; border-radius: 3px; overflow: hidden; }
+    .ob-fill { height: 100%; border-radius: 3px; transition: width 0.2s; }
+    .ob-val { width: 38px; text-align: right; color: #2233aa; font-weight: 700; font-size: 9px; }
+    /* Stats table */
+    .stats-table { width: 100%; border-collapse: collapse; font-size: 9px; }
+    .stats-table th {
+      color: #8898cc; font-weight: 600; text-align: left;
+      padding: 2px 5px; border-bottom: 1px solid #eef0f8; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .stats-table td { padding: 3px 5px; color: #2233aa; }
+    .stats-table tr:nth-child(even) td { background: #f8f9ff; }
+    .dead { color: #cc3333; }
+    /* Legend */
+    .legend { display: flex; flex-direction: column; gap: 4px; }
+    .legend-row { display: flex; align-items: center; gap: 7px; font-size: 10px; color: #5060a0; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    /* CSS2D neuron labels */
+    .nlbl {
+      font-family: 'SF Mono', monospace; font-size: 10px; color: #2233aa;
+      background: rgba(255,255,255,0.92); padding: 1px 5px; border-radius: 3px;
+      border: 1px solid rgba(68,85,220,0.3); pointer-events: none; white-space: nowrap;
+    }
+    .nlbl.out { color: #0077cc; border-color: rgba(17,153,238,0.35); }
+  </style>
+</head>
+<body>
+<div id="canvas-container"></div>
+<div id="panel">
+  <div>
+    <h1>MLP Sorter</h1>
+    <div class="arch-badge" id="arch-badge"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">
+      <span>Inputs</span>
+      <div class="n-controls">
+        <button class="n-btn" onclick="changeN(-1)">−</button>
+        <span class="n-label" id="n-label">N = 3</span>
+        <button class="n-btn" onclick="changeN(+1)">+</button>
+      </div>
+    </div>
+    <div id="input-fields" class="input-fields"></div>
+    <button onclick="onPredict()">▶ Predict</button>
+  </div>
+
+  <div class="result-row">
+    <div class="box"><div class="box-label">Predicted</div><div class="box-value" id="pred-val">—</div></div>
+    <div class="box"><div class="box-label">Expected</div><div class="box-value" id="exp-val">—</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Training</div>
+    <div class="loss-row">
+      <span style="font-size:10px;color:#8090c0">MSE Loss</span>
+      <span class="loss-val" id="loss-val">—</span>
+      <span class="epoch-val" id="epoch-val">epoch 0</span>
+    </div>
+    <canvas id="loss-canvas"></canvas>
+    <div class="btn-row">
+      <button id="train-btn" onclick="onToggleTrain()">▶ Train</button>
+      <button onclick="onReset()">↺ Reset</button>
+    </div>
+    <div class="status" id="status">Untrained — click Train to begin.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Forward Pass Trace</div>
+    <div class="trace-content" id="trace">
+      <div class="trace-step" style="justify-content:center">
+        <span style="font-size:9px;color:#b0b8d0">Click Predict to see the computation.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Activation Heatmap <span style="font-size:8px;color:#b0b8d0">(hover = value)</span></div>
+    <div class="hm-wrap">
+      <div class="hm-row"><span class="hm-lbl">H1 ·16</span><div id="hm-h1" class="hm-grid"></div></div>
+      <div class="hm-row"><span class="hm-lbl">H2 · 8</span><div id="hm-h2" class="hm-grid"></div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Output Values</div>
+    <div class="out-bars" id="out-bars"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Layer Statistics</div>
+    <table class="stats-table">
+      <thead><tr><th>Layer</th><th>N</th><th>Active</th><th>Dead%</th><th>Mean</th><th>Max</th></tr></thead>
+      <tbody id="stats-body">
+        <tr><td colspan="6" style="color:#b0b8d0;text-align:center;padding:6px">Run a prediction first.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Legend</div>
+    <div class="legend">
+      <div class="legend-row"><div class="dot" style="background:#3355ee"></div>Input (N neurons)</div>
+      <div class="legend-row"><div class="dot" style="background:#7733ee"></div>Hidden 1 (16) · relu</div>
+      <div class="legend-row"><div class="dot" style="background:#bb33ee"></div>Hidden 2 (8) · relu</div>
+      <div class="legend-row"><div class="dot" style="background:#1199ee"></div>Output (N) · linear</div>
+    </div>
+    <div class="status" style="margin-top:5px">
+      Sphere size = activation.<br>
+      Blue line = +weight · Red = −weight · opacity = magnitude.<br>
+      Drag to rotate · scroll to zoom.
+    </div>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+// ── MLP ──────────────────────────────────────────────────────────────────────
+
+function matmul(A, B) {
+  const R = A.length, C = B[0].length, K = B.length;
+  const M = Array.from({length:R}, () => new Array(C).fill(0));
+  for (let i=0;i<R;i++) for (let j=0;j<C;j++) for (let k=0;k<K;k++) M[i][j]+=A[i][k]*B[k][j];
+  return M;
+}
+const T   = A => A[0].map((_,j) => A.map(r=>r[j]));
+const aB  = (Z,b) => Z.map(r=>r.map((v,j)=>v+b[j]));
+const had = (A,B) => A.map((r,i)=>r.map((v,j)=>v*B[i][j]));
+const rM  = Z => Z.map(r=>r.map(v=>v>0?1:0));
+
+let N = 3;
+let W1,b1,W2,b2,W3,b3;
+
+function initW(r,c){const s=Math.sqrt(2/r);return Array.from({length:r},()=>Array.from({length:c},()=>(Math.random()-0.5)*s));}
+function initNet(){W1=initW(N,16);b1=new Array(16).fill(0);W2=initW(16,8);b2=new Array(8).fill(0);W3=initW(8,N);b3=new Array(N).fill(0);}
+initNet();
+
+function fwd(X){
+  const Z1=aB(matmul(X,W1),b1), A1=Z1.map(r=>r.map(v=>Math.max(0,v)));
+  const Z2=aB(matmul(A1,W2),b2),A2=Z2.map(r=>r.map(v=>Math.max(0,v)));
+  const Z3=aB(matmul(A2,W3),b3);
+  return {Z1,A1,Z2,A2,Z3};
+}
+function mse(p,t){let s=0,n=0;p.forEach((r,i)=>r.forEach((v,j)=>{s+=(v-t[i][j])**2;n++;}));return s/n;}
+function bwd(X,tgt,f,lr=0.01){
+  const {Z1,A1,Z2,A2,Z3}=f, n=X.length;
+  const dZ3=Z3.map((r,i)=>r.map((v,j)=>(2/n)*(v-tgt[i][j])));
+  const dW3=matmul(T(A2),dZ3), db3=dZ3[0].map((_,j)=>dZ3.reduce((s,r)=>s+r[j],0));
+  const dZ2=had(matmul(dZ3,T(W3)),rM(Z2));
+  const dW2=matmul(T(A1),dZ2), db2=dZ2[0].map((_,j)=>dZ2.reduce((s,r)=>s+r[j],0));
+  const dZ1=had(matmul(dZ2,T(W2)),rM(Z1));
+  const dW1=matmul(T(X),dZ1),  db1=dZ1[0].map((_,j)=>dZ1.reduce((s,r)=>s+r[j],0));
+  W3=W3.map((r,i)=>r.map((w,j)=>w-lr*dW3[i][j])); b3=b3.map((v,j)=>v-lr*db3[j]);
+  W2=W2.map((r,i)=>r.map((w,j)=>w-lr*dW2[i][j])); b2=b2.map((v,j)=>v-lr*db2[j]);
+  W1=W1.map((r,i)=>r.map((w,j)=>w-lr*dW1[i][j])); b1=b1.map((v,j)=>v-lr*db1[j]);
+}
+function genBatch(n){
+  const X=[],Y=[];
+  for(let i=0;i<n;i++){const r=Array.from({length:N},()=>Math.random()*9+1);X.push(r.map(v=>v/10));Y.push([...r].sort((a,b)=>a-b).map(v=>v/10));}
+  return {X,Y};
+}
+
+// ── Three.js ─────────────────────────────────────────────────────────────────
+
+const cont = document.getElementById('canvas-container');
+const CW=()=>cont.clientWidth, CH=()=>cont.clientHeight;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xeff3ff);
+scene.fog = new THREE.Fog(0xeff3ff, 32, 70);
+
+const cam = new THREE.PerspectiveCamera(52, CW()/CH(), 0.1, 100);
+cam.position.set(0, 1, 20);
+
+const ren = new THREE.WebGLRenderer({antialias:true});
+ren.setPixelRatio(Math.min(devicePixelRatio,2));
+ren.setSize(CW(), CH());
+cont.appendChild(ren.domElement);
+
+const lblRen = new CSS2DRenderer();
+lblRen.setSize(CW(), CH());
+lblRen.domElement.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;';
+cont.appendChild(lblRen.domElement);
+
+const ctrl = new OrbitControls(cam, ren.domElement);
+ctrl.enableDamping = true; ctrl.dampingFactor = 0.06;
+
+scene.add(new THREE.AmbientLight(0xffffff, 2.5));
+const dL = new THREE.DirectionalLight(0xffffff, 2); dL.position.set(5,10,8); scene.add(dL);
+[{c:0x6688ff,p:[-10,4,6]},{c:0x9966ff,p:[0,-5,6]},{c:0x44ccff,p:[10,3,6]}]
+  .forEach(({c,p})=>{const l=new THREE.PointLight(c,40,30);l.position.set(...p);scene.add(l);});
+
+// ── Scene objects (rebuilt on N change) ──
+const LX = [-9,-3,3,9];
+const LCOL = [0x3355ee, 0x7733ee, 0xbb33ee, 0x1199ee];
+const LEMI = [0x1a2288, 0x4411aa, 0x771199, 0x0055aa];
+
+let nmesh=[], clines=[], inLbls=[], outLbls=[], hdrLbls=[], allPos=[];
+
+function nPos(size, x) {
+  if (size <= 8) {
+    const sp = Math.min(2.8, 13/Math.max(1,size-1));
+    return Array.from({length:size},(_,i)=>new THREE.Vector3(x,((size-1)/2-i)*sp,0));
+  }
+  if (size===16) return Array.from({length:16},(_,i)=>new THREE.Vector3(x+(i%4-1.5)*1.3,(1.5-Math.floor(i/4))*1.8,0));
+  return [];
+}
+
+function buildScene() {
+  const sizes = [N,16,8,N];
+  allPos = sizes.map((s,l)=>nPos(s,LX[l]));
+  const geo = new THREE.SphereGeometry(0.3,20,20);
+
+  nmesh = sizes.map((s,l)=>allPos[l].map(p=>{
+    const mat=new THREE.MeshStandardMaterial({color:LCOL[l],emissive:LEMI[l],emissiveIntensity:0.25,roughness:0.25,metalness:0.3});
+    const m=new THREE.Mesh(geo,mat); m.position.copy(p); scene.add(m); return m;
+  }));
+
+  clines = sizes.slice(0,-1).map((_,l)=>
+    Array.from({length:sizes[l]},(_,i)=>
+      Array.from({length:sizes[l+1]},(_,j)=>{
+        const g=new THREE.BufferGeometry().setFromPoints([allPos[l][i].clone(),allPos[l+1][j].clone()]);
+        const mat=new THREE.LineBasicMaterial({color:0x7788cc,transparent:true,opacity:0.08});
+        const ln=new THREE.Line(g,mat); scene.add(ln); return ln;
+      })
+    )
+  );
+
+  // Value labels on input neurons (left side)
+  inLbls = allPos[0].map((_,n)=>{
+    const d=document.createElement('div'); d.className='nlbl'; d.textContent='—';
+    const o=new CSS2DObject(d); o.position.set(-0.85,0,0); nmesh[0][n].add(o);
+    return {o,d};
+  });
+
+  // Value labels on output neurons (right side)
+  outLbls = allPos[3].map((_,n)=>{
+    const d=document.createElement('div'); d.className='nlbl out'; d.textContent='—';
+    const o=new CSS2DObject(d); o.position.set(0.85,0,0); nmesh[3][n].add(o);
+    return {o,d};
+  });
+
+  // Layer header labels
+  hdrLbls = sizes.map((s,l)=>{
+    const topY = s<=8 ? (((s-1)/2)*Math.min(2.8,13/Math.max(1,s-1)))+1.3 : 4.5;
+    const d=document.createElement('div');
+    d.style.cssText=`font-family:SF Mono,monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;pointer-events:none;text-shadow:0 1px 4px rgba(255,255,255,0.9);color:${'#3355cc,#7733cc,#bb33cc,#1188cc'.split(',')[l]}`;
+    d.textContent=['Input','H1 · 16','H2 · 8','Output'][l];
+    const o=new CSS2DObject(d); o.position.set(LX[l],topY,0); scene.add(o);
+    return {o,d};
+  });
+}
+
+function disposeScene() {
+  nmesh.flat().forEach(m=>{m.geometry.dispose();m.material.dispose();scene.remove(m);});
+  clines.flat().flat().forEach(l=>{l.geometry.dispose();l.material.dispose();scene.remove(l);});
+  [...inLbls,...outLbls].forEach(({o,d})=>{ d.parentNode?.removeChild(d); });
+  hdrLbls.forEach(({o,d})=>{ d.parentNode?.removeChild(d); scene.remove(o); });
+  nmesh=[];clines=[];inLbls=[];outLbls=[];hdrLbls=[];allPos=[];
+}
+
+// ── Activation → visual ──
+function setAct(l,n,a){
+  const m=nmesh[l]?.[n]; if(!m)return;
+  const c=Math.min(1,Math.max(0,a));
+  m.material.emissiveIntensity=0.05+c*1.0;
+  m.scale.setScalar(0.65+c*0.65);
+}
+function applyActs(f, inputs){
+  if(inputs) inputs.forEach((v,n)=>setAct(0,n,v));
+  f.A1[0].forEach((v,n)=>setAct(1,n,v));
+  f.A2[0].forEach((v,n)=>setAct(2,n,v));
+  f.Z3[0].forEach((v,n)=>setAct(3,n,Math.max(0,v)));
+}
+function resetNeurons(){nmesh.flat().forEach(m=>{m.material.emissiveIntensity=0.25;m.scale.setScalar(1);});
+  inLbls.forEach(({d})=>{d.textContent='—';}); outLbls.forEach(({d})=>{d.textContent='—';});}
+
+function updateConnColors(){
+  const ws=[W1,W2,W3];
+  clines.forEach((lc,l)=>{
+    let mx=0.01; ws[l].forEach(r=>r.forEach(w=>{if(Math.abs(w)>mx)mx=Math.abs(w);}));
+    lc.forEach((nc,i)=>nc.forEach((ln,j)=>{
+      const w=ws[l][i]?.[j]??0, mg=Math.abs(w)/mx;
+      ln.material.color.setHex(w>=0?0x2244cc:0xcc2222);
+      ln.material.opacity=0.03+mg*0.38;
+    }));
+  });
+}
+
+// ── Signal animation ──
+let animT=null;
+function animSignal(inputs,f){
+  if(animT)clearTimeout(animT);
+  let step=0;
+  function next(){
+    if(step>3){applyActs(f,inputs);updateConnColors();return;}
+    nmesh.forEach((layer,l)=>layer.forEach(m=>{m.material.emissiveIntensity=l===step?m.material.emissiveIntensity:0.04;m.scale.setScalar(l===step?m.scale.x:0.6);}));
+    clines.forEach((lc,l)=>lc.forEach(nc=>nc.forEach(ln=>{ln.material.opacity=l===step-1?0.55:0.02;ln.material.color.setHex(l===step-1?0x3355cc:0x8899cc);})));
+    if(step===0)inputs.forEach((v,n)=>setAct(0,n,v));
+    else{const a=[null,f.A1[0],f.A2[0],f.Z3[0]];a[step].forEach((v,n)=>setAct(step,n,Math.abs(v)));}
+    step++; animT=setTimeout(next,360);
+  }
+  next();
+}
+
+// ── Panel updates ──
+function updateLabels(inputs,f){
+  inputs.forEach((v,n)=>{if(inLbls[n])inLbls[n].d.textContent=(v*10).toFixed(1);});
+  f.Z3[0].forEach((v,n)=>{if(outLbls[n])outLbls[n].d.textContent=(v*10).toFixed(2);});
+}
+
+function updateTrace(inputs,f){
+  const {Z1,A1,Z2,A2,Z3}=f;
+  const a1=A1[0],a2=A2[0],z1=Z1[0],z2=Z2[0],z3=Z3[0];
+  const h1act=a1.filter(v=>v>0).length, h2act=a2.filter(v=>v>0).length;
+  const h1dead=16-h1act, h2dead=8-h2act;
+  const mean=(arr)=>(arr.reduce((s,v)=>s+v,0)/arr.length).toFixed(3);
+  const maxAbs=(arr)=>Math.max(...arr.map(Math.abs)).toFixed(3);
+  document.getElementById('trace').innerHTML=`
+<div class="trace-step"><span class="ts-op">Input X</span><span class="ts-info">[${inputs.map(v=>(v*10).toFixed(1)).join(', ')}] <span class="ts-dim">÷10 norm</span></span></div>
+<div class="trace-step"><span class="ts-op">Z₁ = X · W₁ + b₁</span><span class="ts-info"><span class="ts-dim">[${N}×16]</span>  max|z|: ${maxAbs(z1)}</span></div>
+<div class="trace-step"><span class="ts-op">A₁ = relu(Z₁)</span><span class="ts-info">active: ${h1act}/16 · dead: <span class="${h1dead>8?'ts-dead':''}">${h1dead}</span> · mean: ${mean(a1)}</span></div>
+<div class="trace-step"><span class="ts-op">Z₂ = A₁ · W₂ + b₂</span><span class="ts-info"><span class="ts-dim">[16×8]</span>  max|z|: ${maxAbs(z2)}</span></div>
+<div class="trace-step"><span class="ts-op">A₂ = relu(Z₂)</span><span class="ts-info">active: ${h2act}/8 · dead: <span class="${h2dead>4?'ts-dead':''}">${h2dead}</span> · mean: ${mean(a2)}</span></div>
+<div class="trace-step"><span class="ts-op">Ẑ = A₂ · W₃ + b₃</span><span class="ts-info ts-out">[${z3.map(v=>(v*10).toFixed(2)).join(', ')}]</span></div>`;
+}
+
+function updateHeatmaps(f){
+  const a1=f.A1[0],a2=f.A2[0];
+  const mx1=Math.max(...a1,0.01),mx2=Math.max(...a2,0.01);
+  const fill=(id,acts,mx,col)=>{
+    const el=document.getElementById(id); el.innerHTML='';
+    acts.forEach(v=>{
+      const d=document.createElement('div'); d.className='hm-cell'; d.dataset.v=v.toFixed(3);
+      const t=v/mx;
+      d.style.background=v<0.001?'#dde2f0':`rgba(${col},${(0.15+t*0.85).toFixed(2)})`;
+      el.appendChild(d);
+    });
+  };
+  fill('hm-h1',a1,mx1,'51,85,238');
+  fill('hm-h2',a2,mx2,'187,51,238');
+}
+
+function updateOutBars(f){
+  const z3=f.Z3[0], mx=Math.max(...z3.map(Math.abs),0.01);
+  const cols=['#3355cc','#7733cc','#1199ee'];
+  document.getElementById('out-bars').innerHTML=z3.map((v,i)=>`
+<div class="ob-row">
+  <span class="ob-lbl">out${i+1}</span>
+  <div class="ob-bg"><div class="ob-fill" style="width:${Math.min(100,(Math.abs(v)/mx)*100).toFixed(1)}%;background:${cols[i%3]}"></div></div>
+  <span class="ob-val">${(v*10).toFixed(2)}</span>
+</div>`).join('');
+}
+
+function updateStats(f){
+  const layers=[{nm:'H1 (16)',a:f.A1[0],n:16},{nm:'H2 (8)',a:f.A2[0],n:8}];
+  document.getElementById('stats-body').innerHTML=layers.map(({nm,a,n})=>{
+    const act=a.filter(v=>v>0.001).length, dead=n-act, dp=((dead/n)*100).toFixed(0);
+    const mn=(a.reduce((s,v)=>s+v,0)/n).toFixed(3), mx=Math.max(...a).toFixed(3);
+    return `<tr><td>${nm}</td><td>${n}</td><td>${act}/${n}</td><td class="${dead>n*0.5?'dead':''}">${dp}%</td><td>${mn}</td><td>${mx}</td></tr>`;
+  }).join('');
+}
+
+// ── Input UI ──
+function renderInputs(){
+  document.getElementById('input-fields').innerHTML=
+    Array.from({length:N},(_,i)=>`<div class="input-row">
+      <label>${String.fromCharCode(65+i)}</label>
+      <input type="number" id="inp-${i}" value="${Math.floor(Math.random()*9)+1}" min="1" max="9" step="1">
+    </div>`).join('');
+  document.getElementById('n-label').textContent=`N = ${N}`;
+  const cols=['#3355cc','#7733cc','#bb33cc','#1199cc'];
+  const sizes=[N,16,8,N];
+  document.getElementById('arch-badge').innerHTML=sizes.map((s,i)=>
+    `<span class="arch-chip" style="background:${cols[i]}18;color:${cols[i]};border:1px solid ${cols[i]}44">${s}</span>`
+    +(i<3?'<span class="arch-arrow">→</span>':'')).join('');
+}
+function getInputs(){return Array.from({length:N},(_,i)=>(+document.getElementById(`inp-${i}`)?.value||5));}
+
+// ── Loss chart ──
+const lc=document.getElementById('loss-canvas'), lctx=lc.getContext('2d');
+const lhist=[];
+function drawChart(){
+  const w=lc.width=lc.offsetWidth, h=lc.height=lc.offsetHeight;
+  lctx.clearRect(0,0,w,h); if(lhist.length<2)return;
+  const mx=Math.max(...lhist)*1.05, y=v=>h-(v/mx)*h*0.88-2;
+  lctx.strokeStyle='rgba(100,120,200,0.12)';lctx.lineWidth=1;
+  [0.25,0.5,0.75].forEach(t=>{lctx.beginPath();lctx.moveTo(0,t*h);lctx.lineTo(w,t*h);lctx.stroke();});
+  lctx.fillStyle='rgba(68,85,220,0.07)';lctx.beginPath();
+  lhist.forEach((v,i)=>{const x=(i/(lhist.length-1))*w;i===0?lctx.moveTo(x,y(v)):lctx.lineTo(x,y(v));});
+  lctx.lineTo(w,h);lctx.lineTo(0,h);lctx.closePath();lctx.fill();
+  lctx.strokeStyle='#4455cc';lctx.lineWidth=1.5;lctx.shadowColor='#4455cc';lctx.shadowBlur=3;
+  lctx.beginPath();
+  lhist.forEach((v,i)=>{const x=(i/(lhist.length-1))*w;i===0?lctx.moveTo(x,y(v)):lctx.lineTo(x,y(v));});
+  lctx.stroke();
+}
+
+// ── Handlers ──
+let training=false, epoch=0;
+
+window.changeN = d => {
+  const n=Math.max(2,Math.min(7,N+d)); if(n===N)return;
+  N=n; training=false; epoch=0; lhist.length=0;
+  initNet(); disposeScene(); buildScene(); renderInputs();
+  document.getElementById('train-btn').textContent='▶ Train';
+  document.getElementById('train-btn').classList.remove('active');
+  ['loss-val','pred-val','exp-val'].forEach(id=>document.getElementById(id).textContent='—');
+  document.getElementById('epoch-val').textContent='epoch 0';
+  document.getElementById('status').textContent=`N = ${n}. Network re-initialized.`;
+  document.getElementById('trace').innerHTML='<div class="trace-step" style="justify-content:center"><span style="font-size:9px;color:#b0b8d0">Click Predict to see the computation.</span></div>';
+  document.getElementById('stats-body').innerHTML='<tr><td colspan="6" style="color:#b0b8d0;text-align:center;padding:6px">Run a prediction first.</td></tr>';
+  ['hm-h1','hm-h2','out-bars'].forEach(id=>document.getElementById(id).innerHTML='');
+  drawChart();
+};
+
+window.onToggleTrain = () => {
+  training=!training;
+  const btn=document.getElementById('train-btn');
+  btn.textContent=training?'⏸ Stop':'▶ Train';
+  btn.classList.toggle('active',training);
+  document.getElementById('status').textContent=training?'Training…':`Paused at epoch ${epoch.toLocaleString()}.`;
+};
+
+window.onReset = () => {
+  training=false; epoch=0; lhist.length=0; initNet();
+  document.getElementById('train-btn').textContent='▶ Train';
+  document.getElementById('train-btn').classList.remove('active');
+  ['loss-val','pred-val','exp-val'].forEach(id=>document.getElementById(id).textContent='—');
+  document.getElementById('epoch-val').textContent='epoch 0';
+  document.getElementById('status').textContent='Weights reset. Training from scratch.';
+  document.getElementById('trace').innerHTML='<div class="trace-step" style="justify-content:center"><span style="font-size:9px;color:#b0b8d0">Click Predict to see the computation.</span></div>';
+  document.getElementById('stats-body').innerHTML='<tr><td colspan="6" style="color:#b0b8d0;text-align:center;padding:6px">Run a prediction first.</td></tr>';
+  ['hm-h1','hm-h2','out-bars'].forEach(id=>document.getElementById(id).innerHTML='');
+  resetNeurons();
+  clines.flat().flat().forEach(l=>{l.material.color.setHex(0x7788cc);l.material.opacity=0.08;});
+  drawChart();
+};
+
+window.onPredict = () => {
+  const raw=getInputs(), input=raw.map(v=>v/10);
+  const f=fwd([input]);
+  const pred=f.Z3[0].map(v=>+(v*10).toFixed(1));
+  const exp=[...raw].sort((a,b)=>a-b);
+  document.getElementById('pred-val').textContent=`[${pred.join(', ')}]`;
+  document.getElementById('exp-val').textContent=`[${exp.join(', ')}]`;
+  updateLabels(input,f); updateTrace(input,f);
+  updateHeatmaps(f); updateOutBars(f); updateStats(f);
+  animSignal(input,f);
+};
+
+// ── Render loop ──
+let frame=0;
+function animate(){
+  requestAnimationFrame(animate); frame++;
+  if(training){
+    let loss=0;
+    for(let s=0;s<8;s++){const{X,Y}=genBatch(32);const f=fwd(X);loss=mse(f.Z3,Y);bwd(X,Y,f);epoch++;}
+    if(frame%8===0){
+      lhist.push(loss); if(lhist.length>300)lhist.shift();
+      document.getElementById('loss-val').textContent=loss.toFixed(5);
+      document.getElementById('epoch-val').textContent=`epoch ${epoch.toLocaleString()}`;
+      document.getElementById('status').textContent=`Training… loss: ${loss.toFixed(5)}`;
+      drawChart();
+      const s=Array.from({length:N},()=>Math.random()*0.8+0.1);
+      const f=fwd([s]); applyActs(f,s); updateHeatmaps(f); updateStats(f);
+    }
+    if(frame%60===0)updateConnColors();
+    if(loss<0.003&&epoch>5000){
+      training=false;
+      document.getElementById('train-btn').textContent='▶ Train';
+      document.getElementById('train-btn').classList.remove('active');
+      document.getElementById('status').textContent=`✓ Converged at epoch ${epoch.toLocaleString()}!`;
+    }
+  } else {
+    const t=frame*0.015;
+    [0,3].forEach(l=>nmesh[l]?.forEach((m,n)=>{m.material.emissiveIntensity=0.18+0.1*Math.sin(t+n*1.5);m.scale.setScalar(0.88+0.08*Math.sin(t+n*1.5));}));
+  }
+  ctrl.update(); ren.render(scene,cam); lblRen.render(scene,cam);
+}
+
+initNet(); buildScene(); renderInputs(); animate();
+
+window.addEventListener('resize',()=>{
+  cam.aspect=CW()/CH(); cam.updateProjectionMatrix();
+  ren.setSize(CW(),CH()); lblRen.setSize(CW(),CH());
+});
+</script>
+</body>
+</html>

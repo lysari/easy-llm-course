@@ -1,0 +1,28 @@
+{
+  "name": "llm",
+  "version": "1.0.0",
+  "description": "LLM",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon --exec $HOME/.nvm/versions/node/v20.19.5/bin/node dist/index.js",
+    "watch": "tsc --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "canvas": "^3.2.0",
+    "d3": "^7.9.0",
+    "fs-extra": "^11.3.2",
+    "jsdom": "^27.0.1",
+    "mathjs": "^15.0.0",
+    "nodemon": "^3.1.10",
+    "sharp": "^0.34.4"
+  },
+  "devDependencies": {
+    "@types/d3": "^7.4.3",
+    "@types/fs-extra": "^11.0.4",
+    "@types/jsdom": "^27.0.0"
+  }
+}

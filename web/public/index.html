@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM Learning</title>
+  <link rel="stylesheet" href="styles.css">
+  <link id="hljs-theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+</head>
+<body>
+  <div id="app">
+
+    <!-- Sidebar -->
+    <aside id="sidebar">
+      <div id="sidebar-header">
+        <div id="logo">
+          <span id="logo-icon">⬡</span>
+          <span id="logo-text">LLM Learning</span>
+        </div>
+        <div id="progress-bar-wrap">
+          <div id="progress-bar"></div>
+        </div>
+        <div id="progress-label">0 / 31 lessons</div>
+        <div id="theme-picker">
+          <span class="swatch-label">Theme</span>
+          <div id="theme-swatches">
+            <button class="swatch active" data-theme="tokyo-night" style="background:#7aa2f7" title="Tokyo Night"></button>
+            <button class="swatch" data-theme="one-dark"       style="background:#61afef" title="One Dark"></button>
+            <button class="swatch" data-theme="dracula"        style="background:#bd93f9" title="Dracula"></button>
+            <button class="swatch" data-theme="solarized-dark" style="background:#268bd2" title="Solarized Dark"></button>
+            <button class="swatch" data-theme="github-light"   style="background:#0969da" title="GitHub Light"></button>
+            <button class="swatch" data-theme="solarized-light" style="background:#2aa198" title="Solarized Light"></button>
+            <button class="swatch" data-theme="monokai"         style="background:#a6e22e" title="Monokai"></button>
+          </div>
+        </div>
+      </div>
+      <nav id="lesson-list">
+        <div class="loading-placeholder">Loading lessons...</div>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <div id="main">
+
+      <!-- Header -->
+      <div id="main-header">
+        <div id="breadcrumb">Select a lesson</div>
+        <div id="tab-bar">
+          <button class="tab-btn active" data-tab="lesson">
+            <span>&#128218;</span> Lesson
+          </button>
+          <button class="tab-btn" data-tab="code">
+            <span>&#9654;</span> Playground
+          </button>
+        </div>
+      </div>
+
+      <!-- Lesson tab -->
+      <div id="lesson-tab" class="tab-pane active">
+        <div id="markdown-body">
+          <div class="welcome-screen">
+            <div class="welcome-icon">&#8413;</div>
+            <h2>Welcome to LLM Learning</h2>
+            <p>Pick a lesson from the sidebar to get started.<br>
+            Each lesson has a reading section and an interactive TypeScript playground.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Code tab -->
+      <div id="code-tab" class="tab-pane">
+        <div id="editor-toolbar">
+          <button id="run-btn" title="Run code (Ctrl+Enter)">
+            <span>&#9654;</span> Run
+          </button>
+          <button id="reset-btn" title="Reset to original code">
+            <span>&#8635;</span> Reset
+          </button>
+          <span id="run-status"></span>
+        </div>
+        <div id="editor-wrap">
+          <div id="editor-container"></div>
+        </div>
+        <div id="resize-handle" title="Drag to resize console"></div>
+        <div id="console-pane">
+          <div id="console-header">
+            <span>Console</span>
+            <button id="clear-btn" title="Clear console">&#10005;</button>
+          </div>
+          <div id="console-body">
+            <div class="console-hint">Click Run (or Ctrl+Enter) to execute the code.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
