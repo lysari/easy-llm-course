@@ -1,0 +1,5 @@
+Please adapt and translate this lesson into [Your Language], focusing on learner understanding (**Pedagogical translation**):
+
+* **Keep key technical terms in English inside parentheses** to ensure the original meaning in code or logical systems isn't lost.
+* **Use plain and natural [Your Language] explanation** rather than a strict, word-for-word dictionary (**Literal translation**).
+* **Maintain the exact original formatting** (Markdown, code blocks, and diagrams).
