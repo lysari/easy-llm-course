@@ -1,4 +1,3 @@
-const { readFileSync } = require("node:fs");
 // Tiny GPT: character-level language model — the capstone
 // Everything from lessons 00–13 comes together here
 
@@ -74,7 +73,7 @@ const config = {
 };
 
 // ── Training text ──
-const text = readFileSync("./tinyshakespeare.txt", "utf-8");
+const text = "the cat sat on the mat. the cat is fat. the dog is not a cat. the dog sat on the log. the log is not a cat.";
 const tokenizer = new CharTokenizer(text);
 
 // Fix: vocabSize is a prototype getter — { ...tokenizer } spread only copies own
