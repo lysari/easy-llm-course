@@ -19,6 +19,26 @@ It isn't.
 
 ---
 
+## The whole mechanism in one picture
+
+Before the math, here is every step attention takes for a single token. Follow the arrows — there are only four operations, and all of them are arithmetic:
+
+```mermaid
+flowchart LR
+    E["token vector"] --> Q["query = vec × W_Q"]
+    E --> K["key = vec × W_K"]
+    E --> V["value = vec × W_V"]
+    Q --> S["scores = query · key<br/>(dot products)"]
+    K --> S
+    S --> SM["weights = softmax(scores)<br/>(sum to 1.0)"]
+    SM --> O["output = Σ weight × value<br/>(weighted average)"]
+    V --> O
+```
+
+That's the entire engine. Three multiplications to make Q/K/V, a pile of dot products, one softmax, one weighted sum. Let's walk each box.
+
+---
+
 ## What attention does: one sentence
 
 Consider: `"The animal didn't cross the street because it was too tired."`
@@ -101,6 +121,26 @@ No understanding. Just weighted averages.
 
 ---
 
+## Seeing it: the attention grid
+
+Run those dot products for every pair of tokens and you get a grid — a row per token doing the "looking," a column per token being "looked at." Each cell is one softmax weight; darker = more attention. This is the trained pattern for our `"it"` sentence:
+
+```
+            attends to →
+            animal  street   it    tired
+          ┌──────────────────────────────┐
+  animal  │  ███     ░       ░      ░     │
+  street  │  ░       ███     ░      ░     │
+  it      │  ███     ░       ░      ██    │   ← "it" lights up on "animal", not "street"
+  tired   │  █       ░       ░      ███   │
+          └──────────────────────────────┘
+            ███ high   ██ medium   ░ near zero
+```
+
+The row for `it` is the whole trick: a high weight on `animal`, a low weight on `street`. It looks like the model *resolved a pronoun*. What actually produced that row was `query_it · key_animal` coming out larger than `query_it · key_street` — one number beating another number. **The grid is a picture of arithmetic, not comprehension.**
+
+---
+
 ## Back to "it"
 
 So how does the model correctly resolve "it" = "the animal"?
@@ -110,6 +150,27 @@ During training, the weights in W_Q, W_K, W_V were adjusted via gradient descent
 The model doesn't know animals get tired and streets don't. It learned that the vectors for "animal" and "tired" tend to co-occur in patterns where "it" also appears. The query-key dot products for those vectors happen to be higher.
 
 **Grammar is geometry. Understanding is statistics.**
+
+<details>
+<summary><b>🔬 Go deeper — three details the one-head picture skips</b> (optional, more technical)</summary>
+
+**1. Why divide by `√dimension`?**
+Dot products grow with the number of dimensions you sum over. In a 64-dim head, raw scores can swing into the tens or hundreds. Feed those into softmax and it saturates — one weight becomes ~1.0 and the rest ~0.0, so gradients vanish and training stalls. Dividing by `√d` keeps the scores in a sane range. It's numerical hygiene, not intelligence.
+
+**2. One head is never enough — multi-head attention.**
+Real models run many attention heads *in parallel* (12 in GPT-2, 96 in GPT-3), each with its own `W_Q/W_K/W_V`. One head might track subject–verb links, another nearby word order, another long-range references. Their outputs are concatenated and mixed by another matrix. Still no understanding — just *more* dot products, learned to specialize.
+
+```
+        ┌─ head 1 ─┐
+input ──┼─ head 2 ─┼── concat ── × W_O ── output
+        ├─ head 3 ─┤
+        └─  ...   ─┘
+```
+
+**3. Causal masking — the model can't see the future.**
+When generating text left-to-right, token *i* is only allowed to attend to tokens *≤ i*. This is enforced by setting the disallowed scores to `-∞` **before** softmax, so their weights become exactly 0. That single masking step is the entire difference between "fill in the blank" (BERT-style) and "continue the text" (GPT-style) attention.
+
+</details>
 
 ---
 
@@ -144,7 +205,9 @@ Three operations. All arithmetic.
 
 ## Run the demo
 
-See [demo.ts](demo.ts) — implements full single-head attention from scratch, shows every step as explicit numbers, and demonstrates that the output is purely a weighted average — no language knowledge involved.
+See [demo.ts](demo.ts) — implements full single-head attention from scratch, shows every step as explicit numbers, and **prints the attention grid as an ASCII heatmap** so you can watch which token attends to which. The output is purely a weighted average — no language knowledge involved.
+
+> **🔬 Try this:** in `demo.ts`, swap two rows of `W_Q` (or zero one out) and re-run. The heatmap reorganizes completely. Nothing about the *words* changed — only the numbers in a weight matrix — yet the "attention" is now totally different. That's the proof that the pattern lives in the matrices, not in any understanding of the sentence.
 
 ---
 

@@ -31,6 +31,43 @@ function cosineSimilarity(a: number[], b: number[]): number {
   return dotProduct(a, b) / (magnitude(a) * magnitude(b));
 }
 
+// Draw a tiny ASCII scatter map using two dimensions as x / y axes.
+// 768-D can't be drawn, but the clustering idea survives in 2D.
+function drawMap(table: Record<string, number[]>, xDim = 0, yDim = 3): void {
+  const W = 40, H = 14;
+  const grid: string[][] = Array.from({ length: H }, () => Array(W).fill(" "));
+  const xs = Object.values(table).map(v => v[xDim]!);
+  const ys = Object.values(table).map(v => v[yDim]!);
+  const norm = (val: number, lo: number, hi: number, size: number) =>
+    Math.round(((val - lo) / (hi - lo || 1)) * (size - 1));
+  const [xLo, xHi] = [Math.min(...xs), Math.max(...xs)];
+  const [yLo, yHi] = [Math.min(...ys), Math.max(...ys)];
+
+  const LABEL = 6; // reserve room so words near the right edge aren't clipped
+  const free = (r: number, c: number, len: number) =>
+    r >= 0 && r < H && grid[r]!.slice(c, c + len).every(ch => ch === " ");
+  for (const [word, vec] of Object.entries(table)) {
+    const col = norm(vec[xDim]!, xLo, xHi, W - LABEL);
+    let row = H - 1 - norm(vec[yDim]!, yLo, yHi, H); // flip so up = high
+    const label = `•${word}`;
+    // If two words land on the same spot (near-identical vectors), nudge down
+    // so both stay readable — the clustering is still obvious.
+    for (let d = 0; d < H && !free(row, col, label.length); d++) {
+      if (free(row + d, col, label.length)) { row += d; break; }
+    }
+    for (let k = 0; k < label.length && col + k < W; k++) grid[row]![col + k] = label[k]!;
+  }
+  console.log(`  (axes = dimension ${xDim} → x, dimension ${yDim} → y; the other dims are hidden)`);
+  for (const line of grid) console.log("  │" + line.join("").replace(/\s+$/, ""));
+  console.log("  └" + "─".repeat(W));
+}
+
+// Draw a labelled horizontal bar (0..1) for a similarity score.
+function drawBar(label: string, value: number, width = 30): string {
+  const filled = Math.max(0, Math.round(value * width));
+  return `  ${label.padEnd(22)} │${"█".repeat(filled)}${"·".repeat(width - filled)}│ ${value.toFixed(3)}`;
+}
+
 console.log("=== Embedding table (each word = coordinate vector) ===");
 for (const [word, vec] of Object.entries(embeddingTable)) {
   console.log(`  "${word}"  →  [${vec.map(x => x.toFixed(2)).join(", ")}]`);
@@ -44,10 +81,15 @@ const pairs = [
   ["cat", "mat"],   // one animal, one object → should be far
 ];
 
+console.log("=== The map: each word as a dot in (a slice of) the space ===");
+drawMap(embeddingTable);
+console.log("  Notice 'cat' and 'dog' land near each other. The model never");
+console.log("  decided they are animals — the coordinates just sit close.\n");
+
 console.log("=== Cosine similarity (1.0 = identical, 0.0 = unrelated) ===");
 for (const [a, b] of pairs) {
   const sim = cosineSimilarity(embed(a), embed(b));
-  console.log(`  similarity("${a}", "${b}") = ${sim.toFixed(3)}`);
+  console.log(drawBar(`"${a}" vs "${b}"`, sim));
 }
 console.log();
 

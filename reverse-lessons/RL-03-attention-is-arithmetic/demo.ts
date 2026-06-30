@@ -57,6 +57,9 @@ const scale = Math.sqrt(dim);
 
 console.log("=== Single-head attention for 'cat sat mat' ===\n");
 
+// Remember every row of attention weights so we can draw the grid at the end.
+const attentionGrid: number[][] = [];
+
 // Compute attention output for each token
 for (let i = 0; i < tokens.length; i++) {
   const token = tokens[i]!;
@@ -67,6 +70,7 @@ for (let i = 0; i < tokens.length; i++) {
 
   // Convert to attention weights via softmax
   const weights = softmax(rawScores);
+  attentionGrid.push(weights);
 
   // Weighted sum of values
   const output = new Array(dim).fill(0);
@@ -84,6 +88,24 @@ for (let i = 0; i < tokens.length; i++) {
   console.log(`  Output vector:   [${output.map(x => x.toFixed(3)).join(", ")}]`);
   console.log();
 }
+
+// Draw the attention grid as a heatmap: one row per token doing the looking,
+// one column per token being looked at. Denser block = more attention.
+function shade(w: number): string {
+  if (w >= 0.55) return "███";
+  if (w >= 0.40) return "▓▓▓";
+  if (w >= 0.25) return "▒▒▒";
+  if (w >= 0.10) return "░░░";
+  return " · ";
+}
+console.log("=== Attention grid (heatmap) ===");
+console.log("            attends to →");
+console.log("           " + tokens.map(t => t.padStart(4)).join(" "));
+for (let i = 0; i < tokens.length; i++) {
+  const cells = attentionGrid[i]!.map(w => shade(w)).join(" ");
+  console.log(`  ${tokens[i]!.padEnd(5)} │ ${cells}`);
+}
+console.log("  legend: ███ ≥.55  ▓▓▓ ≥.40  ▒▒▒ ≥.25  ░░░ ≥.10   · <.10\n");
 
 console.log("=== What just happened? ===");
 console.log("For each token, we:");

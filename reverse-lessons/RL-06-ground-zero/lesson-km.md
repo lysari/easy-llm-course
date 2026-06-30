@@ -32,7 +32,7 @@
 
 ---
 
-## សមីការតែមួយ គណនាហើយទៀត (One equation, repeated)
+## សមីការតែមួយ គណនាម្ដងហើយម្ដងទៀត (One equation, repeated)
 
 
 

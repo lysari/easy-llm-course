@@ -95,6 +95,29 @@ low temperature (focused):   [Paris: 99%, Lyon: 0.9%, Berlin: 0.1%]
 
 Temperature does not change what the model "knows." It changes how deterministic the sampling is. Knowledge is not a knob. Probability distribution shape is.
 
+<details>
+<summary><b>🔬 Go deeper — what softmax and temperature actually compute</b> (optional, more technical)</summary>
+
+Softmax turns a list of raw logits `zᵢ` into probabilities that sum to 1:
+
+```
+                exp(zᵢ / T)
+P(token i) = ────────────────────
+              Σⱼ exp(zⱼ / T)
+```
+
+`T` is the **temperature**, and it sits inside the exponent dividing every logit:
+
+- `T → low` (e.g. 0.2): logit gaps get *amplified*. The biggest logit dominates → distribution sharpens toward greedy. At `T → 0` it becomes pure argmax.
+- `T = 1`: the distribution exactly as the model produced it.
+- `T → high` (e.g. 1.5): logit gaps get *squashed*. Probabilities flatten toward uniform → more "creative," more errors.
+
+Notice what temperature can't do: it can only rescale logits the model *already* produced. It cannot add a token the model gave ~0 logit, and it cannot check whether the high-probability token is *true*. Two other knobs (`top-k`, `top-p`) just clip the tail before sampling — same story, no fact-checking anywhere in the pipeline.
+
+Hallucination falls straight out of this formula: there is no term for truth. There is only `exp(zᵢ/T)` over a normalizing sum.
+
+</details>
+
 ---
 
 ## What confidence signals

@@ -93,6 +93,29 @@ It adjusts the weight because that specific 0.002 change reduced the loss by a t
 
 The model does not decide to become smarter. The optimizer does not represent goals or intentions. There is no learning in the human sense — no "now I understand." There is only: this set of numbers produces lower prediction error than the previous set.
 
+<details>
+<summary><b>🔬 Go deeper — what "compute the gradient" really means</b> (optional, more technical)</summary>
+
+Step 5 above ("how should each weight change to reduce loss?") sounds mysterious. It's just calculus, applied mechanically.
+
+The gradient is the **partial derivative of the loss with respect to each weight** — a number that says "if you nudge this one weight up by a hair, does the loss go up or down, and how steeply?"
+
+```
+            ∂(loss)
+new_wᵢ = wᵢ  −  η · ───────
+                     ∂wᵢ
+```
+
+- `∂loss/∂wᵢ` → the slope: which way is downhill for this weight
+- `η` (learning rate) → how big a step to take
+- minus sign → step *against* the slope, i.e. downhill toward lower loss
+
+For 1.8 trillion weights, that's 1.8 trillion partial derivatives per step. They're all computed in one efficient backward pass called **backpropagation** — the chain rule from calculus, run from the loss back through every layer. No weight is ever "decided." Each one just slides a hair downhill on the loss surface.
+
+Repeat for trillions of tiny steps and the surface bottoms out at a configuration of numbers that predicts text well. That configuration is the entire "intelligence." It is a low point on a loss curve, found by rolling downhill.
+
+</details>
+
 ---
 
 ## GPT-4 has 1.8 trillion parameters (estimated)
