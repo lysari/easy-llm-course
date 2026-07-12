@@ -1,0 +1,5 @@
+{"runId":"run-1-mrheh43t","timestamp":"2026-07-12T06:16:11.273Z","gitHash":"4dd5f7c","seed":1,"config":{"lr":0.05,"epochs":30,"nPoints":40,"noise":0.2},"finalLoss":0.04196052916985073}
+{"runId":"run-2-mrheh43v","timestamp":"2026-07-12T06:16:11.275Z","gitHash":"4dd5f7c","seed":2,"config":{"lr":0.05,"epochs":30,"nPoints":40,"noise":0.2},"finalLoss":0.022011682153948876}
+{"runId":"run-3-mrheh43w","timestamp":"2026-07-12T06:16:11.276Z","gitHash":"4dd5f7c","seed":3,"config":{"lr":0.05,"epochs":30,"nPoints":40,"noise":0.2},"finalLoss":0.05355683281580916}
+{"runId":"run-4-mrheh43w","timestamp":"2026-07-12T06:16:11.276Z","gitHash":"4dd5f7c","seed":4,"config":{"lr":0.05,"epochs":30,"nPoints":40,"noise":0.2},"finalLoss":0.04412843825082123}
+{"runId":"run-5-mrheh43x","timestamp":"2026-07-12T06:16:11.277Z","gitHash":"4dd5f7c","seed":5,"config":{"lr":0.05,"epochs":30,"nPoints":40,"noise":0.2},"finalLoss":0.020128043401571562}

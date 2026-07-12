@@ -3,7 +3,7 @@
 //
 // Task: sentiment (1 = positive, 0 = negative) on a tiny embedded dataset.
 // The model is logistic regression over three "components":
-//   1. char-bigram features   — which two-letter chunks appear in the text
+//   1. char-bigram features   — which two-letter chunks of training text appear
 //   2. a length feature       — how long the text is
 //   3. case normalization     — lowercase everything before featurizing
 //
@@ -24,8 +24,7 @@ function mulberry32(seed: number): () => number {
 }
 
 // ── Embedded toy dataset ──
-// Imbalanced on purpose (more negatives), and with realistic messy casing:
-// reviewers on the internet SHOUT sometimes.
+// Imbalanced on purpose (more negatives), all-lowercase training text.
 const trainData: Array<[string, number]> = [
   ["i love this movie", 1],
   ["what a great film", 1],
@@ -50,74 +49,74 @@ const trainData: Array<[string, number]> = [
   ["a terrible boring slog", 0],
   ["worst script i have seen", 0],
 ];
+// Test set: real reviewers SHOUT. In the shouty items the sentiment word is
+// capitalized and the lowercase filler words lean the WRONG way (they co-occur
+// with the other class in training). Only a variant that lowercases first can
+// read those items correctly.
 const testData: Array<[string, number]> = [
-  // Plain lowercase items — easy for every variant that has bigrams.
+  // plain lowercase items — easy for every variant that has bigram features
   ["a great and lovely film", 1],
   ["i love the wonderful story", 1],
   ["boring plot terrible cast", 0],
   ["i hated the script", 0],
   ["the worst mess this year", 0],
   ["bad pacing and a bad ending", 0],
-  // SHOUTY items: the sentiment word is capitalized, and the lowercase
-  // filler words lean the WRONG way (they co-occur with the other class
-  // in training). Only a model that lowercases can read these correctly.
-  ["truly a GREAT film", 1], //          "truly" seen in "truly terrible movie"
-  ["a WONDERFUL script indeed", 1], //   "script" seen only in negatives
-  ["a BORING story and cast", 0], //     "story and cast" seen in a positive
+  // shouty items
+  ["truly a GREAT film", 1], //            "truly" seen in "truly terrible movie"
+  ["a WONDERFUL story indeed", 1], //      "indeed" unseen; bare "story" is weak
+  ["a BORING story and cast", 0], //       "story and ... cast" seen in a positive
   ["the acting is TERRIBLE really", 0], // "really ... acting" seen in a positive
-  ["DULL film for everyone", 0], //      "for everyone" seen in a positive
-  ["every minute is AWFUL", 0], //       "every minute" appears in both classes
+  ["a DULL waste for everyone", 0], //     "for everyone" seen in a positive
+  ["every minute is AWFUL", 0], //         "every minute" appears in both classes
 ];
 
-// ── The three components ──
-// Component 3: case normalization. Ablated = featurize the raw string,
-// so "AWFUL" and "awful" produce completely different bigrams.
-function normalize(text: string, useNorm: boolean): string {
-  return useNorm ? text.toLowerCase() : text;
-}
-
-// Component 1: char bigrams, hashed into a fixed number of buckets.
-const BIGRAM_DIM = 256;
-function bigramFeatures(text: string): number[] {
-  const f = Array<number>(BIGRAM_DIM).fill(0);
-  for (let i = 0; i < text.length - 1; i++) {
-    const code = text.charCodeAt(i) * 31 + text.charCodeAt(i + 1);
-    f[code % BIGRAM_DIM] = 1; // presence, not count
-  }
-  return f;
-}
-
-// Component 2: normalized length. (Rigged truth: how LONG a review is says
-// nothing about whether it is positive — we'll let the ablation expose that.)
-function lengthFeature(text: string): number {
-  return text.length / 30;
-}
-
 interface Components {
-  bigrams: boolean;
-  length: boolean;
-  norm: boolean;
+  bigrams: boolean; // component 1
+  length: boolean; // component 2
+  norm: boolean; // component 3
 }
 
-function featurize(raw: string, use: Components): number[] {
-  const text = normalize(raw, use.norm);
-  const f: number[] = [];
-  if (use.bigrams) f.push(...bigramFeatures(text));
-  if (use.length) f.push(lengthFeature(text));
-  return f;
+function bigrams(text: string): string[] {
+  const out: string[] = [];
+  for (let i = 0; i < text.length - 1; i++) out.push(text.slice(i, i + 2));
+  return out;
 }
 
-// ── Logistic regression, retrained from scratch for every variant ──
+// ── One full train+eval per variant: exactly one component differs per row ──
 function trainVariant(name: string, use: Components): { name: string; acc: number } {
+  // Component 3: case normalization (ablated = featurize the raw string,
+  // so "AWFUL" shares no bigrams with the "awful" seen in training).
+  const nz = (s: string) => (use.norm ? s.toLowerCase() : s);
+
+  // Component 1: a bigram vocabulary built from the (maybe-normalized) train
+  // text. A bigram never seen in training has no feature — it contributes 0.
+  const vocab = new Map<string, number>();
+  if (use.bigrams)
+    for (const [text] of trainData)
+      for (const bg of bigrams(nz(text)))
+        if (!vocab.has(bg)) vocab.set(bg, vocab.size);
+
+  const dim = vocab.size + (use.length ? 1 : 0);
+  const featurize = (raw: string): number[] => {
+    const f = Array<number>(dim).fill(0);
+    for (const bg of bigrams(nz(raw))) {
+      const j = vocab.get(bg);
+      if (j !== undefined) f[j] = 1; // presence, not count
+    }
+    // Component 2: normalized length. (Rigged truth: how LONG a review is
+    // says nothing about sentiment — the ablation will expose that.)
+    if (use.length) f[dim - 1] = raw.length / 30;
+    return f;
+  };
+
+  // Logistic regression trained from scratch with plain SGD.
   const rand = mulberry32(42);
-  const dim = featurize(trainData[0]?.[0] ?? "", use).length;
   const w = Array.from({ length: dim }, () => (rand() - 0.5) * 0.01);
   let b = 0;
-
   const lr = 0.5;
   for (let epoch = 0; epoch < 150; epoch++) {
     for (const [text, y] of trainData) {
-      const x = featurize(text, use);
+      const x = featurize(text);
       let z = b;
       for (let j = 0; j < dim; j++) z += (w[j] ?? 0) * (x[j] ?? 0);
       const p = 1 / (1 + Math.exp(-z));
@@ -129,7 +128,7 @@ function trainVariant(name: string, use: Components): { name: string; acc: numbe
 
   let correct = 0;
   for (const [text, y] of testData) {
-    const x = featurize(text, use);
+    const x = featurize(text);
     let z = b;
     for (let j = 0; j < dim; j++) z += (w[j] ?? 0) * (x[j] ?? 0);
     if ((z > 0 ? 1 : 0) === y) correct++;
@@ -172,7 +171,7 @@ console.log("• − length: nothing changes. This component is decoration. If i
 console.log("  cost compute we would delete it — and a paper whose headline");
 console.log("  contribution was the length feature would be selling noise.");
 console.log("• − normalization: a real but smaller drop. Without lowercasing,");
-console.log("  'AWFUL' shares no bigrams with the 'awful' seen in training,");
-console.log("  so shouty test reviews go unrecognized.");
+console.log("  'AWFUL' shares no bigrams with the 'awful' seen in training, so");
+console.log("  shouty reviews are read only through their misleading filler words.");
 console.log("• majority class: the number that gives every other number meaning.");
 console.log(`  'We got ${(100 * full).toFixed(0)}%' impresses only because a rock gets ${(100 * majorityAcc).toFixed(0)}%.`);

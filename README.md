@@ -4,9 +4,9 @@ Learn how large language models work by building every piece yourself in TypeScr
 
 ---
 
-## Two ways to learn
+## Three ways to learn
 
-This course has two tracks. You can take either one first, or both together.
+This course has three tracks. Take the first two in either order (or together); the researcher track runs alongside them.
 
 ### Understanding AI — top down
 Start from what AI produces (meaningful text) and strip back every layer until nothing is left but floating-point math.
@@ -36,6 +36,19 @@ Numbers → Neural Nets → Words → Attention → GPT-1 → GPT-2 → GPT-3 �
 
 Good if you want to know **how to build** a language model.
 → Start at [LESSON.md](LESSON.md)
+
+---
+
+### AI Researcher track — beyond building
+Building models is engineering. This track teaches the other half: how researchers think and work.
+
+```
+Math foundations → DL science → Papers → Experiments → Frontiers → Your own research
+     00–05           06–11      12–16      17–21        22–26          27–30
+```
+
+Good if you want to **become an AI researcher** — read papers, run real experiments, and produce your own research. Designed to interleave with the normal lessons (the roadmap tells you when).
+→ Start at [AI-researcher-lessons/README.md](AI-researcher-lessons/README.md)
 
 ---
 
@@ -141,10 +154,18 @@ LLM/
 │   │   └── index.ts
 │   ├── 01-linear-regression/
 │   └── ...
-└── reverse-lessons/
-    ├── RL-00-the-illusion/
+├── reverse-lessons/
+│   ├── RL-00-the-illusion/
+│   │   ├── lesson.md
+│   │   └── demo.ts
+│   ├── RL-01-text-is-numbers/
+│   └── ...
+└── AI-researcher-lessons/
+    ├── README.md           ← researcher track roadmap
+    ├── 00-what-ai-research-is/
+    │   └── lesson.md
+    ├── 01-linear-algebra/
     │   ├── lesson.md
-    │   └── demo.ts
-    ├── RL-01-text-is-numbers/
+    │   └── index.ts        (some lessons have exercise.md instead)
     └── ...
 ```

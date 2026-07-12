@@ -167,8 +167,8 @@ Train this reflex on your own tables before reviewers do.
 ## Code for this lesson
 
 See [index.ts](index.ts) — a tiny 3-component text classifier built from scratch on an
-embedded toy dataset (character-bigram features + a length feature + a class-prior bias
-correction). It prints a real ablation table: full model, each component removed, and the
+embedded toy dataset (character-bigram features + a length feature + case normalization).
+It prints a real ablation table: full model, each component removed, and the
 majority-class baseline — and the table reveals that one of the three components barely
 matters.
 

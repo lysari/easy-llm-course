@@ -4,6 +4,7 @@
     "module": "CommonJS",
     "moduleResolution": "Node10",
     "ignoreDeprecations": "6.0",
+    "types": ["node"],
     "esModuleInterop": true,
     "strict": true,
     "skipLibCheck": true

@@ -7,8 +7,9 @@
 //         law in non-embedding parameter count, L(N) ≈ a · N^(−b), with
 //         b ≈ 0.076 over ~10^3..10^9 params — a straight line on log-log axes.
 // WHAT WE REPRODUCE: the qualitative claim (tier 1, see lesson.md) — that a
-//         power law fits loss-vs-params — at toy scale: 4 char-level models,
-//         ~200..3,500 params, a few KB of text, from scratch, <30s runtime.
+//         power law fits loss-vs-params — at toy scale: 5 char-level models,
+//         ~240..4,900 params, ~11KB of text, from scratch, <30s runtime,
+//         each size averaged over 2 seeds (noise ≈ effect size down here).
 // HYPERPARAMETER INVENTORY (STATED = from paper / GUESSED = our choice):
 //         objective: next-token cross-entropy ......... STATED
 //         model family: small dense nets .............. STATED (theirs:
@@ -17,7 +18,7 @@
 //         vary N only; same data, steps, optimizer ..... STATED (their
 //                        "no bottleneck from data/compute" regime)
 //         optimizer Adam, lr 5e-3, 3000 steps, batch 32  GUESSED
-//         context length 3 chars ....................... GUESSED
+//         context length 4 chars ....................... GUESSED
 // VERDICT: printed at the bottom of the run.
 // ───────────────────────────────────────────────────────────────────────────
 //
@@ -147,6 +148,181 @@ Full of strange oaths and bearded like the pard,
 Jealous in honour, sudden and quick in quarrel,
 Seeking the bubble reputation
 Even in the cannon's mouth.
+
+When, in disgrace with fortune and men's eyes,
+I all alone beweep my outcast state,
+And trouble deaf heaven with my bootless cries,
+And look upon myself and curse my fate,
+Wishing me like to one more rich in hope,
+Featured like him, like him with friends possess'd,
+Desiring this man's art and that man's scope,
+With what I most enjoy contented least;
+Yet in these thoughts myself almost despising,
+Haply I think on thee, and then my state,
+Like to the lark at break of day arising
+From sullen earth, sings hymns at heaven's gate;
+For thy sweet love remember'd such wealth brings
+That then I scorn to change my state with kings.
+
+Let me not to the marriage of true minds
+Admit impediments. Love is not love
+Which alters when it alteration finds,
+Or bends with the remover to remove:
+O no! it is an ever-fixed mark
+That looks on tempests and is never shaken;
+It is the star to every wandering bark,
+Whose worth's unknown, although his height be taken.
+Love's not Time's fool, though rosy lips and cheeks
+Within his bending sickle's compass come:
+Love alters not with his brief hours and weeks,
+But bears it out even to the edge of doom.
+If this be error and upon me proved,
+I never writ, nor no man ever loved.
+
+My mistress' eyes are nothing like the sun;
+Coral is far more red than her lips' red;
+If snow be white, why then her breasts are dun;
+If hairs be wires, black wires grow on her head.
+I have seen roses damask'd, red and white,
+But no such roses see I in her cheeks;
+And in some perfumes is there more delight
+Than in the breath that from my mistress reeks.
+I love to hear her speak, yet well I know
+That music hath a far more pleasing sound;
+I grant I never saw a goddess go;
+My mistress, when she walks, treads on the ground:
+And yet, by heaven, I think my love as rare
+As any she belied with false compare.
+
+This day is called the feast of Crispian:
+He that outlives this day, and comes safe home,
+Will stand a tip-toe when this day is named,
+And rouse him at the name of Crispian.
+He that shall live this day, and see old age,
+Will yearly on the vigil feast his neighbours,
+And say 'To-morrow is Saint Crispian:'
+Then will he strip his sleeve and show his scars,
+And say 'These wounds I had on Crispin's day.'
+Old men forget: yet all shall be forgot,
+But he'll remember with advantages
+What feats he did that day: then shall our names,
+Familiar in his mouth as household words,
+Harry the king, Bedford and Exeter,
+Warwick and Talbot, Salisbury and Gloucester,
+Be in their flowing cups freshly remember'd.
+This story shall the good man teach his son;
+And Crispin Crispian shall ne'er go by,
+From this day to the ending of the world,
+But we in it shall be remember'd;
+We few, we happy few, we band of brothers;
+For he to-day that sheds his blood with me
+Shall be my brother; be he ne'er so vile,
+This day shall gentle his condition:
+And gentlemen in England now a-bed
+Shall think themselves accursed they were not here,
+And hold their manhoods cheap whiles any speaks
+That fought with us upon Saint Crispin's day.
+
+The quality of mercy is not strain'd,
+It droppeth as the gentle rain from heaven
+Upon the place beneath: it is twice blest;
+It blesseth him that gives and him that takes:
+'Tis mightiest in the mightiest: it becomes
+The throned monarch better than his crown;
+His sceptre shows the force of temporal power,
+The attribute to awe and majesty,
+Wherein doth sit the dread and fear of kings;
+But mercy is above this sceptred sway;
+It is enthroned in the hearts of kings,
+It is an attribute to God himself;
+And earthly power doth then show likest God's
+When mercy seasons justice. Therefore, Jew,
+Though justice be thy plea, consider this,
+That, in the course of justice, none of us
+Should see salvation: we do pray for mercy;
+And that same prayer doth teach us all to render
+The deeds of mercy.
+
+Our revels now are ended. These our actors,
+As I foretold you, were all spirits and
+Are melted into air, into thin air:
+And, like the baseless fabric of this vision,
+The cloud-capp'd towers, the gorgeous palaces,
+The solemn temples, the great globe itself,
+Yea, all which it inherit, shall dissolve
+And, like this insubstantial pageant faded,
+Leave not a rack behind. We are such stuff
+As dreams are made on, and our little life
+Is rounded with a sleep.
+
+Two households, both alike in dignity,
+In fair Verona, where we lay our scene,
+From ancient grudge break to new mutiny,
+Where civil blood makes civil hands unclean.
+From forth the fatal loins of these two foes
+A pair of star-cross'd lovers take their life;
+Whose misadventured piteous overthrows
+Do with their death bury their parents' strife.
+The fearful passage of their death-mark'd love,
+And the continuance of their parents' rage,
+Which, but their children's end, nought could remove,
+Is now the two hours' traffic of our stage;
+The which if you with patient ears attend,
+What here shall miss, our toil shall strive to mend.
+
+But, soft! what light through yonder window breaks?
+It is the east, and Juliet is the sun.
+Arise, fair sun, and kill the envious moon,
+Who is already sick and pale with grief,
+That thou her maid art far more fair than she.
+O, that she knew she were!
+She speaks yet she says nothing: what of that?
+Her eye discourses; I will answer it.
+See, how she leans her cheek upon her hand!
+O, that I were a glove upon that hand,
+That I might touch that cheek!
+
+If music be the food of love, play on;
+Give me excess of it, that, surfeiting,
+The appetite may sicken, and so die.
+That strain again! it had a dying fall:
+O, it came o'er my ear like the sweet sound,
+That breathes upon a bank of violets,
+Stealing and giving odour!
+
+Why, man, he doth bestride the narrow world
+Like a Colossus, and we petty men
+Walk under his huge legs and peep about
+To find ourselves dishonourable graves.
+Men at some time are masters of their fates:
+The fault, dear Brutus, is not in our stars,
+But in ourselves, that we are underlings.
+
+Is this a dagger which I see before me,
+The handle toward my hand? Come, let me clutch thee.
+I have thee not, and yet I see thee still.
+Art thou not, fatal vision, sensible
+To feeling as to sight? or art thou but
+A dagger of the mind, a false creation,
+Proceeding from the heat-oppressed brain?
+I see thee yet, in form as palpable
+As this which now I draw.
+Thou marshall'st me the way that I was going;
+And such an instrument I was to use.
+Mine eyes are made the fools o' the other senses,
+Or else worth all the rest; I see thee still,
+And on thy blade and dudgeon gouts of blood,
+Which was not so before. There's no such thing:
+It is the bloody business which informs
+Thus to mine eyes.
+
+What a piece of work is a man! how noble in reason!
+how infinite in faculty! in form and moving how
+express and admirable! in action how like an angel!
+in apprehension how like a god! the beauty of the
+world! the paragon of animals! And yet, to me,
+what is this quintessence of dust? man delights not
+me: no, nor woman neither.
 `.trim();
 
 // ---------------------------------------------------------------------------
@@ -159,6 +335,17 @@ const charToId = new Map(vocab.map((c, i) => [c, i]));
 const data = CORPUS.split('').map(c => charToId.get(c)!);
 
 const CONTEXT = 4; // predict char t from chars t-4..t-1
+// (Two earlier attempts of this reproduction failed, and both failures were
+// instructive — workflow step 5 happening for real:
+//  1. context 4 on a 3.8KB corpus: the largest model MEMORIZED — most
+//     5-grams were unique, so its val loss went UP. Data was the
+//     bottleneck, violating the regime Kaplan et al. train in.
+//  2. context 3 on the same corpus: the task was too EASY — every model
+//     above ~800 params hit the corpus's conditional-entropy floor and the
+//     curve went flat. Capacity wasn't the bottleneck either.
+// Fix: a ~12KB corpus + context 4 keeps capacity the binding constraint
+// across the whole size range — which is exactly the condition the paper
+// states for the power law to hold.)
 
 // Train/val split: every (context, target) position in the corpus is one
 // example; we shuffle positions deterministically and hold out 10%.
@@ -410,22 +597,30 @@ const SIZES = [
   { name: 'large', d: 16, h: 32 },
 ];
 
-const STEPS = 4000;
+const STEPS = 3000;
 const BATCH = 32;
 const LR = 5e-3;
+const SEEDS = [42, 1337]; // average over seeds: single-run noise at this
+                          // scale is ~the size of the effect (Lesson 20!)
 
 const results: { name: string; N: number; loss: number }[] = [];
 
 for (const s of SIZES) {
-  resetSeed(42); // identical init noise + data order for every size
   const t0 = Date.now();
-  const m = trainModel(s.d, s.h, STEPS, BATCH, LR);
-  const loss = evalLoss(m, valPos);
-  const N = paramCount(m);
+  const seedLosses: number[] = [];
+  let N = 0;
+  for (const seed of SEEDS) {
+    resetSeed(seed); // same init noise + data order across sizes per seed
+    const m = trainModel(s.d, s.h, STEPS, BATCH, LR);
+    seedLosses.push(evalLoss(m, valPos));
+    N = paramCount(m);
+  }
+  const loss = seedLosses.reduce((x, y) => x + y, 0) / seedLosses.length;
   results.push({ name: s.name, N, loss });
   console.log(
     `trained ${s.name.padEnd(6)}  d=${String(s.d).padStart(2)} h=${String(s.h).padStart(2)}  ` +
-    `params=${String(N).padStart(5)}  val loss=${loss.toFixed(4)}  ` +
+    `params=${String(N).padStart(5)}  val loss=${loss.toFixed(4)} ` +
+    `(seeds: ${seedLosses.map(l => l.toFixed(3)).join(', ')})  ` +
     `(${((Date.now() - t0) / 1000).toFixed(1)}s)`
   );
 }

@@ -172,11 +172,13 @@ in TypeScript, on a few KB of text, in 30 seconds?
 1. **The claim**: `L(N) = a·N^(−b)` with some b > 0 — stated up front, like step 1 says.
 2. **Setup**: a fixed few-KB text corpus (embedded in the file), character-level
    next-char prediction — the smallest possible "language model" task.
-3. **Models**: four from-scratch context-window MLPs (embedding → tanh hidden → softmax,
+3. **Models**: five from-scratch context-window MLPs (embedding → tanh hidden → softmax,
    the machinery you built in companion lessons
    [06](../../lessons/06-neural-network/lesson.md)–[11](../../lessons/11-softmax/lesson.md)),
-   differing only in width: ~200 to ~3,500 parameters. Same data, same steps, same
-   optimizer — *only N varies*, because a reproduction must isolate the claimed variable.
+   differing only in width: ~240 to ~4,900 parameters. Same data, same steps, same
+   optimizer — *only N varies*, because a reproduction must isolate the claimed
+   variable. Each size trains on two seeds and averages the losses — at this scale,
+   single-run noise is about the size of the effect (Lesson 20's whole subject).
 4. **Measurement**: held-out validation loss for each size.
 5. **The fit**: take logs — `log L = log a − b·log N` — and run ordinary least-squares
    linear regression ([../../lessons/01-linear-regression/lesson.md](../../lessons/01-linear-regression/lesson.md)!)
@@ -210,10 +212,12 @@ Full treatment of the scaling-law math lives in the companion track:
 
 ## Code for this lesson
 
-See [index.ts](index.ts) — the miniature Kaplan reproduction: four model sizes, one
+See [index.ts](index.ts) — the miniature Kaplan reproduction: five model sizes, one
 power-law fit, one verdict. Read the header comment first: it's formatted as a
 reproduction report (claim → inventory → result), which is the template for every
-reproduction you'll do after this.
+reproduction you'll do after this. And read the comment above `CONTEXT` — it records
+two real reproduction failures (memorization, then a hit loss floor) that happened
+while building this file, and how workflow step 5 diagnosed each.
 
 ## What's next
 [Lesson 16 → Critiquing a Paper](../16-critiquing-a-paper/lesson.md)
