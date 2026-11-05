@@ -1,0 +1,212 @@
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font: var(--weight-regular) var(--text-body) / var(--leading-body) var(--font);
+  font-feature-settings: "tnum";
+}
+
+p,
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+  opacity: var(--opacity-dim);
+}
+
+:focus-visible {
+  outline: var(--border-thick) solid var(--link);
+  outline-offset: var(--space-edge);
+}
+
+.page-title {
+  font-size: var(--text-heading);
+  font-weight: var(--weight-medium);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-stack);
+  padding: var(--space-label) var(--space-item);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-small);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+}
+
+.pill--running {
+  background: var(--running-bg);
+  color: var(--running-ink);
+}
+
+.pill--done {
+  background: var(--done-bg);
+  color: var(--done-ink);
+}
+
+.pill--needs {
+  background: var(--needs-bg);
+  color: var(--needs-ink);
+}
+
+.pill--queued,
+.pill--lesson {
+  background: var(--queued-bg);
+  color: var(--queued-ink);
+}
+
+.spinner {
+  width: var(--icon-small);
+  height: var(--icon-small);
+  border: var(--border-thick) solid var(--running-track);
+  border-top-color: var(--running-spin);
+  border-radius: var(--radius-circle);
+  animation: spin var(--motion-spin) infinite;
+}
+
+.action {
+  flex: none;
+  padding: var(--space-tight) var(--space-block);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--button);
+  color: var(--ink);
+  font-size: var(--text-small);
+  font-weight: var(--weight-medium);
+}
+
+.action--strong {
+  background: var(--button-strong);
+  color: var(--on-button-strong);
+}
+
+.section {
+  display: grid;
+  gap: var(--space-stack);
+}
+
+.section-title {
+  color: var(--ink-soft);
+  font-size: var(--text-small);
+  font-weight: var(--weight-medium);
+}
+
+.note {
+  font-size: var(--text-small);
+}
+
+.chances {
+  display: grid;
+  gap: var(--space-stack);
+}
+
+.chance {
+  display: grid;
+  grid-template-columns: var(--chance-word-width) minmax(var(--chance-bar-min), 1fr) var(--chance-value-width);
+  align-items: center;
+  gap: var(--space-item);
+  font-size: var(--text-small);
+}
+
+.chance > span:last-child {
+  color: var(--ink-soft);
+  text-align: right;
+}
+
+.chance-track {
+  height: var(--chance-bar-height);
+  overflow: hidden;
+  border-radius: var(--radius-bar);
+  background: var(--group);
+}
+
+.chance-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-bar);
+  background: var(--bar);
+}
+
+.chance.is-key .chance-fill {
+  background: var(--bar-key);
+}
+
+.chance.is-key > span:first-child {
+  font-weight: var(--weight-medium);
+}
+
+.plot {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.plot-axis {
+  stroke: var(--card-line);
+  stroke-width: var(--border-thin);
+}
+
+.plot-text {
+  fill: var(--ink-soft);
+  font: var(--weight-regular) var(--text-plot) var(--font);
+}
+
+.plot-line {
+  fill: none;
+  stroke: var(--running-spin);
+  stroke-width: var(--stroke-plot);
+  stroke-linejoin: round;
+}
+
+.plot-line--second {
+  stroke: var(--miss);
+}
+
+.plot-baseline {
+  stroke: var(--ink-faint);
+  stroke-width: var(--border-mid);
+  stroke-dasharray: var(--dash-baseline);
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(var(--motion-rise));
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}

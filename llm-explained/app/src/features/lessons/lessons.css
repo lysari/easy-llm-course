@@ -1,0 +1,414 @@
+#lessons {
+  --lessons-tile-size: 32px;
+  --lessons-foot-height: 28px;
+  --lessons-panel-max-height: min(72vh, 640px);
+  --lessons-nest-indent: 24px;
+  --lessons-dash-miss: 4 4;
+}
+
+.fleet {
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-item) var(--space-section);
+  margin-bottom: var(--space-region);
+  padding: 0 var(--space-control);
+}
+
+.top-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-tight) var(--space-wide);
+  color: var(--ink-soft);
+}
+
+.top-stats strong {
+  margin-left: var(--space-block);
+  color: var(--ink);
+  font-weight: var(--weight-medium);
+}
+
+.flow {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--stage-width) calc(var(--part-width) * 2 + var(--sub-gap));
+  column-gap: var(--column-gap);
+  align-items: start;
+}
+
+.links {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.link-path {
+  fill: none;
+  stroke: var(--link);
+  stroke-width: var(--border-thick);
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw var(--motion-draw) forwards;
+}
+
+.link-dot {
+  fill: var(--card);
+  stroke: var(--link);
+  stroke-width: var(--border-thick);
+}
+
+.column {
+  position: relative;
+  display: grid;
+  gap: var(--space-card);
+}
+
+.card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-item);
+  width: 100%;
+  padding: var(--space-block) var(--space-surface);
+  border: var(--border-thin) solid var(--card-line);
+  border-radius: var(--radius-card);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition: opacity var(--motion-fast), box-shadow var(--motion-fast);
+}
+
+.card.is-dim {
+  opacity: var(--opacity-dim);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+.card.is-active {
+  border-color: var(--link);
+  box-shadow: var(--shadow-card-active);
+}
+
+.card.is-entering {
+  animation: appear var(--motion-draw) backwards;
+}
+
+.part-row {
+  display: flex;
+  align-items: stretch;
+  gap: var(--sub-gap);
+  width: max-content;
+}
+
+.part-row > .card {
+  width: var(--part-width);
+}
+
+.part-column.is-leaving {
+  opacity: 0;
+  transition: opacity var(--motion-fast);
+}
+
+.card-head {
+  display: grid;
+  grid-template-columns: var(--lessons-tile-size) minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: var(--space-card);
+}
+
+.tile {
+  display: grid;
+  place-items: center;
+  width: var(--lessons-tile-size);
+  height: var(--lessons-tile-size);
+  border: var(--border-thin) solid var(--card-line);
+  border-radius: var(--radius-tile);
+  background: var(--tile);
+  color: var(--ink);
+}
+
+.card-title {
+  font-size: var(--text-title);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-title);
+}
+
+.card-lesson {
+  color: var(--ink-soft);
+  font-size: var(--text-small);
+}
+
+.card-task {
+  overflow: hidden;
+  color: var(--ink);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-block);
+  min-height: var(--lessons-foot-height);
+  color: var(--ink-soft);
+  font-size: var(--text-small);
+}
+
+.card-foot b {
+  color: var(--ink);
+  font-weight: var(--weight-medium);
+}
+
+.foot-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.foot-actions {
+  display: flex;
+  flex: none;
+  gap: var(--space-control);
+}
+
+.panel {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  width: var(--panel-width);
+  max-height: var(--lessons-panel-max-height);
+  overflow-y: auto;
+  padding: var(--space-surface);
+  border: var(--border-thin) solid var(--card-line);
+  border-radius: var(--radius-card);
+  background: var(--card);
+  box-shadow: var(--shadow-float);
+  animation: appear var(--motion-fast);
+}
+
+.panel-inner {
+  display: grid;
+  gap: var(--space-block);
+}
+
+.tasks {
+  display: grid;
+  gap: var(--space-hair);
+  padding: var(--space-stack);
+  border-radius: var(--radius-group);
+  background: var(--group);
+}
+
+.task {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-block);
+  width: 100%;
+  padding: var(--space-stack) var(--space-word);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  font-size: var(--text-small);
+  text-align: left;
+}
+
+.task > span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.task > span:last-child {
+  flex: none;
+  max-width: 62%;
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+button.task {
+  border: var(--border-thin) solid transparent;
+}
+
+button.task:hover {
+  background: var(--card);
+}
+
+.task.is-on {
+  border-color: var(--link);
+  background: var(--card);
+  font-weight: var(--weight-medium);
+}
+
+.words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-tight);
+}
+
+.word {
+  display: grid;
+  justify-items: center;
+  padding: var(--space-label) var(--space-word);
+  border-radius: var(--radius-pill);
+  background: var(--group);
+  font-size: var(--text-small);
+  font-weight: var(--weight-medium);
+}
+
+.word small {
+  color: var(--ink-soft);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-regular);
+}
+
+.word.is-new {
+  background: var(--running-bg);
+  color: var(--running-ink);
+}
+
+.code {
+  margin: 0;
+  padding: var(--space-item) var(--space-card);
+  overflow-x: auto;
+  border-radius: var(--radius-tile);
+  background: var(--group);
+  font: var(--weight-regular) var(--text-caption) / var(--leading-code) var(--font-mono);
+}
+
+.why {
+  padding-top: var(--space-item);
+  border-top: var(--border-thin) solid var(--card-line);
+  color: var(--ink-soft);
+  font-size: var(--text-small);
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.grid-sum {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-item);
+  font: var(--weight-regular) var(--text-small) var(--font-mono);
+}
+
+.grid-sum table {
+  border-collapse: collapse;
+  border-inline: var(--border-thick) solid var(--ink-soft);
+}
+
+.grid-sum td {
+  padding: var(--space-hair) var(--space-control);
+  text-align: center;
+}
+
+.plot-miss {
+  stroke: var(--miss);
+  stroke-width: var(--border-thick);
+  stroke-dasharray: var(--lessons-dash-miss);
+}
+
+.plot-dot {
+  fill: var(--needs-bg);
+  stroke: var(--needs-ink);
+  stroke-width: var(--border-thick);
+}
+
+.net-link {
+  stroke: var(--card-line);
+  stroke-width: var(--border-thick);
+}
+
+.net-node {
+  fill: var(--group);
+  stroke: var(--ink-soft);
+  stroke-width: var(--border-thick);
+}
+
+.net-node--hidden {
+  fill: var(--running-bg);
+  stroke: var(--running-spin);
+}
+
+.net-text {
+  fill: var(--ink);
+  font: var(--weight-medium) var(--text-plot) var(--font);
+  text-anchor: middle;
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card.is-entering,
+  .panel {
+    animation: none;
+  }
+
+  .link-path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (max-width: 960px) {
+  .fleet {
+    width: 100%;
+  }
+
+  .flow {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--space-card);
+  }
+
+  .links {
+    display: none;
+  }
+
+  .column {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .part-row {
+    flex-direction: column;
+    gap: var(--space-card);
+    width: 100%;
+  }
+
+  .part-row > .card {
+    width: 100%;
+  }
+
+  .part-row > .card.is-nested {
+    width: calc(100% - var(--lessons-nest-indent));
+    margin-left: var(--lessons-nest-indent);
+  }
+
+  .part-column {
+    padding-left: var(--space-surface);
+    border-left: var(--border-thick) solid var(--link);
+  }
+
+  .panel {
+    position: static;
+    width: 100%;
+    max-height: none;
+  }
+}

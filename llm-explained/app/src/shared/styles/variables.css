@@ -1,0 +1,91 @@
+:root {
+  --text-heading: 1.02rem;
+  --text-title: 0.98rem;
+  --text-body: 0.93rem;
+  --text-small: 0.82rem;
+  --text-caption: 0.76rem;
+  --text-label: 0.74rem;
+  --text-micro: 0.72rem;
+  --text-plot: 16px;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --leading-title: 1.2;
+  --leading-link: 1.25;
+  --leading-body: 1.4;
+  --leading-code: 1.5;
+  --space-hair: 1px;
+  --space-edge: 2px;
+  --space-label: 3px;
+  --space-tight: 4px;
+  --space-stack: 5px;
+  --space-control: 6px;
+  --space-word: 7px;
+  --space-item: 8px;
+  --space-card: 10px;
+  --space-block: 12px;
+  --space-surface: 14px;
+  --space-wide: 16px;
+  --space-region: 18px;
+  --space-section: 24px;
+  --radius-card: 14px;
+  --radius-group: 10px;
+  --radius-tile: 8px;
+  --radius-pill: 6px;
+  --radius-bar: 5px;
+  --radius-circle: 50%;
+  --border-thin: 1px;
+  --border-mid: 1.5px;
+  --border-thick: 2px;
+  --stroke-plot: 3px;
+  --dash-baseline: 5 5;
+  --shadow-card: 0 1px 3px var(--shadow);
+  --shadow-card-hover: 0 2px 8px var(--shadow-strong);
+  --shadow-card-active: 0 0 0 1px var(--link), 0 2px 10px var(--shadow-strong);
+  --shadow-float: 0 8px 28px var(--shadow-strong);
+  --shadow-chip: 0 1px 2px var(--shadow-strong);
+  --shadow-button: 0 1px 2px var(--shadow);
+  --shadow-group: 0 1px 4px var(--shadow);
+  --shadow-result: 0 2px 10px var(--shadow);
+  --opacity-dim: 0.5;
+  --motion-fast: 150ms ease-out;
+  --motion-draw: 280ms ease-out;
+  --motion-spin: 900ms linear;
+  --motion-rise: 4px;
+  --icon-small: 12px;
+  --chance-word-width: 3.8rem;
+  --chance-bar-min: 40px;
+  --chance-bar-height: 10px;
+  --chance-value-width: 3.2rem;
+  --sidebar-width: 208px;
+  --sidebar-pad: 12px;
+  --sidebar-stages-indent: 15px;
+  --page-pad-top: 40px;
+  --page-pad-bottom: 80px;
+  --page-pad-side: 24px;
+  --page-pad-top-narrow: 16px;
+  --page-pad-bottom-narrow: 48px;
+  --page-pad-side-narrow: 12px;
+  --stage-width: 430px;
+  --part-width: 390px;
+  --panel-width: 500px;
+  --column-gap: 84px;
+  --sub-gap: 52px;
+}
+
+@media (max-width: 1640px) {
+  :root {
+    --stage-width: 380px;
+    --part-width: 340px;
+    --column-gap: 50px;
+    --sub-gap: 36px;
+  }
+}
+
+@media (max-width: 1420px) {
+  :root {
+    --stage-width: 340px;
+    --part-width: 300px;
+    --column-gap: 34px;
+    --sub-gap: 30px;
+  }
+}

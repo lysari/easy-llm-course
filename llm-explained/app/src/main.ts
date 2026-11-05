@@ -1,7 +1,7 @@
-import "./styles/palette.css";
-import "./styles/variables.css";
-import "./styles/app.css";
-import "./styles/playground.css";
-import { startApp } from "./ui/app";
+import "@/shared/styles/palette.css";
+import "@/shared/styles/variables.css";
+import "@/shared/styles/fonts.css";
+import "@/shared/styles/global.css";
+import { mountLayout } from "@/core/layout/layout";
 
-startApp();
+mountLayout();
