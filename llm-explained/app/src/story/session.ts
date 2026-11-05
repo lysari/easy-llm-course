@@ -1,6 +1,6 @@
 import type { ForwardTrace, RankedToken, TinyGptWeights } from "../interfaces/model.interface";
 import { END_TOKEN, MAX_CONTEXT, TRAINING_SEQUENCES, VOCABULARY, joinTokens } from "../model/corpus";
-import { nextOptions, pickToken, writeText } from "../model/generate";
+import { applySampling, nextOptions, pickToken, writeText } from "../model/generate";
 import { ModelLab } from "../model/lab";
 import { LINE_TOTAL_STEPS, type Line, stepLine, trainedLine } from "../model/line-model";
 import { NETWORK_TOTAL_ROUNDS, SmallNetwork } from "../model/small-network";
@@ -135,22 +135,7 @@ export class Session {
   }
 
   sampledOptions(): RankedToken[] {
-    const options = this.options();
-    const scaled = options.map((option) => ({ ...option, raw: Math.exp((option.score - options[0].score) / this.temperature) }));
-    let kept = this.topK > 0 ? scaled.slice(0, this.topK) : scaled;
-    const total = kept.reduce((sum, option) => sum + option.raw, 0);
-    let withChance = kept.map((option) => ({ ...option, chance: option.raw / total }));
-    if (this.topP < 1) {
-      let running = 0;
-      kept = withChance.filter((option) => {
-        const keep = running < this.topP;
-        running += option.chance;
-        return keep;
-      });
-      const nucleus = kept.reduce((sum, option) => sum + (option as RankedToken).chance, 0);
-      withChance = (kept as typeof withChance).map((option) => ({ ...option, chance: option.chance / nucleus }));
-    }
-    return withChance.map(({ token, id, score, chance }) => ({ token, id, score, chance }));
+    return applySampling(this.options(), this);
   }
 
   pickCounts(): [string, number][] {

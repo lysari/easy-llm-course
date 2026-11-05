@@ -11,7 +11,10 @@ export class Adam {
   private readonly momentum: Float64Array[];
   private readonly variance: Float64Array[];
 
-  constructor(private readonly weights: TinyGptWeights) {
+  constructor(
+    private readonly weights: TinyGptWeights,
+    private readonly learningRate = LEARNING_RATE,
+  ) {
     const tables = allTables(weights);
     this.momentum = tables.map(({ tensor }) => new Float64Array(tensor.data.length));
     this.variance = tables.map(({ tensor }) => new Float64Array(tensor.data.length));
@@ -28,7 +31,7 @@ export class Adam {
         const gradient = tensor.grad[i];
         momentum[i] = MOMENTUM_DECAY * momentum[i] + (1 - MOMENTUM_DECAY) * gradient;
         variance[i] = VARIANCE_DECAY * variance[i] + (1 - VARIANCE_DECAY) * gradient * gradient;
-        tensor.data[i] -= (LEARNING_RATE * (momentum[i] / momentumFix)) / (Math.sqrt(variance[i] / varianceFix) + EPSILON);
+        tensor.data[i] -= (this.learningRate * (momentum[i] / momentumFix)) / (Math.sqrt(variance[i] / varianceFix) + EPSILON);
       }
     });
   }

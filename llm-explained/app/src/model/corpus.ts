@@ -23,10 +23,13 @@ export const VOCABULARY: string[] = [
 
 export const END_ID = VOCABULARY.indexOf(END_TOKEN);
 
-export const TRAINING_SEQUENCES: number[][] = TRAINING_LINES.flatMap((line) => {
-  const ids = [...line.text.split(" ").map((token) => VOCABULARY.indexOf(token)), END_ID];
-  return Array.from({ length: line.times }, () => ids);
-});
+export const toSequences = (lines: { text: string; times: number }[]): number[][] =>
+  lines.flatMap((line) => {
+    const ids = [...line.text.split(" ").map((token) => VOCABULARY.indexOf(token)), END_ID];
+    return Array.from({ length: line.times }, () => ids);
+  });
+
+export const TRAINING_SEQUENCES: number[][] = toSequences(TRAINING_LINES);
 
 export function joinTokens(tokens: string[]): string {
   return tokens

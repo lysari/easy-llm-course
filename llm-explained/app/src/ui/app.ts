@@ -3,6 +3,7 @@ import { NESTED_STEPS, STAGES, STEPS, TRAINING_PATH, stepsOf } from "../story/fl
 import { escapeHtml } from "../story/pieces";
 import { Session } from "../story/session";
 import { SPARKLE_SVG, iconSvg } from "./icons";
+import { createPlayground } from "./playground";
 
 const SELECT_DELAY_MS = 120;
 const CLOSE_DELAY_MS = 260;
@@ -93,19 +94,51 @@ export function startApp() {
   const openStep = () => stepsOf(stageId).find((step) => step.id === openStepId);
 
   function renderShell() {
-    byId("app").innerHTML = `<div class="fleet">
-      <header class="top">
-        <h1 class="brand">${SPARKLE_SVG} Tiny GPT</h1>
-        <p class="top-stats" id="top-stats"></p>
-      </header>
-      <div class="flow" id="flow">
-        <svg class="links" id="links" aria-hidden="true"></svg>
-        <div class="column" id="stages">
-          ${STAGES.map((stage) => `<article class="card" id="stage-${stage.id}" data-stage="${stage.id}" tabindex="0" aria-label="${escapeHtml(stage.title)}"></article>`).join("")}
+    byId("app").innerHTML = `<aside class="sidebar">
+      <p class="brand">${SPARKLE_SVG} Tiny GPT</p>
+      <nav class="side-nav" aria-label="Pages">
+        <a class="side-link side-link--page" id="nav-lessons" href="#lessons">${iconSvg("book")} Lessons</a>
+        <div class="side-stages" id="side-stages">
+          ${STAGES.map((stage) => `<button type="button" class="side-link" id="nav-${stage.id}" data-stage="${stage.id}">${iconSvg(stage.icon)} ${escapeHtml(stage.title)}</button>`).join("")}
         </div>
-        <div class="column part-column" id="parts"></div>
+        <a class="side-link side-link--page" id="nav-playground" href="#playground">${iconSvg("play")} Playground</a>
+      </nav>
+    </aside>
+    <main class="page" id="lessons">
+      <div class="fleet">
+        <header class="top">
+          <h1 class="page-title">Lessons</h1>
+          <p class="top-stats" id="top-stats"></p>
+        </header>
+        <div class="flow" id="flow">
+          <svg class="links" id="links" aria-hidden="true"></svg>
+          <div class="column" id="stages">
+            ${STAGES.map((stage) => `<article class="card" id="stage-${stage.id}" data-stage="${stage.id}" tabindex="0" aria-label="${escapeHtml(stage.title)}"></article>`).join("")}
+          </div>
+          <div class="column part-column" id="parts"></div>
+        </div>
       </div>
-    </div>`;
+    </main>
+    <main class="page page--playground" id="playground" hidden></main>`;
+  }
+
+  function showPage() {
+    const isPlayground = location.hash === "#playground";
+    byId("lessons").hidden = isPlayground;
+    byId("playground").hidden = !isPlayground;
+    byId("side-stages").hidden = isPlayground;
+    for (const [id, isOn] of [["nav-lessons", !isPlayground], ["nav-playground", isPlayground]] as const) {
+      byId(id).classList.toggle("is-on", isOn);
+      if (isOn) byId(id).setAttribute("aria-current", "page");
+      else byId(id).removeAttribute("aria-current");
+    }
+    if (isPlayground) {
+      closePanel();
+      playground.open();
+    } else {
+      playground.close();
+      drawLinks();
+    }
   }
 
   function renderHeader() {
@@ -132,6 +165,7 @@ export function startApp() {
       }));
       element.classList.toggle("is-dim", stage.id !== stageId);
       element.setAttribute("aria-current", String(stage.id === stageId));
+      byId(`nav-${stage.id}`).classList.toggle("is-selected", stage.id === stageId);
     }
     const activeIndex = session.isRunning("train") ? Math.floor(performance.now() / STEP_ORDER_MS) % TRAINING_PATH.length : -1;
     for (const step of stepsOf(stageId)) {
@@ -182,7 +216,7 @@ export function startApp() {
     const parent = byId(`stage-${stageId}`).getBoundingClientRect();
     const startX = parent.right - flow.left;
     const startY = parent.top + parent.height / 2 - flow.top;
-    const trunk = startX + 42;
+    const trunk = (startX + byId("parts").getBoundingClientRect().left - flow.left) / 2;
     const paths: string[] = [];
     const dots: string[] = [`<circle class="link-dot" cx="${startX}" cy="${startY}" r="4"/>`];
     let previous: DOMRect | null = null;
@@ -359,4 +393,7 @@ export function startApp() {
   renderShell();
   renderHeader();
   renderParts();
+  const playground = createPlayground(byId("playground"));
+  window.addEventListener("hashchange", showPage);
+  showPage();
 }

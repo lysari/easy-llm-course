@@ -6,9 +6,12 @@
   --radius-card: 14px;
   --radius-tile: 8px;
   --radius-pill: 6px;
+  --sidebar-width: 208px;
   --stage-width: 430px;
   --part-width: 390px;
   --panel-width: 500px;
+  --pg-builder-width: 640px;
+  --pg-result-width: 360px;
   --column-gap: 84px;
   --sub-gap: 52px;
   --motion-fast: 140ms ease-out;

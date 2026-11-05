@@ -9,12 +9,28 @@ export interface TinyGptWeights {
   outputTable: Tensor;
 }
 
-export interface BlockWeights {
+export interface BlockWeights extends LayerShape {
   query: Tensor;
   key: Tensor;
   value: Tensor;
   expand: Tensor;
   contract: Tensor;
+}
+
+export interface LayerShape {
+  hasAttention: boolean;
+  hasFeedForward: boolean;
+}
+
+export interface ModelShape {
+  vectorSize: number;
+  layers: LayerShape[];
+}
+
+export interface Sampling {
+  temperature: number;
+  topK: number;
+  topP: number;
 }
 
 export interface BlockTrace {

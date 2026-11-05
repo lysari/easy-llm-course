@@ -24,6 +24,10 @@
   --bar: #6faef7;
   --bar-key: #2f86e0;
   --miss: #c2570b;
+  --chip: #ffffff;
+  --chip-hover: #f8f8f8;
+  --rule-line: #d9d9d9;
+  --toggle: #26b79e;
   --shadow: rgb(0 0 0 / 5%);
   --shadow-strong: rgb(0 0 0 / 14%);
 }
@@ -55,6 +59,10 @@
     --bar: #4f8fd9;
     --bar-key: #8cc0f8;
     --miss: #f59e5b;
+    --chip: #3a3a3d;
+    --chip-hover: #444448;
+    --rule-line: #4a4a4e;
+    --toggle: #26b79e;
     --shadow: rgb(0 0 0 / 25%);
     --shadow-strong: rgb(0 0 0 / 55%);
   }

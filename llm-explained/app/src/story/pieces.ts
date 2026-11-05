@@ -123,16 +123,19 @@ export function lossCurve(chance: number) {
   </svg>`;
 }
 
-/** Plots the loss over training rounds, with a dashed line at the level of pure random guessing. */
-export function lossPlot(points: LossPoint[], rounds: number, guessingLoss: number) {
-  const { width, height, left, right, top, bottom } = PLOT;
-  const yMax = Math.ceil(Math.max(guessingLoss, ...points.map((point) => point.loss)));
+/** Plots the loss over training rounds, with a dashed line at the level of pure random guessing. Pass `earlier` to draw an older run behind it. */
+export function lossPlot(points: LossPoint[], rounds: number, guessingLoss: number, options: { earlier?: LossPoint[]; width?: number; height?: number } = {}) {
+  const { left, right, top, bottom } = PLOT;
+  const { earlier = [], width = PLOT.width, height = PLOT.height } = options;
+  const yMax = Math.ceil(Math.max(guessingLoss, ...points.map((point) => point.loss), ...earlier.map((point) => point.loss)));
   const xAt = (round: number) => left + (round / rounds) * (width - left - right);
   const yAt = (loss: number) => top + (1 - loss / yMax) * (height - top - bottom);
   const grid = [0, yMax]
     .map((y) => `<line x1="${left}" x2="${width - right}" y1="${yAt(y)}" y2="${yAt(y)}" class="plot-axis"/><text x="${left - 10}" y="${yAt(y) + 5}" text-anchor="end" class="plot-text">${y}</text>`)
     .join("");
-  const line = points.length > 1 ? `<polyline class="plot-line" points="${points.map((point) => `${xAt(point.step).toFixed(1)},${yAt(point.loss).toFixed(1)}`).join(" ")}"/>` : "";
+  const polyline = (series: LossPoint[], className: string) =>
+    series.length > 1 ? `<polyline class="${className}" points="${series.map((point) => `${xAt(point.step).toFixed(1)},${yAt(point.loss).toFixed(1)}`).join(" ")}"/>` : "";
+  const line = polyline(earlier, "plot-line plot-line--earlier") + polyline(points, "plot-line");
   return `<svg class="plot" viewBox="0 0 ${width} ${height}" role="img" aria-label="Loss over ${rounds} training rounds">
     ${grid}
     <line x1="${left}" x2="${width - right}" y1="${yAt(guessingLoss)}" y2="${yAt(guessingLoss)}" class="plot-baseline"/>
