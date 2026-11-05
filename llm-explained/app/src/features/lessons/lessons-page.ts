@@ -236,7 +236,7 @@ export function createLessonsPage() {
     if (partCard) {
       window.clearTimeout(openTimer);
       window.clearTimeout(closeTimer);
-      if (isPinned && openStepId !== partCard.dataset.part) return;
+      if (!target.closest("[data-command]") || (isPinned && openStepId !== partCard.dataset.part)) return;
       openTimer = window.setTimeout(() => openPanel(partCard.dataset.part as string, false), SELECT_DELAY_MS);
       return;
     }
