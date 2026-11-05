@@ -52,6 +52,20 @@ Good if you want to **become an AI researcher** — read papers, run real experi
 
 ---
 
+## See it first: Inside an LLM
+
+A visual flow of how a language model is built, trained and used. It starts with `y = w × x + b`, and a small model really trains in your browser. Each card names its lessons. No programming needed to use it.
+
+```bash
+cd llm-explained/app
+bun install
+bun run dev
+```
+
+The kids' lesson that goes with it is [llm-explained/lesson.md](llm-explained/lesson.md).
+
+---
+
 ## Prerequisites
 
 No ML background needed. You do need:

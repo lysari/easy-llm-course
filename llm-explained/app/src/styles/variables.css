@@ -1,0 +1,16 @@
+:root {
+  --font: "Inter", "Segoe UI", system-ui, sans-serif;
+  --text-title: 0.98rem;
+  --text-body: 0.93rem;
+  --text-small: 0.82rem;
+  --radius-card: 14px;
+  --radius-tile: 8px;
+  --radius-pill: 6px;
+  --stage-width: 430px;
+  --part-width: 390px;
+  --panel-width: 500px;
+  --column-gap: 84px;
+  --sub-gap: 52px;
+  --motion-fast: 140ms ease-out;
+  --motion-draw: 280ms ease-out;
+}
