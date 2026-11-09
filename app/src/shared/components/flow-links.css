@@ -1,0 +1,42 @@
+.links {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.link-path {
+  fill: none;
+  stroke: var(--link);
+  stroke-width: var(--border-thick);
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw var(--motion-draw) forwards;
+}
+
+.link-dot {
+  fill: var(--card);
+  stroke: var(--link);
+  stroke-width: var(--border-thick);
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link-path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (max-width: 960px) {
+  .links {
+    display: none;
+  }
+}

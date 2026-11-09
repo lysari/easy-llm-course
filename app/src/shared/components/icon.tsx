@@ -25,6 +25,8 @@ const ICON_PATHS: Record<string, string> = {
   plus: "M8 3.500v9 M3.500 8h9",
   trash: "M3 4.500h10 M6.500 4.500V3h3v1.500 M4.500 4.500l.5 8.500h6l.5-8.500",
   layers: "M8 2.500 14 6l-6 3.500L2 6z M2 10l6 3.500 6-3.500",
+  split: "M2 8h3 M5 8c2 0 2-4 5-4h4 M5 8c2 0 2 4 5 4h4",
+  key: "M5 5.500a2.500 2.500 0 1 0 0 5 2.500 2.500 0 0 0 0-5z M7.500 8H14 M12 8v2.500 M10 8v1.500",
 };
 
 export function Icon({ name }: { name: string }) {

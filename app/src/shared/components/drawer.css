@@ -1,0 +1,79 @@
+.drawer {
+  position: fixed;
+  z-index: 3;
+  inset: 0 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  width: min(var(--drawer-width), 100%);
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) 0;
+  border-left: var(--border-thin) solid var(--card-line);
+  border-radius: var(--radius-card) 0 0 var(--radius-card);
+  background: var(--card);
+  box-shadow: var(--shadow-float);
+  animation: slide-in var(--motion-draw);
+}
+
+.drawer:focus-visible {
+  outline: none;
+}
+
+.drawer-head {
+  grid-template-columns: var(--tile-size) minmax(0, 1fr) max-content var(--tile-size);
+  padding: var(--space-region) var(--space-section);
+  border-bottom: var(--border-thin) solid var(--card-line);
+}
+
+.drawer-close {
+  display: grid;
+  place-items: center;
+  width: var(--tile-size);
+  height: var(--tile-size);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-tile);
+  background: transparent;
+  color: var(--ink-soft);
+}
+
+.drawer-close:hover {
+  background: var(--group);
+  color: var(--ink);
+}
+
+.drawer-body {
+  display: grid;
+  flex: 1;
+  align-content: start;
+  gap: var(--space-block);
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-region) var(--space-section) var(--space-section);
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer {
+    animation: none;
+  }
+}
+
+@media (max-width: 960px) {
+  .drawer {
+    width: 100%;
+    padding-left: env(safe-area-inset-left, 0px);
+    border-left: 0;
+    border-radius: 0;
+  }
+
+  .drawer-head,
+  .drawer-body {
+    padding-inline: var(--space-wide);
+  }
+}

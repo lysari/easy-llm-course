@@ -1,5 +1,5 @@
 import { LEARNING_RATE, MOMENTUM_DECAY, VARIANCE_DECAY } from "@/core/model/adam";
-import { END_TOKEN, MAX_CONTEXT, START_CHOICES, TRAINING_SEQUENCES, VOCABULARY, joinTokens } from "@/core/model/corpus";
+import { END_TOKEN, MAX_CONTEXT, START_CHOICES, TEST_ANSWER, TEST_WORDS, TRAINING_SEQUENCES, VOCABULARY, joinTokens } from "@/core/model/corpus";
 import { applySampling, nextOptions, pickToken, writeText } from "@/core/model/generate";
 import { ModelLab } from "@/core/model/lab";
 import { LINE_TOTAL_ROUNDS, trainLineRound, trainedLine } from "@/core/model/line-model";
@@ -8,9 +8,6 @@ import { NETWORK_TOTAL_ROUNDS, SmallNetwork } from "@/core/model/small-network";
 import { allTables, copyWeights, lossAndGradients, measureLoss, predictNext, traceForward } from "@/core/model/tiny-gpt";
 import type { Line } from "@/shared/interfaces/line.interface";
 import type { ForwardTrace, RankedToken, TinyGptWeights } from "@/shared/interfaces/model.interface";
-
-export const TEST_WORDS = "my dog is hungry , so i give it a".split(" ");
-export const TEST_ANSWER = "bone";
 
 export type JobName = "line" | "network" | "train" | "write";
 

@@ -33,8 +33,6 @@ export function WordCards({ words, numbers, newFrom }: WordCardsProps) {
   );
 }
 
-export const shortList = (values: number[], limit = 4) => `[${values.slice(0, limit).map((value) => value.toFixed(2)).join(", ")}, …]`;
-
 export function SalaryPlot({ model, showMisses }: SalaryPlotProps) {
   const X_MAX = 8;
   const Y_MAX = 140;

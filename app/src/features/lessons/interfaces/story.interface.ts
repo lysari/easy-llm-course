@@ -1,31 +1,15 @@
 import type { ReactNode } from "react";
 import type { Session } from "@/features/lessons/session";
-
-export type Status = "running" | "done" | "needs" | "queued" | "lesson";
+import type { CardAction, Status } from "@/shared/interfaces/card.interface";
+import type { Formula } from "@/shared/interfaces/formula.interface";
 
 export type StageId = "simple" | "data" | "forward" | "learn" | "use" | "beyond";
-
-export interface CardAction {
-  label: string;
-  command: string;
-  isStrong?: boolean;
-}
 
 export interface TaskRow {
   text: string;
   value?: string;
   command?: string;
   isOn?: boolean;
-}
-
-export interface FormulaTerm {
-  term: string;
-  meaning: string;
-}
-
-export interface Formula {
-  lines: string[];
-  legend?: FormulaTerm[];
 }
 
 export interface FlowStep {

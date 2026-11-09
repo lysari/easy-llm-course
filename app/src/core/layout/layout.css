@@ -121,6 +121,20 @@
     padding-inline: max(var(--sidebar-pad), env(safe-area-inset-left, 0px)) max(var(--sidebar-pad), env(safe-area-inset-right, 0px));
   }
 
+  .brand,
+  .side-link {
+    white-space: nowrap;
+  }
+
+  .side-nav {
+    flex: 1;
+    min-width: 0;
+    margin: calc(-1 * var(--space-tight));
+    padding: var(--space-tight);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
   .page {
     padding: var(--page-pad-top-narrow) max(var(--page-pad-side-narrow), env(safe-area-inset-right, 0px)) var(--page-pad-bottom-narrow) max(var(--page-pad-side-narrow), env(safe-area-inset-left, 0px));
   }

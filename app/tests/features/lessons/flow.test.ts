@@ -2,13 +2,13 @@ import { describe, expect, test } from "bun:test";
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
-import { END_TOKEN, START_CHOICES } from "@/core/model/corpus";
+import { END_TOKEN, START_CHOICES, TEST_ANSWER } from "@/core/model/corpus";
 import { TARGET_ROUNDS } from "@/core/model/lab";
 import { LINE_TOTAL_ROUNDS, SALARIES, YEARS, lineLoss, predictOnLine } from "@/core/model/line-model";
 import { LESSON_ROUNDS, NETWORK_TOTAL_ROUNDS, SmallNetwork } from "@/core/model/small-network";
 import { STAGES, STEPS, TRAINING_PATH, stepsOf } from "@/features/lessons/flow";
 import { rollUp } from "@/features/lessons/roll-up";
-import { Session, TEST_ANSWER } from "@/features/lessons/session";
+import { Session } from "@/features/lessons/session";
 
 const LONG_ENOUGH = 10_000;
 const MIN_DETAILS = 2;

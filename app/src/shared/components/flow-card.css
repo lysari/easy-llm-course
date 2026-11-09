@@ -1,0 +1,74 @@
+.card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-item);
+  width: 100%;
+  padding: var(--space-block) var(--space-surface);
+  border: var(--border-thin) solid var(--card-line);
+  border-radius: var(--radius-card);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition: opacity var(--motion-fast), box-shadow var(--motion-fast);
+}
+
+.card.is-dim {
+  opacity: var(--opacity-dim);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+.card.is-active {
+  border-color: var(--link);
+  box-shadow: var(--shadow-card-active);
+}
+
+.card.is-open {
+  border-color: var(--link);
+}
+
+.card.is-entering {
+  animation: appear var(--motion-draw) backwards;
+}
+
+.card-task {
+  overflow: hidden;
+  color: var(--ink);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-block);
+  min-height: var(--card-foot-height);
+  color: var(--ink-soft);
+  font-size: var(--text-small);
+}
+
+.card-foot b {
+  color: var(--ink);
+  font-weight: var(--weight-medium);
+}
+
+.foot-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.foot-actions {
+  display: flex;
+  flex: none;
+  gap: var(--space-control);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card.is-entering {
+    animation: none;
+  }
+}

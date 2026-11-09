@@ -1,5 +1,5 @@
 import { Adam, LEARNING_RATE } from "@/core/model/adam";
-import { TRAINING_LINES, VOCABULARY, toSequences } from "@/core/model/corpus";
+import { TRAINING_LINES, toSequences } from "@/core/model/corpus";
 import { TARGET_ROUNDS } from "@/core/model/lab";
 import { allTables, LAYER_COUNT, countWeights, createWeights, lossAndGradients, VECTOR_SIZE } from "@/core/model/tiny-gpt";
 import type { PlaygroundSettings } from "@/features/playground/interfaces/playground.interface";
@@ -13,8 +13,6 @@ export const TEXT_GROUPS = [
   { name: "likes", match: " likes " },
   { name: "chases", match: " chases " },
 ];
-
-export const GUESSING_LOSS = Math.log(VOCABULARY.length);
 
 export const defaultSettings = (start: string): PlaygroundSettings => ({
   textGroups: TEXT_GROUPS.map((group) => group.name),

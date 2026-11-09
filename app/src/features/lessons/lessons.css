@@ -1,7 +1,4 @@
 #lessons {
-  --lessons-tile-size: 32px;
-  --lessons-foot-height: 28px;
-  --lessons-drawer-width: 520px;
   --lessons-nest-indent: 24px;
   --lessons-dash-miss: 4 4;
 }
@@ -11,100 +8,12 @@
   margin: 0 auto;
 }
 
-.top {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-item) var(--space-section);
-  margin-bottom: var(--space-region);
-  padding: 0 var(--space-control);
-}
-
-.top-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-tight) var(--space-wide);
-  color: var(--ink-soft);
-}
-
-.top-stats strong {
-  margin-left: var(--space-block);
-  color: var(--ink);
-  font-weight: var(--weight-medium);
-}
-
 .flow {
   position: relative;
   display: grid;
   grid-template-columns: var(--stage-width) calc(var(--part-width) * 2 + var(--sub-gap));
   column-gap: var(--column-gap);
   align-items: start;
-}
-
-.links {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  pointer-events: none;
-}
-
-.link-path {
-  fill: none;
-  stroke: var(--link);
-  stroke-width: var(--border-thick);
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: draw var(--motion-draw) forwards;
-}
-
-.link-dot {
-  fill: var(--card);
-  stroke: var(--link);
-  stroke-width: var(--border-thick);
-}
-
-.column {
-  position: relative;
-  display: grid;
-  gap: var(--space-card);
-}
-
-.card {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-item);
-  width: 100%;
-  padding: var(--space-block) var(--space-surface);
-  border: var(--border-thin) solid var(--card-line);
-  border-radius: var(--radius-card);
-  background: var(--card);
-  box-shadow: var(--shadow-card);
-  cursor: pointer;
-  transition: opacity var(--motion-fast), box-shadow var(--motion-fast);
-}
-
-.card.is-dim {
-  opacity: var(--opacity-dim);
-}
-
-.card:hover {
-  box-shadow: var(--shadow-card-hover);
-}
-
-.card.is-active {
-  border-color: var(--link);
-  box-shadow: var(--shadow-card-active);
-}
-
-.card.is-open {
-  border-color: var(--link);
-}
-
-.card.is-entering {
-  animation: appear var(--motion-draw) backwards;
 }
 
 .part-row {
@@ -121,171 +30,6 @@
 .part-column.is-leaving {
   opacity: 0;
   transition: opacity var(--motion-fast);
-}
-
-.card-head {
-  display: grid;
-  grid-template-columns: var(--lessons-tile-size) minmax(0, 1fr) max-content;
-  align-items: center;
-  gap: var(--space-card);
-}
-
-.tile {
-  display: grid;
-  place-items: center;
-  width: var(--lessons-tile-size);
-  height: var(--lessons-tile-size);
-  border: var(--border-thin) solid var(--card-line);
-  border-radius: var(--radius-tile);
-  background: var(--tile);
-  color: var(--ink);
-}
-
-.card-title {
-  font-size: var(--text-title);
-  font-weight: var(--weight-medium);
-  line-height: var(--leading-title);
-}
-
-.card-lesson {
-  color: var(--ink-soft);
-  font-size: var(--text-small);
-}
-
-.card-task {
-  overflow: hidden;
-  color: var(--ink);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.card-foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-block);
-  min-height: var(--lessons-foot-height);
-  color: var(--ink-soft);
-  font-size: var(--text-small);
-}
-
-.card-foot b {
-  color: var(--ink);
-  font-weight: var(--weight-medium);
-}
-
-.foot-value {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.foot-actions {
-  display: flex;
-  flex: none;
-  gap: var(--space-control);
-}
-
-.drawer {
-  position: fixed;
-  z-index: 3;
-  inset: 0 0 0 auto;
-  display: flex;
-  flex-direction: column;
-  width: min(var(--lessons-drawer-width), 100%);
-  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) 0;
-  border-left: var(--border-thin) solid var(--card-line);
-  border-radius: var(--radius-card) 0 0 var(--radius-card);
-  background: var(--card);
-  box-shadow: var(--shadow-float);
-  animation: slide-in var(--motion-draw);
-}
-
-.drawer:focus-visible {
-  outline: none;
-}
-
-.drawer-head {
-  grid-template-columns: var(--lessons-tile-size) minmax(0, 1fr) max-content var(--lessons-tile-size);
-  padding: var(--space-region) var(--space-section);
-  border-bottom: var(--border-thin) solid var(--card-line);
-}
-
-.drawer-close {
-  display: grid;
-  place-items: center;
-  width: var(--lessons-tile-size);
-  height: var(--lessons-tile-size);
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius-tile);
-  background: transparent;
-  color: var(--ink-soft);
-}
-
-.drawer-close:hover {
-  background: var(--group);
-  color: var(--ink);
-}
-
-.drawer-body {
-  display: grid;
-  flex: 1;
-  align-content: start;
-  gap: var(--space-block);
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: var(--space-region) var(--space-section) var(--space-section);
-}
-
-.tasks {
-  display: grid;
-  gap: var(--space-hair);
-  padding: var(--space-stack);
-  border-radius: var(--radius-group);
-  background: var(--group);
-}
-
-.task {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-block);
-  width: 100%;
-  padding: var(--space-stack) var(--space-word);
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: transparent;
-  font-size: var(--text-small);
-  text-align: left;
-}
-
-.task > span:first-child {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.task > span:last-child {
-  flex: none;
-  max-width: 62%;
-  color: var(--ink-soft);
-  overflow-wrap: anywhere;
-  text-align: right;
-}
-
-button.task {
-  border: var(--border-thin) solid transparent;
-}
-
-button.task:hover {
-  background: var(--card);
-}
-
-.task.is-on {
-  border-color: var(--link);
-  background: var(--card);
-  font-weight: var(--weight-medium);
 }
 
 .words {
@@ -313,13 +57,6 @@ button.task:hover {
 .word.is-new {
   background: var(--running-bg);
   color: var(--running-ink);
-}
-
-.why {
-  padding-top: var(--space-item);
-  border-top: var(--border-thin) solid var(--card-line);
-  color: var(--ink-soft);
-  font-size: var(--text-small);
 }
 
 .table-scroll {
@@ -378,31 +115,6 @@ button.task:hover {
   text-anchor: middle;
 }
 
-@keyframes slide-in {
-  from {
-    opacity: 0;
-    transform: translateX(100%);
-  }
-}
-
-@keyframes draw {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .card.is-entering,
-  .drawer {
-    animation: none;
-  }
-
-  .link-path {
-    animation: none;
-    stroke-dashoffset: 0;
-  }
-}
-
 @media (max-width: 960px) {
   .fleet {
     width: 100%;
@@ -411,14 +123,6 @@ button.task:hover {
   .flow {
     grid-template-columns: minmax(0, 1fr);
     row-gap: var(--space-card);
-  }
-
-  .links {
-    display: none;
-  }
-
-  .column {
-    grid-template-columns: minmax(0, 1fr);
   }
 
   .part-row {
@@ -434,22 +138,5 @@ button.task:hover {
   .part-row > .card.is-nested {
     width: calc(100% - var(--lessons-nest-indent));
     margin-left: var(--lessons-nest-indent);
-  }
-
-  .part-column {
-    padding-left: var(--space-surface);
-    border-left: var(--border-thick) solid var(--link);
-  }
-
-  .drawer {
-    width: 100%;
-    padding-left: env(safe-area-inset-left, 0px);
-    border-left: 0;
-    border-radius: 0;
-  }
-
-  .drawer-head,
-  .drawer-body {
-    padding-inline: var(--space-wide);
   }
 }

@@ -1,7 +1,8 @@
 import { END_TOKEN, MAX_CONTEXT, START_CHOICES, joinTokens } from "@/core/model/corpus";
 import { TARGET_ROUNDS } from "@/core/model/lab";
-import type { FlowStep, Status } from "@/features/lessons/interfaces/story.interface";
+import type { FlowStep } from "@/features/lessons/interfaces/story.interface";
 import { ChanceBars } from "@/shared/components/chance-bars";
+import type { Status } from "@/shared/interfaces/card.interface";
 import { count, percent, showWord } from "@/shared/utils/format";
 import { WordCards } from "./lesson-plots";
 import type { Session } from "./session";

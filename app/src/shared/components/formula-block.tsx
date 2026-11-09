@@ -1,5 +1,5 @@
 import { Fragment, type ReactNode } from "react";
-import type { Formula } from "@/features/lessons/interfaces/story.interface";
+import type { Formula } from "@/shared/interfaces/formula.interface";
 import { CopyButton } from "./copy-button";
 import "./snippet-blocks.css";
 

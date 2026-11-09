@@ -53,6 +53,9 @@
   --motion-spin: 900ms linear;
   --motion-rise: 4px;
   --icon-small: 12px;
+  --tile-size: 32px;
+  --card-foot-height: 28px;
+  --drawer-width: 520px;
   --chance-word-width: 3.8rem;
   --chance-bar-min: 40px;
   --chance-bar-height: 10px;

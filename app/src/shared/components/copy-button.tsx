@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Icon } from "@/shared/components/icon";
+import { Icon } from "./icon";
 
 const COPIED_MS = 1500;
 

@@ -1,6 +1,7 @@
 import { LINE_LEARNING_RATE, LINE_TOTAL_ROUNDS, SALARIES, YEARS, lineLoss, predictOnLine } from "@/core/model/line-model";
 import { LESSON_ROUNDS, NETWORK_NUMBER_COUNT, NETWORK_TOTAL_ROUNDS } from "@/core/model/small-network";
-import type { FlowStep, Status } from "@/features/lessons/interfaces/story.interface";
+import type { FlowStep } from "@/features/lessons/interfaces/story.interface";
+import type { Status } from "@/shared/interfaces/card.interface";
 import { count } from "@/shared/utils/format";
 import { CurvePlot, NetworkDiagram, SalaryPlot } from "./lesson-plots";
 import type { Session } from "./session";

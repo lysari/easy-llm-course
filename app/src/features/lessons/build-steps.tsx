@@ -1,10 +1,10 @@
-import { VOCABULARY, joinTokens } from "@/core/model/corpus";
+import { TEST_ANSWER, TEST_WORDS, VOCABULARY, joinTokens } from "@/core/model/corpus";
 import { LAYER_COUNT, EXPANDED_SIZE, VECTOR_SIZE } from "@/core/model/tiny-gpt";
 import type { FlowStep } from "@/features/lessons/interfaces/story.interface";
 import { ChanceBars } from "@/shared/components/chance-bars";
-import { percent, showWord } from "@/shared/utils/format";
-import { WordCards, shortList } from "./lesson-plots";
-import { type Session, TEST_ANSWER, TEST_WORDS } from "./session";
+import { percent, shortList, showWord } from "@/shared/utils/format";
+import { WordCards } from "./lesson-plots";
+import type { Session } from "./session";
 
 const LAST = TEST_WORDS.length - 1;
 const TEST_TEXT = joinTokens(TEST_WORDS);

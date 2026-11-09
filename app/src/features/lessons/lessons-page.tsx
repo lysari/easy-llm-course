@@ -1,11 +1,11 @@
 import "./lessons.css";
-import { Fragment, useRef } from "react";
+import { Fragment, useMemo, useRef } from "react";
 import type { FlowStep, StageId } from "@/features/lessons/interfaces/story.interface";
+import { FlowLinks } from "@/shared/components/flow-links";
+import { useFlowLinks } from "@/shared/hooks/use-flow-links";
+import { NARROW_WIDTH, useWindowWidth } from "@/shared/hooks/use-window-width";
 import { NESTED_STEPS, STAGES, STEPS, stepsOf } from "./flow";
-import { FlowLinks } from "./flow-links";
-import { useFlowLinks } from "./hooks/use-flow-links";
 import { useLessons } from "./hooks/use-lessons";
-import { NARROW_WIDTH, useWindowWidth } from "./hooks/use-window-width";
 import { PartCard, StageCard } from "./lesson-cards";
 import { PartDrawer } from "./part-drawer";
 
@@ -22,11 +22,15 @@ export function LessonsPage({ isOpen, stageId, onSelectStage }: LessonsPageProps
   const isNarrow = width <= NARROW_WIDTH;
   const flowRef = useRef<HTMLDivElement>(null);
   const partsRef = useRef<HTMLDivElement>(null);
-  const stageCards = useRef(new Map<StageId, HTMLElement>());
-  const links = useFlowLinks({ flowRef, partsRef, stageCards, partCards }, partsStageId, isOpen && !isLeaving && !isNarrow, width);
+  const stageCards = useRef(new Map<string, HTMLElement>());
+  const steps = useMemo(() => stepsOf(partsStageId), [partsStageId]);
+  const stepIds = useMemo(() => steps.map((step) => step.id), [steps]);
+  const links = useFlowLinks(
+    { flowRef, childColumnRef: partsRef, parentCards: stageCards, childCards: partCards },
+    { parentId: partsStageId, childIds: stepIds, nestedIds: NESTED_STEPS, isShown: isOpen && !isLeaving && !isNarrow, width },
+  );
 
   const statuses = STEPS.map((step) => step.status(session));
-  const steps = stepsOf(partsStageId);
   const partCard = (step: FlowStep) => (
     <PartCard
       key={step.id}
@@ -74,7 +78,7 @@ export function LessonsPage({ isOpen, stageId, onSelectStage }: LessonsPageProps
           </p>
         </header>
         <div className="flow" id="flow" ref={flowRef}>
-          <FlowLinks drawing={links} />
+          <FlowLinks id="links" drawing={links} />
           <div className="column" id="stages">
             {STAGES.map((stage) => (
               <Fragment key={stage.id}>

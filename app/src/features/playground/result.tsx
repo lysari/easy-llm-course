@@ -1,11 +1,11 @@
-import { joinTokens } from "@/core/model/corpus";
+import { GUESSING_LOSS, joinTokens } from "@/core/model/corpus";
 import { applySampling, nextOptions, writeText } from "@/core/model/generate";
 import { seededRandom } from "@/core/model/random";
 import type { PlaygroundState } from "@/features/playground/interfaces/playground.interface";
 import { ChanceBars } from "@/shared/components/chance-bars";
 import { LossPlot } from "@/shared/components/loss-plot";
 import { count, showWord } from "@/shared/utils/format";
-import { GUESSING_LOSS, type PlaygroundRun } from "./playground-run";
+import type { PlaygroundRun } from "./playground-run";
 
 const PLOT_SIZE = { width: 400, height: 220 };
 const PLOT_CEILING = GUESSING_LOSS * 3;

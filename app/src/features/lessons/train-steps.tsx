@@ -1,14 +1,13 @@
 import { MOMENTUM_DECAY, LEARNING_RATE, VARIANCE_DECAY } from "@/core/model/adam";
-import { VOCABULARY } from "@/core/model/corpus";
+import { GUESSING_LOSS, TEST_ANSWER, VOCABULARY } from "@/core/model/corpus";
 import { TARGET_ROUNDS } from "@/core/model/lab";
 import { countWeights } from "@/core/model/tiny-gpt";
-import type { FlowStep, Status } from "@/features/lessons/interfaces/story.interface";
+import type { FlowStep } from "@/features/lessons/interfaces/story.interface";
 import { LossPlot } from "@/shared/components/loss-plot";
+import type { Status } from "@/shared/interfaces/card.interface";
 import { count } from "@/shared/utils/format";
 import { GradientBars, LossCurve } from "./lesson-plots";
-import { type Session, TEST_ANSWER } from "./session";
-
-const GUESSING_LOSS = Math.log(VOCABULARY.length);
+import type { Session } from "./session";
 
 const trainStatus = (session: Session): Status => {
   if (session.isRunning("train")) return "running";

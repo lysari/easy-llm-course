@@ -7,6 +7,8 @@ export const START_CHOICES = [
   "my cat is bored , so i give it a",
   "the cat likes the",
 ];
+export const TEST_WORDS = "my dog is hungry , so i give it a".split(" ");
+export const TEST_ANSWER = "bone";
 
 export const TRAINING_LINES: { text: string; times: number }[] = [
   { text: "my dog is hungry , so i give it a bone .", times: 3 },
@@ -29,6 +31,8 @@ export const VOCABULARY: string[] = [
 ];
 
 export const END_ID = VOCABULARY.indexOf(END_TOKEN);
+
+export const GUESSING_LOSS = Math.log(VOCABULARY.length);
 
 export const toSequences = (lines: { text: string; times: number }[]): number[][] =>
   lines.flatMap((line) => {
