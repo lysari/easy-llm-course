@@ -1,9 +1,9 @@
 import { END_TOKEN, MAX_CONTEXT, START_CHOICES, joinTokens } from "@/core/model/corpus";
 import { TARGET_ROUNDS } from "@/core/model/lab";
 import type { FlowStep, Status } from "@/features/lessons/interfaces/story.interface";
-import { chanceBars } from "@/shared/utils/charts";
+import { ChanceBars } from "@/shared/components/chance-bars";
 import { count, percent, showWord } from "@/shared/utils/format";
-import { wordCards } from "./lesson-plots";
+import { WordCards } from "./lesson-plots";
 import type { Session } from "./session";
 
 const useStatus = (session: Session, whenTrained: Status): Status => (session.lab.isTrained ? whenTrained : "queued");
@@ -30,7 +30,7 @@ export const useSteps: FlowStep[] = [
     rows: (session) => START_CHOICES.map((start) => ({ text: `${joinTokens(start.split(" "))} …`, command: `choose:${start}`, isOn: session.chosenStart?.join(" ") === start })),
     visual: (session) => {
       const options = session.options();
-      return chanceBars(options, options[0].token, 5);
+      return <ChanceBars options={options} answer={options[0].token} limit={5} />;
     },
     note: (session) => trainFirst(session) || "Training has guess, loss, backprop and update. Using keeps only the guess, so the numbers never change. It does not learn from you.",
     code: "const context = tokens.slice(-blockSize);\nconst { logits } = forward(context);\nconst lastLogits = logits[logits.length - 1];",
@@ -60,8 +60,17 @@ export const useSteps: FlowStep[] = [
     visual: (session) => {
       const options = session.sampledOptions();
       const picks = session.pickCounts();
-      return `${chanceBars(options, options[0].token, 5)}
-        ${picks.length > 0 ? `<p class="section-title">What got picked (${session.picks.length})</p>${wordCards(picks.map(([word]) => word), { numbers: picks.map(([, number]) => `${number}×`) })}` : ""}`;
+      return (
+        <>
+          <ChanceBars options={options} answer={options[0].token} limit={5} />
+          {picks.length > 0 && (
+            <>
+              <p className="section-title">{`What got picked (${session.picks.length})`}</p>
+              <WordCards words={picks.map(([word]) => word)} numbers={picks.map(([, number]) => `${number}×`)} />
+            </>
+          )}
+        </>
+      );
     },
     note: () => `The lesson's logits [2, 1, 0]: T = 0.5 gives ${softmaxWith(0.5)}. T = 1 gives ${softmaxWith(1)}. T = 2 gives ${softmaxWith(2)}.`,
     formula: "p = softmax(logits / T)\nTop-K: keep the K highest, then sample\nTop-P: keep tokens until they total p",
@@ -82,7 +91,7 @@ export const useSteps: FlowStep[] = [
       return useStatus(session, session.isWritingDone ? "done" : "needs");
     },
     actions: (session) => (session.lab.isTrained && !session.isRunning("write") ? [{ label: session.written.length > 0 ? "Write again" : "Write a reply", command: "start:write", isStrong: true }] : []),
-    visual: (session) => wordCards([...session.startWords, ...session.written], { newFrom: session.startWords.length }),
+    visual: (session) => <WordCards words={[...session.startWords, ...session.written]} newFrom={session.startWords.length} />,
     rowsTitle: "Each new token",
     rows: (session) => session.writtenSteps().map((step, i) => ({ text: `Trip ${i + 1}: top ${showWord(step.top)} ${percent(step.topChance)}`, value: `picked ${showWord(step.word)}` })),
     note: (session) => trainFirst(session) || `It stops when it picks "stop", or at the context window of ${MAX_CONTEXT} tokens.`,

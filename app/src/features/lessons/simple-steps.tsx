@@ -2,7 +2,7 @@ import { LINE_LEARNING_RATE, LINE_TOTAL_ROUNDS, SALARIES, YEARS, lineLoss, predi
 import { LESSON_ROUNDS, NETWORK_NUMBER_COUNT, NETWORK_TOTAL_ROUNDS } from "@/core/model/small-network";
 import type { FlowStep, Status } from "@/features/lessons/interfaces/story.interface";
 import { count } from "@/shared/utils/format";
-import { curvePlot, networkDiagram, salaryPlot } from "./lesson-plots";
+import { CurvePlot, NetworkDiagram, SalaryPlot } from "./lesson-plots";
 import type { Session } from "./session";
 
 const SCORED_LINE = { w: 13, b: 25 };
@@ -62,7 +62,7 @@ export const simpleSteps: FlowStep[] = [
       { text: "w = 12, b = 26", value: `total miss ${totalMiss(12, 26)}`, command: "line:12,26", isOn: lineChoice === "12,26" },
       { text: "w = 13, b = 25", value: `total miss ${totalMiss(13, 25)}`, command: "line:13,25", isOn: lineChoice === "13,25" },
     ],
-    visual: ({ chosenLine }) => salaryPlot({ model: (x) => predictOnLine(chosenLine, x), showMisses: true }),
+    visual: ({ chosenLine }) => <SalaryPlot model={(x) => predictOnLine(chosenLine, x)} showMisses />,
     note: () => "Dots are the true salaries. Dashed lines are the misses.",
     code: "for (const { w, b } of candidates) {\n  let totalError = 0;\n  for (let i = 0; i < x.length; i++) {\n    totalError += Math.abs(predict(x[i], w, b) - y[i]);\n  }\n}",
     why: "A line can also predict new values it never saw. But it can only ever be straight.",
@@ -117,7 +117,7 @@ export const simpleSteps: FlowStep[] = [
         { text: `8. New b = 0 − ${LINE_LEARNING_RATE} × dL/db`, value: round.b.toFixed(2) },
       ];
     },
-    visual: ({ learningLine }) => salaryPlot({ model: (x) => predictOnLine(learningLine, x) }),
+    visual: ({ learningLine }) => <SalaryPlot model={(x) => predictOnLine(learningLine, x)} />,
     note: ({ lineRounds, learningLine }) => `Step ${count(lineRounds)} of ${count(LINE_TOTAL_ROUNDS)}. Loss now: ${lineLoss(learningLine).toFixed(1)}.`,
     formula: "dL/dw = (2/n) × Σ (guess − true) × x\ndL/db = (2/n) × Σ (guess − true)\nw = w − lr × dL/dw\nb = b − lr × dL/db",
     code: "function step(): void {\n  const n = x.length;\n  let dw = 0;\n  let db = 0;\n  for (let i = 0; i < n; i++) {\n    const error = predict(x[i]) - y[i];\n    dw += error * x[i];\n    db += error;\n  }\n  w -= lr * (2 / n) * dw;\n  b -= lr * (2 / n) * db;\n}",
@@ -159,9 +159,9 @@ export const simpleSteps: FlowStep[] = [
       { text: "Tanh: squeezes to −1 to 1", value: `z = 2 → ${tanh(2).toFixed(3)}`, command: "curve:tanh", isOn: curveChoice === "tanh" },
     ],
     visual: ({ curveChoice }) => {
-      if (curveChoice === "relu") return curvePlot(relu, 0, 5);
-      if (curveChoice === "tanh") return curvePlot(tanh, -1, 1);
-      return curvePlot(sigmoid, 0, 1);
+      if (curveChoice === "relu") return <CurvePlot curve={relu} yMin={0} yMax={5} />;
+      if (curveChoice === "tanh") return <CurvePlot curve={tanh} yMin={-1} yMax={1} />;
+      return <CurvePlot curve={sigmoid} yMin={0} yMax={1} />;
     },
     note: () => {
       const slope = (z: number) => sigmoid(z) * (1 - sigmoid(z));
@@ -181,7 +181,7 @@ export const simpleSteps: FlowStep[] = [
     from: () => "x",
     to: () => "Salary guess",
     status: () => "done",
-    visual: () => networkDiagram(),
+    visual: () => <NetworkDiagram />,
     rowsTitle: "Forward pass, x = 7, with the current numbers",
     rows: (session) => {
       const { hidden, out } = networkExplain(session);
@@ -220,7 +220,7 @@ export const simpleSteps: FlowStep[] = [
         { text: "5. Back to hidden: δ_h1 = δ_out × wO1 × h1(1 − h1)", value: round.deltaHidden.toFixed(5) },
       ];
     },
-    visual: ({ network }) => salaryPlot({ model: (x) => network.predict(x) }),
+    visual: ({ network }) => <SalaryPlot model={(x) => network.predict(x)} />,
     note: ({ network, bestLine }) => {
       const compare = `Round ${count(network.rounds)} of ${count(NETWORK_TOTAL_ROUNDS)}. Loss ${network.loss().toFixed(1)}. The best straight line has ${lineLoss(bestLine).toFixed(1)}.`;
       return network.rounds > 0 && network.rounds <= LESSON_ROUNDS ? `${compare} Lesson 07 stops at 50,000 rounds, where it only ties the line.` : compare;
@@ -239,11 +239,31 @@ export const simpleSteps: FlowStep[] = [
     from: () => "Loops over numbers",
     to: () => "One table multiply",
     status: () => "done",
-    visual: () => `<div class="grid-sum">
-      <table><tr><td>1</td><td>2</td><td>3</td></tr><tr><td>4</td><td>5</td><td>6</td></tr></table> ×
-      <table><tr><td>7</td><td>8</td></tr><tr><td>9</td><td>10</td></tr><tr><td>11</td><td>12</td></tr></table> =
-      <table><tr><td>58</td><td>64</td></tr><tr><td>139</td><td>154</td></tr></table>
-    </div>`,
+    visual: () => (
+      <div className="grid-sum">
+        <table>
+          <tbody>
+            <tr><td>1</td><td>2</td><td>3</td></tr>
+            <tr><td>4</td><td>5</td><td>6</td></tr>
+          </tbody>
+        </table>
+        ×
+        <table>
+          <tbody>
+            <tr><td>7</td><td>8</td></tr>
+            <tr><td>9</td><td>10</td></tr>
+            <tr><td>11</td><td>12</td></tr>
+          </tbody>
+        </table>
+        =
+        <table>
+          <tbody>
+            <tr><td>58</td><td>64</td></tr>
+            <tr><td>139</td><td>154</td></tr>
+          </tbody>
+        </table>
+      </div>
+    ),
     rowsTitle: "How each result is made",
     rows: () => [
       { text: "Top left: 1×7 + 2×9 + 3×11", value: "58" },

@@ -1,26 +1,10 @@
-import { byId } from "@/shared/utils/html";
-import { showSidebarPage } from "./sidebar";
+import { useSyncExternalStore } from "react";
 
-interface Page {
-  open(): void;
-  close(): void;
+function subscribeToHash(onChange: () => void) {
+  window.addEventListener("hashchange", onChange);
+  return () => window.removeEventListener("hashchange", onChange);
 }
 
-export function startRouter(lessons: Page, playground: Page) {
-  function showPage() {
-    const isPlayground = location.hash === "#playground";
-    byId("lessons").hidden = isPlayground;
-    byId("playground").hidden = !isPlayground;
-    showSidebarPage(isPlayground);
-    if (isPlayground) {
-      lessons.close();
-      playground.open();
-    } else {
-      playground.close();
-      lessons.open();
-    }
-  }
-
-  window.addEventListener("hashchange", showPage);
-  showPage();
+export function useIsPlayground() {
+  return useSyncExternalStore(subscribeToHash, () => location.hash === "#playground");
 }

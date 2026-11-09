@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
+import { renderToStaticMarkup } from "react-dom/server";
 import { END_TOKEN, START_CHOICES } from "@/core/model/corpus";
 import { TARGET_ROUNDS } from "@/core/model/lab";
 import { LINE_TOTAL_ROUNDS, SALARIES, YEARS, lineLoss, predictOnLine } from "@/core/model/line-model";
@@ -53,17 +54,18 @@ describe.each(states)("every step when %s", (_, makeSession) => {
       const text = [
         step.title, step.lesson, step.goal, step.from(session), step.to(session), step.why,
         ...rows.flatMap((row) => [row.text, row.value ?? ""]),
-        step.visual?.(session) ?? "", step.note?.(session) ?? "",
+        renderToStaticMarkup(step.visual?.(session)), renderToStaticMarkup(step.note?.(session)),
       ].join(" ");
       expect(text, step.id).not.toMatch(/undefined|NaN|Infinity|\[object|\$\{/);
       expect(text, step.id).not.toContain(END_TOKEN);
+      expect(text, step.id).not.toContain(renderToStaticMarkup(END_TOKEN));
     }
   });
 });
 
 describe("the flow", () => {
   test("every lesson from 00 to 30 has a step", () => {
-    const folders = readdirSync(join(import.meta.dir, "../../../../../lessons")).map((name) => name.slice(0, 2)).sort();
+    const folders = readdirSync(join(import.meta.dir, "../../../../lessons")).map((name) => name.slice(0, 2)).sort();
     const named = new Set(STEPS.flatMap((step) => step.lesson.match(/\d{2}/g) ?? []));
     expect(folders.filter((lesson) => !named.has(lesson))).toEqual([]);
   });

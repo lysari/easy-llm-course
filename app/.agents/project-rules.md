@@ -1,7 +1,7 @@
 # Project Rules
 
 ## Tech Stack
-- Language & Framework: TypeScript 5.9 (strict), plain DOM with no UI framework, Vite 8
+- Language & Framework: TypeScript 5.9 (strict), React 19 with JSX (`react-jsx`), Vite 8 with `@vitejs/plugin-react`
 - Package Manager: bun (`bun.lock`). Never add a second lockfile.
 - Tests: `bun:test`
 - Runs entirely in the browser. There is no server, database or auth.
@@ -10,19 +10,22 @@
 
 ```text
 src/
-├── main.ts                     # loads global styles and mounts the layout, nothing else
+├── main.tsx                    # loads global styles and renders <Layout />, nothing else
 ├── core/
-│   ├── layout/                 # shell, sidebar, hash page switching and layout.css
+│   ├── layout/                 # layout.tsx shell (holds the selected stage), sidebar.tsx, router.ts (hash page hook) and layout.css
 │   └── model/                  # the real models both pages run: tensor, tiny-gpt, adam, corpus, generate, lab, line-model, small-network, random
 ├── features/
-│   ├── lessons/                # Lessons page: flow, stages, parts, session, its plots and lessons.css
+│   ├── lessons/                # Lessons page: lessons-page, lesson-cards, part-panel, flow-links, lesson-plots (.tsx), the parts (*-steps.tsx), flow.ts, session.ts and lessons.css
+│   │   ├── hooks/              # use-lessons (state and actions), use-session (session and frame loop), use-flow-links, use-panel-place, use-window-width
 │   │   └── interfaces/         # types private to Lessons
-│   └── playground/             # Playground page: builder, result, menu, playground run and playground.css
+│   └── playground/             # Playground page: playground-page, builder, menu, result (.tsx), playground-run.ts and playground.css
+│       ├── hooks/              # use-playground (state and actions), use-training-loop, use-menu
 │       └── interfaces/         # types private to Playground
 └── shared/
+    ├── components/             # React components used by 2 or more modules: Icon, SparkleIcon, ChanceBars, LossPlot
     ├── interfaces/             # types used across core and features
     ├── styles/                 # palette, variables, fonts, global
-    └── utils/                  # helpers used by both pages, grouped by kind, plus icons
+    └── utils/                  # helpers grouped by kind: format
 
 public/fonts/                   # Inter, served from the project
 tests/                          # mirrors src/ at the same relative paths
@@ -34,7 +37,8 @@ docs/                           # one doc per page, kept out of git by docs/.git
 - `shared`: only what 2 or more modules use, with no page-specific logic. Never place a file loose in `shared/`.
 - New page code belongs in: `src/features/<page>/`, with a sidebar link in `src/core/layout/`
 - Shared primitives belong in: `src/shared/<kind>/`
-- Each UI region has its own file. `main.ts` only mounts the layout.
+- Each UI region has its own file. `main.tsx` only mounts the layout.
+- A feature's React hooks live in `src/features/<page>/hooks/`.
 - Keep a file readable in one pass. Split by responsibility when it passes about 300 lines.
 
 ## Import Aliases & Paths
@@ -42,7 +46,8 @@ docs/                           # one doc per page, kept out of git by docs/.git
 - Use `@/` for imports across folders, and `./` for imports within the same folder.
 
 ## Naming Conventions
-- Files: `kebab-case.ts`. Shared types live in `<name>.interface.ts`.
+- Files: `kebab-case.ts`, and `kebab-case.tsx` for files with JSX (components). Hooks: `use-<name>.ts` exporting `use<Name>`. Shared types live in `<name>.interface.ts`.
+- Components: PascalCase named function exports, e.g. `export function LossPlot`.
 - Exports: named exports only, no default exports. The only exception is what `vite.config.ts` requires.
 - Functions and variables: `camelCase`. Module constants: `UPPER_SNAKE_CASE`. Booleans read as questions (`isDone`, `hasAttention`).
 - Types and interfaces: PascalCase with no `I` prefix. `interface` for object shapes, `type` for unions and aliases.
@@ -54,16 +59,17 @@ docs/                           # one doc per page, kept out of git by docs/.git
   - `weights` in code are the "numbers" on screen. `token` in code is a "word" on screen.
 
 ## Core Shared Helpers (Do Not Duplicate)
-- HTML and DOM: `escapeHtml` for every word placed in markup, `setHtml` to skip unchanged HTML. Both must keep their current behaviour, because `setHtml` preserves hover, focus and scroll.
+- Markup: JSX only. Never build HTML strings; JSX escapes text itself. Keep keys stable so hover, focus and scroll survive a redraw.
 - Formatting: `percent`, `count`, `showWord`, `joinTokens`.
-- Charts used by both pages: `chanceBars`, `lossPlot`.
+- Charts: the `ChanceBars` and `LossPlot` components in `src/shared/components/`. `PLOT` (plot size and margins) lives in `loss-plot.tsx`; Lessons' own plots read it from there.
 - Sampling and writing: `applySampling`, `writeText`, `nextOptions`, `pickToken` in `core/model/generate.ts`.
 - Seeded randomness: `seededRandom` in `core/model/random.ts`. Never use `Math.random` for anything a test or a comparison depends on.
-- Icons: `iconSvg`, with paths in one table. Draw new icons in the same style.
+- Icons: the `Icon` component (`<Icon name="chevron" />`) and `SparkleIcon` in `src/shared/components/icon.tsx`, reading paths from the one `ICON_PATHS` table in the same file. Draw new icons in the same style.
 - Network, auth and notifications: none exist, and none are needed.
 
 ## UI & Styling Conventions
-- Rendering: plain TypeScript builds HTML strings and sets `innerHTML`. No UI framework.
+- Rendering: React components with JSX, under `StrictMode`. No `dangerouslySetInnerHTML` and no `innerHTML`. Every effect cleans up its listeners, timers and frames.
+- Live training: keep the mutable run object in state and redraw on each animation frame from a hook (`use-training-loop.ts` in Playground, `use-session.ts` in Lessons); never copy the model into state.
 - Styling: plain CSS with custom properties, no preprocessor and no CSS framework.
 - Global styles live in `src/shared/styles/`:
   - `palette.css`: base colours first, then design colours as `var()` of a base colour, for light and dark. Components read design colours only.
@@ -99,7 +105,7 @@ docs/                           # one doc per page, kept out of git by docs/.git
 - Fixed lists: keep `STAGES`, `STEPS` and `ROWS` as lists plus a loop, an exception to `references/code-structure.md:20-21`, because tests loop over them to check every lesson 00-30 has a part, answered 2026-11-05
 - Linter and formatter: keep none, `tsc` only (`references/project-hygiene.md:30-31`), answered 2026-11-05
 - UI tests: keep none. Logic stays in tested model and feature code, and screens are checked by hand in Chrome (`references/project-hygiene.md:20`, `:23`), answered 2026-11-05
-- Rendering: keep HTML strings with no framework (rules are silent), answered 2026-11-05
+- Rendering: React with full JSX and no `dangerouslySetInnerHTML` (rules are silent), chosen by the user 2026-11-09, replacing "HTML strings with no framework" from 2026-11-05. Both pages are moved
 - File size: follow splitting large files (`references/code-structure.md:15`), answered 2026-11-05
 - Shared helpers: follow splitting `pieces.ts` by who uses it (`references/file-organization.md:13`, `:20`), answered 2026-11-05
 - Language: keep simple English in code with no translation system (`references/code-structure.md:73`), answered 2026-11-05

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { Session } from "@/features/lessons/session";
 
 export type Status = "running" | "done" | "needs" | "queued" | "lesson";
@@ -29,8 +30,8 @@ export interface FlowStep {
   status: (session: Session) => Status;
   rowsTitle?: string;
   rows?: (session: Session) => TaskRow[];
-  visual?: (session: Session) => string;
-  note?: (session: Session) => string;
+  visual?: (session: Session) => ReactNode;
+  note?: (session: Session) => ReactNode;
   formula?: string;
   code?: string;
   why: string;

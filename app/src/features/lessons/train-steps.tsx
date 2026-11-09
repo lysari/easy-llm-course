@@ -3,10 +3,9 @@ import { VOCABULARY } from "@/core/model/corpus";
 import { TARGET_ROUNDS } from "@/core/model/lab";
 import { countWeights } from "@/core/model/tiny-gpt";
 import type { FlowStep, Status } from "@/features/lessons/interfaces/story.interface";
-import { lossPlot } from "@/shared/utils/charts";
+import { LossPlot } from "@/shared/components/loss-plot";
 import { count } from "@/shared/utils/format";
-import { escapeHtml } from "@/shared/utils/html";
-import { lossCurve } from "./lesson-plots";
+import { GradientBars, LossCurve } from "./lesson-plots";
 import { type Session, TEST_ANSWER } from "./session";
 
 const GUESSING_LOSS = Math.log(VOCABULARY.length);
@@ -37,7 +36,7 @@ export const learnSteps: FlowStep[] = [
         { text: `Random guessing = ln(${VOCABULARY.length})`, value: GUESSING_LOSS.toFixed(2) },
       ];
     },
-    visual: (session) => lossCurve(session.answerChanceNow()),
+    visual: (session) => <LossCurve chance={session.answerChanceNow()} />,
     formula: "loss = −ln(p(right word))\np = 100% → loss 0",
     code: "function crossEntropyLoss(probs: number[], targetIndex: number) {\n  return -Math.log(probs[targetIndex] + 1e-9);\n}",
     why: "Being confidently wrong is punished hard. This is the number the whole training loop tries to lower. An untrained model starts near random guessing.",
@@ -63,11 +62,12 @@ export const learnSteps: FlowStep[] = [
       { text: "Q, K, V → Wq, Wk, Wv", value: "chain rule" },
       { text: "→ position and token tables", value: "row by row" },
     ],
-    visual: (session) => {
-      const tables = session.gradientTables();
-      const largest = Math.max(...tables.map((table) => table.size));
-      return `<p class="section-title">Average gradient per table, first training step</p>${chanceBarsFromSizes(tables, largest)}`;
-    },
+    visual: (session) => (
+      <>
+        <p className="section-title">Average gradient per table, first training step</p>
+        <GradientBars tables={session.gradientTables()} />
+      </>
+    ),
     note: (session) => {
       const test = session.nudgeTest();
       return `Checked for real: one number has gradient ${test.gradient.toFixed(3)}. That predicts raising it by 0.01 changes the loss by ${test.predicted.toFixed(4)}. Measured: ${test.measured.toFixed(4)}.`;
@@ -119,7 +119,7 @@ export const learnSteps: FlowStep[] = [
       if (session.isRunning("train")) return [{ label: "Finish quickly", command: "finish", isStrong: true }];
       return [{ label: session.lab.round > 0 ? "Continue" : "Start training", command: "start:train", isStrong: true }];
     },
-    visual: (session) => lossPlot(session.lab.history, TARGET_ROUNDS, GUESSING_LOSS),
+    visual: (session) => <LossPlot points={session.lab.history} rounds={TARGET_ROUNDS} guessingLoss={GUESSING_LOSS} />,
     rowsTitle: "Right now",
     rows: (session) => [
       { text: "Round", value: `${session.lab.round} of ${TARGET_ROUNDS}` },
@@ -127,14 +127,8 @@ export const learnSteps: FlowStep[] = [
       { text: `Chance of "${TEST_ANSWER}"`, value: `${(session.answerChanceNow() * 100).toFixed(1)}%` },
       { text: "Time", value: `${Math.round(session.trainSeconds)} s` },
     ],
-    note: (session) => `It writes: "${escapeHtml(session.sampleWriting())}". The loss stops near 0.2 because the text itself is unsure: bone or treat.`,
+    note: (session) => `It writes: "${session.sampleWriting()}". The loss stops near 0.2 because the text itself is unsure: bone or treat.`,
     code: "for (let round = 0; round < 200; round++) {\n  const loss = forward(text);   // guess and score\n  backward(loss);               // find gradients\n  adam.update();                // fix the numbers\n}",
     why: "One step does almost nothing. Thousands of small steps add up to learning. Real models read so much they must learn general patterns, but ours just memorises.",
   },
 ];
-
-function chanceBarsFromSizes(tables: { name: string; size: number }[], largest: number) {
-  return `<div class="chances">${tables
-    .map(({ name, size }) => `<div class="chance" title="${escapeHtml(name)}: ${size.toFixed(4)}"><span>${escapeHtml(name.replace("feed-forward", "FFN").replace("attention", "attn").replace("Layer ", "L"))}</span><span class="chance-track"><i class="chance-fill" style="width:${Math.round((size / largest) * 100)}%"></i></span><span>${size.toFixed(3)}</span></div>`)
-    .join("")}</div>`;
-}

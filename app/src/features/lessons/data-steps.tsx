@@ -1,7 +1,7 @@
 import { END_TOKEN, TRAINING_LINES, TRAINING_SEQUENCES, VOCABULARY, joinTokens } from "@/core/model/corpus";
 import type { FlowStep } from "@/features/lessons/interfaces/story.interface";
 import { count } from "@/shared/utils/format";
-import { wordCards } from "./lesson-plots";
+import { WordCards } from "./lesson-plots";
 
 const tokenTotal = TRAINING_SEQUENCES.reduce((sum, sequence) => sum + sequence.length, 0);
 const questionTotal = TRAINING_SEQUENCES.reduce((sum, sequence) => sum + sequence.length - 1, 0);
@@ -33,7 +33,7 @@ export const dataSteps: FlowStep[] = [
     from: () => "Text",
     to: () => `${VOCABULARY.length} token IDs`,
     status: () => "done",
-    visual: () => wordCards(VOCABULARY, { numbers: VOCABULARY.map((_, i) => i) }),
+    visual: () => <WordCards words={VOCABULARY} numbers={VOCABULARY.map((_, i) => i)} />,
     rowsTitle: "Three ways to cut text",
     rows: () => [
       { text: "Characters (Lesson 09)", value: "small dictionary, long text" },

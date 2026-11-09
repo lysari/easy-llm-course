@@ -1,9 +1,9 @@
 import { VOCABULARY, joinTokens } from "@/core/model/corpus";
 import { LAYER_COUNT, EXPANDED_SIZE, VECTOR_SIZE } from "@/core/model/tiny-gpt";
 import type { FlowStep } from "@/features/lessons/interfaces/story.interface";
-import { chanceBars } from "@/shared/utils/charts";
+import { ChanceBars } from "@/shared/components/chance-bars";
 import { percent, showWord } from "@/shared/utils/format";
-import { shortList, wordCards } from "./lesson-plots";
+import { WordCards, shortList } from "./lesson-plots";
 import { type Session, TEST_ANSWER, TEST_WORDS } from "./session";
 
 const LAST = TEST_WORDS.length - 1;
@@ -96,10 +96,7 @@ export const forwardSteps: FlowStep[] = [
     from: () => `${gridShape} numbers`,
     to: () => `${gridShape} numbers, with context`,
     status: () => "done",
-    visual: (session) => {
-      const shares = session.trace().layers[0].attention[LAST];
-      return `${wordCards(TEST_WORDS, { numbers: shares.map(percent) })}`;
-    },
+    visual: (session) => <WordCards words={TEST_WORDS} numbers={session.trace().layers[0].attention[LAST].map(percent)} />,
     rowsTitle: `Five steps for "${TEST_WORDS[LAST]}", real numbers`,
     rows: (session) => {
       const layer = session.trace().layers[0];
@@ -197,7 +194,7 @@ export const forwardSteps: FlowStep[] = [
     from: () => `${VOCABULARY.length} scores`,
     to: () => `${VOCABULARY.length} percents`,
     status: () => "done",
-    visual: (session) => chanceBars(session.guess(), TEST_ANSWER),
+    visual: (session) => <ChanceBars options={session.guess()} answer={TEST_ANSWER} />,
     rowsTitle: "Worked out for the top word",
     rows: (session) => {
       const guess = session.guess();
