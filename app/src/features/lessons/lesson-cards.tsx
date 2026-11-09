@@ -4,6 +4,8 @@ import { Icon } from "@/shared/components/icon";
 import { STAGGER_MS } from "./flow-links";
 import type { Session } from "./session";
 
+export const DRAWER_ID = "part-drawer";
+
 const STATUS_TEXT: Record<Status, string> = { running: " Running", done: "✓ Done", needs: " Needs you", queued: "• Queued", lesson: "◦ Lesson only" };
 const STATUS_ICONS: Partial<Record<Status, ReactNode>> = {
   running: <i className="spinner" />,
@@ -42,7 +44,8 @@ interface PartCardProps {
   index: number;
   isNested: boolean;
   isActive: boolean;
-  onSelect: () => void;
+  isOpen: boolean;
+  onToggle: () => void;
   onCommand: (command: string) => void;
 }
 
@@ -50,6 +53,10 @@ function activateOnKey(event: KeyboardEvent<HTMLElement>) {
   if (event.target !== event.currentTarget || (event.key !== "Enter" && event.key !== " ")) return;
   event.preventDefault();
   event.currentTarget.click();
+}
+
+export function StatusPill({ status }: { status: Status }) {
+  return <span className={`pill pill--${status}`}>{STATUS_ICONS[status]}{STATUS_TEXT[status]}</span>;
 }
 
 function CardBody({ icon, title, lesson, status, task, foot, actions, onCommand }: CardBodyProps) {
@@ -61,7 +68,7 @@ function CardBody({ icon, title, lesson, status, task, foot, actions, onCommand 
           <h3 className="card-title">{title}</h3>
           <p className="card-lesson">{lesson}</p>
         </div>
-        <span className={`pill pill--${status}`}>{STATUS_ICONS[status]}{STATUS_TEXT[status]}</span>
+        <StatusPill status={status} />
       </div>
       <p className="card-task">{task}</p>
       <div className="card-foot">
@@ -98,10 +105,7 @@ export function StageCard({ ref, stage, session, isSelected, onSelect, onCommand
       tabIndex={0}
       aria-label={stage.title}
       aria-current={isSelected}
-      onClick={(event) => {
-        event.stopPropagation();
-        onSelect();
-      }}
+      onClick={onSelect}
       onKeyDown={activateOnKey}
     >
       <CardBody
@@ -118,19 +122,18 @@ export function StageCard({ ref, stage, session, isSelected, onSelect, onCommand
   );
 }
 
-export function PartCard({ ref, step, session, index, isNested, isActive, onSelect, onCommand }: PartCardProps) {
+export function PartCard({ ref, step, session, index, isNested, isActive, isOpen, onToggle, onCommand }: PartCardProps) {
   return (
     <article
       ref={ref}
-      className={`card is-entering${isNested ? " is-nested" : ""}${isActive ? " is-active" : ""}`}
+      className={`card is-entering${isNested ? " is-nested" : ""}${isActive ? " is-active" : ""}${isOpen ? " is-open" : ""}`}
       id={`part-${step.id}`}
       tabIndex={0}
       aria-label={step.title}
+      aria-expanded={isOpen}
+      aria-controls={isOpen ? DRAWER_ID : undefined}
       style={{ animationDelay: `${index * STAGGER_MS}ms` }}
-      onClick={(event) => {
-        event.stopPropagation();
-        onSelect();
-      }}
+      onClick={onToggle}
       onKeyDown={activateOnKey}
     >
       <CardBody

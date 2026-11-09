@@ -1,0 +1,160 @@
+.snippet-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-item);
+}
+
+.snippet-language {
+  padding: var(--space-edge) var(--space-control);
+  border-radius: var(--radius-pill);
+  background: var(--group);
+  color: var(--ink-soft);
+  font: var(--weight-medium) var(--text-micro) / var(--leading-title) var(--font-mono);
+}
+
+.copy {
+  display: flex;
+  align-items: center;
+  gap: var(--space-tight);
+  margin-left: auto;
+}
+
+.copy-status {
+  color: var(--done-ink);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-medium);
+}
+
+.copy-button {
+  display: grid;
+  place-items: center;
+  padding: var(--space-control);
+  border: 0;
+  border-radius: var(--radius-tile);
+  background: transparent;
+  color: var(--ink-soft);
+  transition: background-color var(--motion-fast), color var(--motion-fast);
+}
+
+.copy-button:hover {
+  background: var(--group);
+  color: var(--ink);
+}
+
+.copy-button.is-copied {
+  color: var(--done-ink);
+}
+
+.copy-icon {
+  display: grid;
+  animation: appear var(--motion-fast);
+}
+
+.snippet-box {
+  border: var(--border-thin) solid var(--card-line);
+  border-radius: var(--radius-tile);
+  background: var(--group);
+}
+
+.snippet-code {
+  --snippet-gutter: 2ch;
+
+  margin: 0;
+  padding: var(--space-item) 0;
+  overflow-x: auto;
+  color: var(--code-identifier);
+  font: var(--weight-regular) var(--text-caption) / var(--leading-code) var(--font-mono);
+}
+
+.snippet-code code {
+  display: block;
+  width: max-content;
+  min-width: 100%;
+  padding-inline: var(--space-card);
+  font: inherit;
+}
+
+.code-line {
+  display: flex;
+}
+
+.code-line-number {
+  flex: none;
+  width: var(--snippet-gutter);
+  margin-right: var(--space-block);
+  color: var(--code-line-number);
+  text-align: right;
+  user-select: none;
+}
+
+.code-token--keyword {
+  color: var(--code-keyword);
+}
+
+.code-token--string {
+  color: var(--code-string);
+}
+
+.code-token--comment {
+  color: var(--code-comment);
+  font-style: italic;
+}
+
+.code-token--class {
+  color: var(--code-class);
+}
+
+.code-token--property {
+  color: var(--code-property);
+}
+
+.code-token--sign {
+  color: var(--code-sign);
+}
+
+.formula {
+  display: grid;
+  gap: var(--space-tight);
+  padding: var(--space-block) var(--space-surface);
+  font-family: var(--font-math);
+  overflow-wrap: break-word;
+}
+
+.formula-line {
+  font-size: var(--text-formula);
+}
+
+.math-op {
+  padding-inline: var(--space-edge);
+  color: var(--ink-soft);
+}
+
+.math-sign {
+  color: var(--ink-soft);
+}
+
+.formula-legend {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: baseline;
+  gap: var(--space-tight) var(--space-block);
+  margin: var(--space-tight) 0 0;
+  padding-top: var(--space-item);
+  border-top: var(--border-thin) solid var(--card-line);
+}
+
+.formula-legend dd {
+  margin: 0;
+  color: var(--ink-soft);
+  font: var(--weight-regular) var(--text-small) / var(--leading-body) var(--font);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .copy-button {
+    transition: none;
+  }
+
+  .copy-icon {
+    animation: none;
+  }
+}

@@ -1,36 +1,37 @@
-import { type RefObject, useRef } from "react";
+import type { Ref } from "react";
 import type { FlowStep } from "@/features/lessons/interfaces/story.interface";
-import { usePanelPlace } from "./hooks/use-panel-place";
+import { Icon } from "@/shared/components/icon";
+import { CodeBlock } from "./code-block";
+import { FormulaBlock } from "./formula-block";
+import { DRAWER_ID, StatusPill } from "./lesson-cards";
 import type { Session } from "./session";
 
-interface PartPanelProps {
+interface PartDrawerProps {
+  ref: Ref<HTMLElement>;
   step: FlowStep;
   session: Session;
-  partCards: RefObject<Map<string, HTMLElement>>;
-  width: number;
   onCommand: (command: string) => void;
-  onClick: () => void;
+  onClose: () => void;
 }
 
-export function PartPanel({ step, session, partCards, width, onCommand, onClick }: PartPanelProps) {
-  const panelRef = useRef<HTMLElement>(null);
-  const place = usePanelPlace(panelRef, partCards, step.id, width);
+export function PartDrawer({ ref, step, session, onCommand, onClose }: PartDrawerProps) {
   const rows = step.rows?.(session) ?? [];
   const note = step.note?.(session);
 
   return (
-    <section
-      className="panel"
-      id="panel"
-      aria-label={`${step.title} details`}
-      ref={panelRef}
-      style={place}
-      onClick={(event) => {
-        event.stopPropagation();
-        onClick();
-      }}
-    >
-      <div className="panel-inner" id="panel-inner">
+    <aside className="drawer" id={DRAWER_ID} ref={ref} tabIndex={-1} aria-label={`${step.title} details`}>
+      <header className="card-head drawer-head">
+        <span className="tile"><Icon name={step.icon} /></span>
+        <div>
+          <h2 className="card-title">{step.title}</h2>
+          <p className="card-lesson">{step.lesson}</p>
+        </div>
+        <StatusPill status={step.status(session)} />
+        <button type="button" className="drawer-close" aria-label="Close details" onClick={onClose}>
+          <Icon name="close" />
+        </button>
+      </header>
+      <div className="drawer-body" key={step.id}>
         {rows.length > 0 && (
           <section className="section">
             <p className="section-title">{step.rowsTitle ?? "Step by step"}</p>
@@ -53,20 +54,10 @@ export function PartPanel({ step, session, partCards, width, onCommand, onClick 
         )}
         {step.visual && <section className="section">{step.visual(session)}</section>}
         {note && <p className="note">{note}</p>}
-        {step.formula && (
-          <section className="section">
-            <p className="section-title">Formula</p>
-            <pre className="code">{step.formula}</pre>
-          </section>
-        )}
-        {step.code && (
-          <section className="section">
-            <p className="section-title">Code</p>
-            <pre className="code">{step.code}</pre>
-          </section>
-        )}
+        {step.formula && <FormulaBlock formula={step.formula} />}
+        {step.code && <CodeBlock code={step.code} />}
         <p className="why">{step.why}</p>
       </div>
-    </section>
+    </aside>
   );
 }

@@ -54,6 +54,7 @@ describe.each(states)("every step when %s", (_, makeSession) => {
       const text = [
         step.title, step.lesson, step.goal, step.from(session), step.to(session), step.why,
         ...rows.flatMap((row) => [row.text, row.value ?? ""]),
+        ...(step.formula?.lines ?? []), ...(step.formula?.legend ?? []).flatMap(({ term, meaning }) => [term, meaning]),
         renderToStaticMarkup(step.visual?.(session)), renderToStaticMarkup(step.note?.(session)),
       ].join(" ");
       expect(text, step.id).not.toMatch(/undefined|NaN|Infinity|\[object|\$\{/);

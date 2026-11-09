@@ -37,8 +37,8 @@ export const learnSteps: FlowStep[] = [
       ];
     },
     visual: (session) => <LossCurve chance={session.answerChanceNow()} />,
-    formula: "loss = −ln(p(right word))\np = 100% → loss 0",
-    code: "function crossEntropyLoss(probs: number[], targetIndex: number) {\n  return -Math.log(probs[targetIndex] + 1e-9);\n}",
+    formula: { lines: ["loss = −ln(p(right word))", "p = 100% → loss 0"] },
+    code: "function crossEntropyLoss(\n  probs: number[],\n  targetIndex: number,\n) {\n  return -Math.log(probs[targetIndex] + 1e-9);\n}",
     why: "Being confidently wrong is punished hard. This is the number the whole training loop tries to lower. An untrained model starts near random guessing.",
   },
   {
@@ -72,7 +72,7 @@ export const learnSteps: FlowStep[] = [
       const test = session.nudgeTest();
       return `Checked for real: one number has gradient ${test.gradient.toFixed(3)}. That predicts raising it by 0.01 changes the loss by ${test.predicted.toFixed(4)}. Measured: ${test.measured.toFixed(4)}.`;
     },
-    formula: "C = A·B → dA = dC·Bᵀ, dB = Aᵀ·dC\n∂A[i][j]/∂s[i][l] = A[i][j] (δjl − A[i][l])",
+    formula: { lines: ["C = A·B → dA = dC·Bᵀ, dB = Aᵀ·dC", "∂A[i][j]/∂s[i][l] = A[i][j] (δjl − A[i][l])"] },
     why: "One backward pass gives the answer for every number at once. Trying each number separately would be far too slow.",
   },
   {
@@ -100,8 +100,8 @@ export const learnSteps: FlowStep[] = [
       ];
     },
     note: (session) => `The first step is always exactly the learning rate, ${LEARNING_RATE}. Later steps vary. So far, numbers have moved ${session.averageMove().toFixed(3)} on average.`,
-    formula: "m = β1·m + (1−β1)·g\nv = β2·v + (1−β2)·g²\nθ = θ − lr · m̂ / (√v̂ + ε)",
-    code: "m = 0.9 * m + 0.1 * g;\nv = 0.999 * v + 0.001 * g * g;\nconst mHat = m / (1 - 0.9 ** t);\nconst vHat = v / (1 - 0.999 ** t);\ntheta -= lr * mHat / (Math.sqrt(vHat) + 1e-8);",
+    formula: { lines: ["m = β1·m + (1−β1)·g", "v = β2·v + (1−β2)·g²", "θ = θ − lr · m̂ / (√v̂ + ε)"] },
+    code: "m = 0.9 * m + 0.1 * g;\nv = 0.999 * v + 0.001 * g * g;\nconst mHat = m / (1 - 0.9 ** t);\nconst vHat = v / (1 - 0.999 ** t);\ntheta -= (lr * mHat) / (Math.sqrt(vHat) + 1e-8);",
     why: "m remembers direction, like momentum. v tracks how much a number bounces. Steady numbers get bigger steps, and bouncing numbers get smaller ones.",
   },
   {
@@ -128,7 +128,7 @@ export const learnSteps: FlowStep[] = [
       { text: "Time", value: `${Math.round(session.trainSeconds)} s` },
     ],
     note: (session) => `It writes: "${session.sampleWriting()}". The loss stops near 0.2 because the text itself is unsure: bone or treat.`,
-    code: "for (let round = 0; round < 200; round++) {\n  const loss = forward(text);   // guess and score\n  backward(loss);               // find gradients\n  adam.update();                // fix the numbers\n}",
+    code: "for (let round = 0; round < 200; round++) {\n  const loss = forward(text); // guess and score\n  backward(loss); // find gradients\n  adam.update(); // fix the numbers\n}",
     why: "One step does almost nothing. Thousands of small steps add up to learning. Real models read so much they must learn general patterns, but ours just memorises.",
   },
 ];

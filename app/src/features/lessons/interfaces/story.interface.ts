@@ -18,6 +18,16 @@ export interface TaskRow {
   isOn?: boolean;
 }
 
+export interface FormulaTerm {
+  term: string;
+  meaning: string;
+}
+
+export interface Formula {
+  lines: string[];
+  legend?: FormulaTerm[];
+}
+
 export interface FlowStep {
   id: string;
   stage: StageId;
@@ -32,7 +42,7 @@ export interface FlowStep {
   rows?: (session: Session) => TaskRow[];
   visual?: (session: Session) => ReactNode;
   note?: (session: Session) => ReactNode;
-  formula?: string;
+  formula?: Formula;
   code?: string;
   why: string;
   actions?: (session: Session) => CardAction[];

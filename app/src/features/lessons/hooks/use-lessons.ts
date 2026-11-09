@@ -3,38 +3,20 @@ import type { StageId } from "@/features/lessons/interfaces/story.interface";
 import { TRAINING_PATH, stepsOf } from "@/features/lessons/flow";
 import { useSession } from "./use-session";
 
-const SELECT_DELAY_MS = 120;
-const CLOSE_DELAY_MS = 260;
 const LEAVE_MS = 150;
 const STEP_ORDER_MS = 450;
 
-interface OpenPanel {
-  stepId: string;
-  isPinned: boolean;
-}
-
-const canHover = () => !matchMedia("(hover: none)").matches;
 const prefersReducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-export function useLessons(isOpen: boolean, stageId: StageId, onSelectStage: (id: StageId) => void) {
+export function useLessons(isOpen: boolean, stageId: StageId) {
   const { session, runCommand } = useSession();
   const [partsStageId, setPartsStageId] = useState(stageId);
-  const [panel, setPanel] = useState<OpenPanel | null>(null);
-  const timers = useRef({ select: 0, open: 0, close: 0 });
+  const [openStepId, setOpenStepId] = useState<string | null>(null);
+  const partCards = useRef(new Map<string, HTMLElement>());
+  const drawerRef = useRef<HTMLElement>(null);
 
   if (partsStageId !== stageId && prefersReducedMotion()) setPartsStageId(stageId);
   const isLeaving = partsStageId !== stageId;
-
-  function clearTimers() {
-    window.clearTimeout(timers.current.select);
-    window.clearTimeout(timers.current.open);
-    window.clearTimeout(timers.current.close);
-  }
-
-  function openPanel(stepId: string, pin: boolean) {
-    window.clearTimeout(timers.current.close);
-    setPanel((current) => ({ stepId, isPinned: pin || (current?.isPinned === true && current.stepId === stepId) }));
-  }
 
   useEffect(() => {
     if (!isLeaving) return;
@@ -43,34 +25,38 @@ export function useLessons(isOpen: boolean, stageId: StageId, onSelectStage: (id
   }, [isLeaving, stageId]);
 
   useEffect(() => {
-    setPanel(null);
-    return clearTimers;
+    setOpenStepId(null);
   }, [isOpen, stageId]);
 
   useEffect(() => {
-    if (!isOpen) return;
-    function closeOnOutsideClick() {
-      window.clearTimeout(timers.current.select);
-      window.clearTimeout(timers.current.open);
-      if (panel?.isPinned) {
-        setPanel(null);
-      } else if (panel) {
-        window.clearTimeout(timers.current.close);
-        timers.current.close = window.setTimeout(() => setPanel(null), CLOSE_DELAY_MS);
-      }
+    if (!openStepId) return;
+    function closeOnOutsideClick(event: MouseEvent) {
+      const target = event.target;
+      if (!(target instanceof Node) || drawerRef.current?.contains(target)) return;
+      if ([...partCards.current.values()].some((card) => card.contains(target))) return;
+      setOpenStepId(null);
     }
     function closeOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape" && panel) setPanel(null);
+      if (event.key === "Escape") setOpenStepId(null);
     }
-    document.addEventListener("click", closeOnOutsideClick);
+    document.addEventListener("click", closeOnOutsideClick, true);
     document.addEventListener("keydown", closeOnEscape);
     return () => {
-      document.removeEventListener("click", closeOnOutsideClick);
+      document.removeEventListener("click", closeOnOutsideClick, true);
       document.removeEventListener("keydown", closeOnEscape);
     };
-  }, [isOpen, panel]);
+  }, [openStepId]);
 
-  const openStep = panel && !isLeaving ? stepsOf(partsStageId).find((step) => step.id === panel.stepId) : undefined;
+  useEffect(() => {
+    if (!openStepId) return;
+    drawerRef.current?.focus();
+    const cards = partCards.current;
+    return () => {
+      if (document.activeElement === document.body) cards.get(openStepId)?.focus();
+    };
+  }, [openStepId]);
+
+  const openStep = openStepId && !isLeaving ? stepsOf(partsStageId).find((step) => step.id === openStepId) : undefined;
   const activeStepId = session.isRunning("train") ? TRAINING_PATH[Math.floor(performance.now() / STEP_ORDER_MS) % TRAINING_PATH.length] : null;
 
   return {
@@ -79,28 +65,14 @@ export function useLessons(isOpen: boolean, stageId: StageId, onSelectStage: (id
     isLeaving,
     openStep,
     activeStepId,
-    clickStage(id: StageId) {
-      window.clearTimeout(timers.current.select);
-      onSelectStage(id);
+    partCards,
+    drawerRef,
+    runCommand,
+    togglePart(stepId: string) {
+      setOpenStepId((current) => (current === stepId ? null : stepId));
     },
-    stageCommand(id: StageId, command: string) {
-      runCommand(command);
-      window.clearTimeout(timers.current.select);
-      if (canHover()) timers.current.select = window.setTimeout(() => onSelectStage(id), SELECT_DELAY_MS);
+    closeDrawer() {
+      setOpenStepId(null);
     },
-    clickPart(stepId: string) {
-      clearTimers();
-      if (panel?.isPinned && panel.stepId === stepId) setPanel(null);
-      else openPanel(stepId, true);
-    },
-    partCommand(stepId: string, command: string) {
-      runCommand(command);
-      if (!canHover()) return;
-      clearTimers();
-      if (panel?.isPinned && panel.stepId !== stepId) return;
-      timers.current.open = window.setTimeout(() => openPanel(stepId, false), SELECT_DELAY_MS);
-    },
-    panelCommand: runCommand,
-    clickPanel: clearTimers,
   };
 }

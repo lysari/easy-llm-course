@@ -1,7 +1,7 @@
 #lessons {
   --lessons-tile-size: 32px;
   --lessons-foot-height: 28px;
-  --lessons-panel-max-height: min(72vh, 640px);
+  --lessons-drawer-width: 520px;
   --lessons-nest-indent: 24px;
   --lessons-dash-miss: 4 4;
 }
@@ -99,6 +99,10 @@
   box-shadow: var(--shadow-card-active);
 }
 
+.card.is-open {
+  border-color: var(--link);
+}
+
 .card.is-entering {
   animation: appear var(--motion-draw) backwards;
 }
@@ -182,24 +186,57 @@
   gap: var(--space-control);
 }
 
-.panel {
-  position: absolute;
+.drawer {
+  position: fixed;
   z-index: 3;
-  left: 0;
-  width: var(--panel-width);
-  max-height: var(--lessons-panel-max-height);
-  overflow-y: auto;
-  padding: var(--space-surface);
-  border: var(--border-thin) solid var(--card-line);
-  border-radius: var(--radius-card);
+  inset: 0 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  width: min(var(--lessons-drawer-width), 100%);
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) 0;
+  border-left: var(--border-thin) solid var(--card-line);
+  border-radius: var(--radius-card) 0 0 var(--radius-card);
   background: var(--card);
   box-shadow: var(--shadow-float);
-  animation: appear var(--motion-fast);
+  animation: slide-in var(--motion-draw);
 }
 
-.panel-inner {
+.drawer:focus-visible {
+  outline: none;
+}
+
+.drawer-head {
+  grid-template-columns: var(--lessons-tile-size) minmax(0, 1fr) max-content var(--lessons-tile-size);
+  padding: var(--space-region) var(--space-section);
+  border-bottom: var(--border-thin) solid var(--card-line);
+}
+
+.drawer-close {
   display: grid;
+  place-items: center;
+  width: var(--lessons-tile-size);
+  height: var(--lessons-tile-size);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-tile);
+  background: transparent;
+  color: var(--ink-soft);
+}
+
+.drawer-close:hover {
+  background: var(--group);
+  color: var(--ink);
+}
+
+.drawer-body {
+  display: grid;
+  flex: 1;
+  align-content: start;
   gap: var(--space-block);
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-region) var(--space-section) var(--space-section);
 }
 
 .tasks {
@@ -278,15 +315,6 @@ button.task:hover {
   color: var(--running-ink);
 }
 
-.code {
-  margin: 0;
-  padding: var(--space-item) var(--space-card);
-  overflow-x: auto;
-  border-radius: var(--radius-tile);
-  background: var(--group);
-  font: var(--weight-regular) var(--text-caption) / var(--leading-code) var(--font-mono);
-}
-
 .why {
   padding-top: var(--space-item);
   border-top: var(--border-thin) solid var(--card-line);
@@ -350,6 +378,13 @@ button.task:hover {
   text-anchor: middle;
 }
 
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
 @keyframes draw {
   to {
     stroke-dashoffset: 0;
@@ -358,7 +393,7 @@ button.task:hover {
 
 @media (prefers-reduced-motion: reduce) {
   .card.is-entering,
-  .panel {
+  .drawer {
     animation: none;
   }
 
@@ -406,9 +441,15 @@ button.task:hover {
     border-left: var(--border-thick) solid var(--link);
   }
 
-  .panel {
-    position: static;
+  .drawer {
     width: 100%;
-    max-height: none;
+    padding-left: env(safe-area-inset-left, 0px);
+    border-left: 0;
+    border-radius: 0;
+  }
+
+  .drawer-head,
+  .drawer-body {
+    padding-inline: var(--space-wide);
   }
 }

@@ -42,8 +42,14 @@ export const simpleSteps: FlowStep[] = [
     rows: () =>
       [1, 2, 3, 4, 5].map((x, i) => ({ text: `x = ${x} → 10 × ${x} + 30`, value: `${10 * x + 30} (true ${LOSS_TARGETS[i]}) ✓` })),
     note: () => `With wrong numbers, w = 5 and b = 10: x = 1 gives ${5 + 10}, but the true answer is 40. It is off by 25.`,
-    formula: "y = w × x + b\nw (weight): how steep the line is\nb (bias): where the line starts",
-    code: "function predict(x: number, w: number, b: number): number {\n  return w * x + b;\n}",
+    formula: {
+      lines: ["y = w × x + b"],
+      legend: [
+        { term: "w (weight)", meaning: "how steep the line is" },
+        { term: "b (bias)", meaning: "where the line starts" },
+      ],
+    },
+    code: "function predict(\n  x: number,\n  w: number,\n  b: number,\n): number {\n  return w * x + b;\n}",
     why: "Machine learning means finding the right w and b automatically. Every model, even a very large one, follows this idea.",
   },
   {
@@ -88,8 +94,8 @@ export const simpleSteps: FlowStep[] = [
     ],
     note: () =>
       `Why square? Compare one big error, with guesses 140, 50, 60, 70, 80: MSE ${mse([140, 50, 60, 70, 80], LOSS_TARGETS).toFixed(0)}, but plain average miss (MAE) only ${mae([140, 50, 60, 70, 80], LOSS_TARGETS).toFixed(0)}. Squaring punishes big errors more.`,
-    formula: "MSE = (1/n) × Σ (guess − true)²",
-    code: "function mse(predictions: number[], targets: number[]): number {\n  const n = predictions.length;\n  let sum = 0;\n  for (let i = 0; i < n; i++) {\n    sum += (predictions[i] - targets[i]) ** 2;\n  }\n  return sum / n;\n}",
+    formula: { lines: ["MSE = (1/n) × Σ (guess − true)²"] },
+    code: "function mse(\n  predictions: number[],\n  targets: number[],\n): number {\n  const n = predictions.length;\n  let sum = 0;\n  for (let i = 0; i < n; i++) {\n    sum += (predictions[i] - targets[i]) ** 2;\n  }\n  return sum / n;\n}",
     why: "Loss is the compass. Training has one goal: make this number smaller.",
   },
   {
@@ -119,7 +125,7 @@ export const simpleSteps: FlowStep[] = [
     },
     visual: ({ learningLine }) => <SalaryPlot model={(x) => predictOnLine(learningLine, x)} />,
     note: ({ lineRounds, learningLine }) => `Step ${count(lineRounds)} of ${count(LINE_TOTAL_ROUNDS)}. Loss now: ${lineLoss(learningLine).toFixed(1)}.`,
-    formula: "dL/dw = (2/n) × Σ (guess − true) × x\ndL/db = (2/n) × Σ (guess − true)\nw = w − lr × dL/dw\nb = b − lr × dL/db",
+    formula: { lines: ["dL/dw = (2/n) × Σ (guess − true) × x", "dL/db = (2/n) × Σ (guess − true)", "w = w − lr × dL/dw", "b = b − lr × dL/db"] },
     code: "function step(): void {\n  const n = x.length;\n  let dw = 0;\n  let db = 0;\n  for (let i = 0; i < n; i++) {\n    const error = predict(x[i]) - y[i];\n    dw += error * x[i];\n    db += error;\n  }\n  w -= lr * (2 / n) * dw;\n  b -= lr * (2 / n) * db;\n}",
     why: "Like hiking down a hill blindfolded: feel the slope and take a small step downhill. The learning rate (lr) is the step size.",
   },
@@ -139,7 +145,7 @@ export const simpleSteps: FlowStep[] = [
       { text: "predict(x)", value: "w × x + b" },
       { text: "loss()", value: "MSE" },
     ],
-    code: "class LinearRegression {\n  private w = 0;\n  private b = 0;\n\n  constructor(private x: number[], private y: number[],\n              private lr = 0.01, iterations = 10000) {\n    this.train(iterations);\n  }\n\n  predict(xv: number): number {\n    return this.w * xv + this.b;\n  }\n}",
+    code: "class LinearRegression {\n  private w = 0;\n  private b = 0;\n\n  constructor(\n    private x: number[],\n    private y: number[],\n    private lr = 0.01,\n    iterations = 10000,\n  ) {\n    this.train(iterations);\n  }\n\n  predict(xv: number): number {\n    return this.w * xv + this.b;\n  }\n}",
     why: "No new math here. Several separate models can now exist together, each with its own w and b.",
   },
   {
@@ -167,7 +173,7 @@ export const simpleSteps: FlowStep[] = [
       const slope = (z: number) => sigmoid(z) * (1 - sigmoid(z));
       return `The problem with sigmoid: its slope at z = 10 is only ${slope(10).toFixed(6)}, so learning nearly stops. That is the vanishing gradient. ReLU's slope is 0 or 1.`;
     },
-    formula: "sigmoid(z) = 1 / (1 + e^(−z))\nrelu(z) = max(0, z)\ntanh(z) = (e^z − e^(−z)) / (e^z + e^(−z))",
+    formula: { lines: ["sigmoid(z) = 1 / (1 + e^(−z))", "relu(z) = max(0, z)", "tanh(z) = (e^z − e^(−z)) / (e^z + e^(−z))"] },
     code: "function sigmoid(z: number): number {\n  return 1 / (1 + Math.exp(-z));\n}\nfunction relu(z: number): number {\n  return Math.max(0, z);\n}",
     why: "Without a curve, stacked layers collapse into one straight line, however many you add.",
   },
@@ -194,8 +200,8 @@ export const simpleSteps: FlowStep[] = [
       ];
     },
     note: () => `One neuron is: weighted sum, plus bias, then a curve. This network has ${NETWORK_NUMBER_COUNT} numbers to learn: 3 × (w, b) + 3 output weights + 1 output bias.`,
-    formula: "neuron(x) = sigmoid(w · x + b)\nlayer = many neurons side by side",
-    code: "function neuron(inputs: number[], weights: number[], bias: number) {\n  const z = inputs.reduce((sum, xi, i) => sum + xi * weights[i], bias);\n  return sigmoid(z);\n}",
+    formula: { lines: ["neuron(x) = sigmoid(w · x + b)", "layer = many neurons side by side"] },
+    code: "function neuron(\n  inputs: number[],\n  weights: number[],\n  bias: number,\n) {\n  const z = inputs.reduce(\n    (sum, xi, i) => sum + xi * weights[i],\n    bias,\n  );\n  return sigmoid(z);\n}",
     why: "The middle layer is the hidden layer. More neurons can make more complex shapes.",
   },
   {
@@ -225,7 +231,7 @@ export const simpleSteps: FlowStep[] = [
       const compare = `Round ${count(network.rounds)} of ${count(NETWORK_TOTAL_ROUNDS)}. Loss ${network.loss().toFixed(1)}. The best straight line has ${lineLoss(bestLine).toFixed(1)}.`;
       return network.rounds > 0 && network.rounds <= LESSON_ROUNDS ? `${compare} Lesson 07 stops at 50,000 rounds, where it only ties the line.` : compare;
     },
-    formula: "dL/d(out) = −2 × (y − out)\nd(out)/dz = out × (1 − out)\ndL/dwO1 = δ_out × h1",
+    formula: { lines: ["dL/d(out) = −2 × (y − out)", "d(out)/dz = out × (1 − out)", "dL/dwO1 = δ_out × h1"] },
     code: "const error = yi - out;\nconst dOut = error * sigmoidDerivative(out);\nwO1 += lr * dOut * h1;\nconst dH1 = dOut * wO1 * sigmoidDerivative(h1);\nw1 += lr * dH1 * xi;",
     why: "This is the chain rule, applied from the output back to the input. It is how every neural network learns.",
   },
@@ -273,7 +279,7 @@ export const simpleSteps: FlowStep[] = [
       { text: "Shape rule", value: "(2×3) × (3×2) = (2×2)" },
       { text: "Dot product: [1,2,3] · [4,5,6]", value: "32" },
     ],
-    formula: "One layer: output = activation(X @ W + b)",
+    formula: { lines: ["One layer: output = activation(X @ W + b)"] },
     code: "for (let i = 0; i < rows; i++)\n  for (let j = 0; j < cols; j++)\n    for (let k = 0; k < inner; k++)\n      C[i][j] += A[i][k] * B[k][j];",
     why: "Every layer of a big model is this: multiply tables, add, then a curve.",
   },

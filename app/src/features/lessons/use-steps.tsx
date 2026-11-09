@@ -73,7 +73,13 @@ export const useSteps: FlowStep[] = [
       );
     },
     note: () => `The lesson's logits [2, 1, 0]: T = 0.5 gives ${softmaxWith(0.5)}. T = 1 gives ${softmaxWith(1)}. T = 2 gives ${softmaxWith(2)}.`,
-    formula: "p = softmax(logits / T)\nTop-K: keep the K highest, then sample\nTop-P: keep tokens until they total p",
+    formula: {
+      lines: ["p = softmax(logits / T)"],
+      legend: [
+        { term: "Top-K", meaning: "keep the K highest, then sample" },
+        { term: "Top-P", meaning: "keep tokens until they total p" },
+      ],
+    },
     code: "let r = Math.random();\nfor (let i = 0; i < probs.length; i++) {\n  r -= probs[i];\n  if (r <= 0) return i;\n}",
     why: "Always taking the top word makes writing repeat itself. Sampling is why the same question can get different answers.",
   },
@@ -95,7 +101,7 @@ export const useSteps: FlowStep[] = [
     rowsTitle: "Each new token",
     rows: (session) => session.writtenSteps().map((step, i) => ({ text: `Trip ${i + 1}: top ${showWord(step.top)} ${percent(step.topChance)}`, value: `picked ${showWord(step.word)}` })),
     note: (session) => trainFirst(session) || `It stops when it picks "stop", or at the context window of ${MAX_CONTEXT} tokens.`,
-    code: "function generate(seed: string, length: number, temperature = 0.8) {\n  let tokens = tokenizer.encode(seed);\n  for (let i = 0; i < length; i++) {\n    const context = tokens.slice(-blockSize);\n    const { logits } = forward(context);\n    tokens.push(sampleToken(logits[logits.length - 1], temperature));\n  }\n  return tokenizer.decode(tokens);\n}",
+    code: "function generate(\n  seed: string,\n  length: number,\n  temperature = 0.8,\n) {\n  let tokens = tokenizer.encode(seed);\n  for (let i = 0; i < length; i++) {\n    const context = tokens.slice(-blockSize);\n    const { logits } = forward(context);\n    tokens.push(\n      sampleToken(\n        logits[logits.length - 1],\n        temperature,\n      ),\n    );\n  }\n  return tokenizer.decode(tokens);\n}",
     why: "Each token is a full trip through the model. That is why chat apps show words one by one.",
   },
   {
@@ -121,7 +127,13 @@ export const useSteps: FlowStep[] = [
       ];
     },
     note: () => "Why not Q too? Q is only needed for the newest token. K and V of old tokens never change. This small app runs without a cache.",
-    formula: "No cache: 1 + 2 + … + N = N(N + 1) / 2\nWith cache: N\nPrefill: run the whole prompt once\nDecode: one token at a time",
+    formula: {
+      lines: ["No cache: 1 + 2 + … + N = N(N + 1) / 2", "With cache: N"],
+      legend: [
+        { term: "Prefill", meaning: "run the whole prompt once" },
+        { term: "Decode", meaning: "one token at a time" },
+      ],
+    },
     why: "Without it, the waste grows with the square of the length. The cost is memory, which real systems manage carefully.",
   },
 ];
@@ -145,7 +157,7 @@ export const beyondSteps: FlowStep[] = [
       { text: "GPT-4 (2023)", value: "unknown, rumored ~1 trillion" },
       { text: "Doubling the numbers lowers loss by", value: `a factor of ${(2 ** 0.076).toFixed(3)}` },
     ],
-    formula: "L(N) ≈ (Nc / N)^0.076",
+    formula: { lines: ["L(N) ≈ (Nc / N)^0.076"] },
     why: "You can train a small model, measure it, and predict a much bigger one before paying for it. Chinchilla (2022) added how much data to use.",
   },
   {
@@ -164,7 +176,7 @@ export const beyondSteps: FlowStep[] = [
       { text: "One-shot", value: "1 example" },
       { text: "Few-shot", value: "a few examples" },
     ],
-    code: "Translate English to French:\ncheese →",
+    code: "const prompt = `Translate English to French:\ncheese →`;",
     note: () => "No numbers change. It just continues the pattern. Our small model is far too small to do this.",
     why: "GPT-3's big discovery. It needs a model that is large enough. Prompt engineering comes from this.",
   },
@@ -205,7 +217,7 @@ export const beyondSteps: FlowStep[] = [
       { text: "Experts disagree", value: "about 20–30% of the time" },
       { text: "Danger", value: "reward hacking" },
     ],
-    formula: "P(A preferred) = sigmoid(r_A − r_B)",
+    formula: { lines: ["P(A preferred) = sigmoid(r_A − r_B)"] },
     why: "People find it easier to recognise a good reply than to describe one. This turns that judgment into a number.",
   },
   {
@@ -225,7 +237,7 @@ export const beyondSteps: FlowStep[] = [
       { text: "Clip each update", value: "avoids big changes" },
       { text: "KL penalty", value: "stays near the old model" },
     ],
-    formula: "maximize E[reward_model(prompt, completion)]\nr(t) = π_new(token) / π_old(token)\nA = R − V(state)",
+    formula: { lines: ["maximize E[reward_model(prompt, completion)]", "r(t) = π_new(token) / π_old(token)", "A = R − V(state)"] },
     why: "This is how InstructGPT and ChatGPT became helpful. DPO is a simpler alternative that the lesson also covers.",
   },
   {
@@ -244,7 +256,7 @@ export const beyondSteps: FlowStep[] = [
       { text: "Output", value: "weighted sum of the K" },
       { text: "Problem to manage", value: "load balancing" },
     ],
-    formula: "Input → Router → K of N experts → weighted sum → Output",
+    formula: { lines: ["Input → Router → K of N experts → weighted sum → Output"] },
     why: "In a normal model, every token passes through every number. This breaks that link, so capacity grows without the same cost.",
   },
   {
@@ -268,7 +280,7 @@ export const beyondSteps: FlowStep[] = [
       { text: "Lesson 29", value: "GPT-4" },
     ],
     note: () => "Lesson 30 also points to what to read and build next.",
-    formula: "tokens → model → probability of the next token",
+    formula: { lines: ["tokens → model → probability of the next token"] },
     why: "Every language model is a function that takes tokens and gives a probability for the next one. The learning is in the numbers.",
   },
 ];

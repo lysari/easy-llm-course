@@ -1,3 +1,4 @@
+import { NavLink } from "react-router";
 import { STAGES } from "@/features/lessons/flow";
 import type { StageId } from "@/features/lessons/interfaces/story.interface";
 import { Icon, SparkleIcon } from "@/shared/components/icon";
@@ -13,9 +14,9 @@ export function Sidebar({ isPlayground, stageId, onSelectStage }: SidebarProps) 
     <aside className="sidebar">
       <p className="brand"><SparkleIcon /> Tiny GPT</p>
       <nav className="side-nav" aria-label="Pages">
-        <a className={`side-link side-link--page${isPlayground ? "" : " is-on"}`} id="nav-lessons" href="#lessons" aria-current={isPlayground ? undefined : "page"}>
+        <NavLink className={({ isActive }) => `side-link side-link--page${isActive ? " is-on" : ""}`} id="nav-lessons" to="/">
           <Icon name="book" /> Lessons
-        </a>
+        </NavLink>
         <div className="side-stages" id="side-stages" hidden={isPlayground}>
           {STAGES.map((stage) => (
             <button
@@ -23,18 +24,15 @@ export function Sidebar({ isPlayground, stageId, onSelectStage }: SidebarProps) 
               type="button"
               className={`side-link${stage.id === stageId ? " is-selected" : ""}`}
               id={`nav-${stage.id}`}
-              onClick={(event) => {
-                event.stopPropagation();
-                onSelectStage(stage.id);
-              }}
+              onClick={() => onSelectStage(stage.id)}
             >
               <Icon name={stage.icon} /> {stage.title}
             </button>
           ))}
         </div>
-        <a className={`side-link side-link--page${isPlayground ? " is-on" : ""}`} id="nav-playground" href="#playground" aria-current={isPlayground ? "page" : undefined}>
+        <NavLink className={({ isActive }) => `side-link side-link--page${isActive ? " is-on" : ""}`} id="nav-playground" to="/playground">
           <Icon name="play" /> Playground
-        </a>
+        </NavLink>
       </nav>
     </aside>
   );

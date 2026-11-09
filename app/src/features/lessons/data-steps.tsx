@@ -43,7 +43,7 @@ export const dataSteps: FlowStep[] = [
       { text: `Decode [${VOCABULARY.indexOf("my")}, ${VOCABULARY.indexOf("dog")}]`, value: `"my dog"` },
     ],
     note: () => `"stop" (ID ${VOCABULARY.indexOf(END_TOKEN)}) is a real token. It is how a model learns to finish.`,
-    code: "encode(text: string): number[] {\n  return text.split(/\\s+/).map(w => this.wordToId.get(w));\n}\ndecode(ids: number[]): string {\n  return ids.map(i => this.idToWord.get(i)).join(' ');\n}",
+    code: "class Tokenizer {\n  encode(text: string): number[] {\n    return text\n      .split(/\\s+/)\n      .map((w) => this.wordToId.get(w));\n  }\n  decode(ids: number[]): string {\n    return ids\n      .map((i) => this.idToWord.get(i))\n      .join(\" \");\n  }\n}",
     why: "A token number has no meaning. It is only an address, like a locker number.",
   },
   {
@@ -58,7 +58,7 @@ export const dataSteps: FlowStep[] = [
     status: () => "done",
     rowsTitle: "From the first sentence",
     rows: () => FIRST_LINE.slice(0, -1).map((_, i) => ({ text: joinTokens(FIRST_LINE.slice(0, i + 1)), value: `→ ${FIRST_LINE[i + 1]}` })),
-    code: "const inputs  = tokens.slice(0, -1);\nconst targets = tokens.slice(1);",
+    code: "const inputs = tokens.slice(0, -1);\nconst targets = tokens.slice(1);",
     why: "Nobody writes the answers. The next word in the text is always the answer. This is the only task a base model trains on.",
   },
 ];

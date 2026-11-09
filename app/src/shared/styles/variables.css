@@ -1,4 +1,5 @@
 :root {
+  --text-formula: 1.12rem;
   --text-heading: 1.02rem;
   --text-title: 0.98rem;
   --text-body: 0.93rem;
@@ -67,7 +68,6 @@
   --page-pad-side-narrow: 12px;
   --stage-width: 430px;
   --part-width: 390px;
-  --panel-width: 500px;
   --column-gap: 84px;
   --sub-gap: 52px;
 }

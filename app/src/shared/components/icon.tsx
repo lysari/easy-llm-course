@@ -21,6 +21,7 @@ const ICON_PATHS: Record<string, string> = {
   chevron: "M4.500 6.500 8 10l3.500-3.500",
   check: "M3.500 8.500 6.500 11.500 12.500 4.500",
   close: "M4.500 4.500l7 7 M11.500 4.500l-7 7",
+  copy: "M6 6h7v7H6z M10 6V3H3v7h3",
   plus: "M8 3.500v9 M3.500 8h9",
   trash: "M3 4.500h10 M6.500 4.500V3h3v1.500 M4.500 4.500l.5 8.500h6l.5-8.500",
   layers: "M8 2.500 14 6l-6 3.500L2 6z M2 10l6 3.500 6-3.500",

@@ -37,6 +37,8 @@
   --green-700: #0b6f34;
   --green-900: #173823;
   --teal-500: #26b79e;
+  --purple-300: #c8a6f7;
+  --purple-700: #7a3fc4;
   --orange-100: #feebcf;
   --orange-300: #fbc377;
   --orange-400: #f59e5b;
@@ -79,6 +81,14 @@
   --rule-line: var(--gray-300);
   --toggle: var(--teal-500);
   --toggle-knob: var(--white);
+  --code-identifier: var(--gray-950);
+  --code-keyword: var(--purple-700);
+  --code-string: var(--green-700);
+  --code-comment: var(--gray-600);
+  --code-class: var(--orange-600);
+  --code-property: var(--blue-800);
+  --code-sign: var(--gray-600);
+  --code-line-number: var(--gray-400);
   --shadow: var(--black-5);
   --shadow-strong: var(--black-14);
 }
@@ -114,6 +124,14 @@
     --chip: var(--slate-650);
     --chip-hover: var(--slate-625);
     --rule-line: var(--slate-600);
+    --code-identifier: var(--gray-125);
+    --code-keyword: var(--purple-300);
+    --code-string: var(--green-300);
+    --code-comment: var(--slate-300);
+    --code-class: var(--orange-300);
+    --code-property: var(--blue-300);
+    --code-sign: var(--slate-300);
+    --code-line-number: var(--slate-400);
     --shadow: var(--black-25);
     --shadow-strong: var(--black-55);
   }

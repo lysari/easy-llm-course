@@ -1,6 +1,7 @@
 :root {
   --font: "Inter", "Segoe UI", system-ui, sans-serif;
   --font-mono: ui-monospace, Menlo, Consolas, monospace;
+  --font-math: "STIX Two Text", "Cambria Math", Cambria, "Times New Roman", serif;
 }
 
 @font-face {

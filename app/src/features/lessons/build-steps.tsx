@@ -33,8 +33,8 @@ export const forwardSteps: FlowStep[] = [
       const now = session.similarity("dog", "cat", session.lab.live);
       return `Similarity of "dog" and "cat": ${before.toFixed(2)} at the start, ${now.toFixed(2)} now. With huge text, training pulls words used in similar ways closer. Our tiny text barely shows this.`;
     },
-    formula: `table shape: ${VOCABULARY.length} × ${VECTOR_SIZE} (words × numbers)\ncosine(a, b) = a · b / (|a| × |b|)`,
-    code: "function lookup(tokenId: number, table: number[][]): number[] {\n  return table[tokenId];\n}",
+    formula: { lines: [`table shape: ${VOCABULARY.length} × ${VECTOR_SIZE} (words × numbers)`, "cosine(a, b) = a · b / (|a| × |b|)"] },
+    code: "function lookup(\n  tokenId: number,\n  table: number[][],\n): number[] {\n  return table[tokenId];\n}",
     why: "It is a lookup, not a calculation. The numbers start random, and training fills them with meaning.",
   },
   {
@@ -56,8 +56,8 @@ export const forwardSteps: FlowStep[] = [
         { text: "= new list", value: shortList(combined[1], 4) },
       ];
     },
-    formula: "final[position] = token_embedding + position_embedding",
-    code: "const X = tokens.map((t, i) =>\n  add(tokenTable[t], positionTable[i]));",
+    formula: { lines: ["final[position] = token_embedding + position_embedding"] },
+    code: "const X = tokens.map((t, i) =>\n  add(tokenTable[t], positionTable[i]),\n);",
     why: "Attention treats tokens as a set, so without this, \"dog bites man\" and \"man bites dog\" look the same. Newer models use RoPE (Lesson 25).",
   },
   {
@@ -82,8 +82,8 @@ export const forwardSteps: FlowStep[] = [
         { text: "Its mean now", value: Math.abs(mean) < 0.005 ? "0" : mean.toFixed(2) },
       ];
     },
-    formula: "LayerNorm(x) = (x − mean(x)) / √(variance(x) + ε)",
-    code: "const mean = x.reduce((s, v) => s + v, 0) / x.length;\nconst variance = x.reduce((s, v) => s + (v - mean) ** 2, 0) / x.length;\nreturn x.map(v => (v - mean) / Math.sqrt(variance + eps));",
+    formula: { lines: ["LayerNorm(x) = (x − mean(x)) / √(variance(x) + ε)"] },
+    code: "const mean = x.reduce((s, v) => s + v, 0) / x.length;\nconst variance =\n  x.reduce((s, v) => s + (v - mean) ** 2, 0) / x.length;\nreturn x.map(\n  (v) => (v - mean) / Math.sqrt(variance + eps),\n);",
     why: "Numbers can grow too large or too small as they pass through layers, which makes training unstable. This model normalizes before each job (Pre-LN, from GPT-2).",
   },
   {
@@ -111,8 +111,15 @@ export const forwardSteps: FlowStep[] = [
       ];
     },
     note: (session) => `Showing ${modelState(session)}, layer 1. Later words are hidden (causal mask). This model has 1 head. GPT-2 small runs 12 in parallel, each of 64 numbers.`,
-    formula: "attention = softmax(Q · Kᵀ / √d) · V\nQ: what am I looking for?\nK: what do I offer?\nV: what do I contain?",
-    code: "const scores = matmul(Q, transpose(K))\n  .map(row => row.map(s => s / Math.sqrt(dk)));\nif (causal)\n  for (let i = 0; i < T; i++)\n    for (let j = i + 1; j < T; j++)\n      scores[i][j] = -Infinity;\nconst weights = scores.map(row => softmax(row));",
+    formula: {
+      lines: ["attention = softmax(Q · Kᵀ / √d) · V"],
+      legend: [
+        { term: "Q", meaning: "what am I looking for?" },
+        { term: "K", meaning: "what do I offer?" },
+        { term: "V", meaning: "what do I contain?" },
+      ],
+    },
+    code: "const scores = matmul(Q, transpose(K)).map((row) =>\n  row.map((s) => s / Math.sqrt(dk)),\n);\nif (causal)\n  for (let i = 0; i < T; i++)\n    for (let j = i + 1; j < T; j++)\n      scores[i][j] = -Infinity;\nconst weights = scores.map((row) => softmax(row));",
     why: "This lets a word use clues from far back in the sentence. It works like a search: match a query against keys, then take the values.",
   },
   {
@@ -138,7 +145,7 @@ export const forwardSteps: FlowStep[] = [
         { text: "4. Add old list back (residual)", value: shortList(layer.afterFeedForward[LAST], 3) },
       ];
     },
-    formula: "FFN(x) = W2 · ReLU(W1 · x)\noutput = x + FFN(LayerNorm(x))",
+    formula: { lines: ["FFN(x) = W2 · ReLU(W1 · x)", "output = x + FFN(LayerNorm(x))"] },
     code: "// Lesson 15 uses GELU, a smoother curve\nconst pre = matmul(x, W1);\nconst h = pre.map(relu);\nconst out = matmul(h, W2);\nreturn add(x, out);",
     why: "Attention is communication between words. This is computation inside one word. The 4× width gives it working space.",
   },
@@ -164,7 +171,7 @@ export const forwardSteps: FlowStep[] = [
       ];
     },
     note: () => `This model has ${LAYER_COUNT} layers. GPT-1 and GPT-2 small have 12. The largest GPT-2 has 48.`,
-    formula: "x = x + attention(LayerNorm(x))\nx = x + FFN(LayerNorm(x))",
+    formula: { lines: ["x = x + attention(LayerNorm(x))", "x = x + FFN(LayerNorm(x))"] },
     why: "These are the hidden layers. The size going in equals the size coming out, so layers can stack. Residual additions keep gradients flowing through deep stacks.",
   },
   {
@@ -180,7 +187,7 @@ export const forwardSteps: FlowStep[] = [
     rowsTitle: `Top scores after "${TEST_TEXT}"`,
     rows: (session) => session.guess().slice(0, 6).map((option) => ({ text: showWord(option.token), value: option.score.toFixed(2) })),
     note: () => "Only the last token's list predicts the next word. In training, every position predicts its own next word.",
-    formula: `logits = LayerNorm(x) @ Woutput\n(1 × ${VECTOR_SIZE}) @ (${VECTOR_SIZE} × ${VOCABULARY.length}) = (1 × ${VOCABULARY.length})`,
+    formula: { lines: ["logits = LayerNorm(x) @ Woutput", `(1 × ${VECTOR_SIZE}) @ (${VECTOR_SIZE} × ${VOCABULARY.length}) = (1 × ${VOCABULARY.length})`] },
     code: "const logits = matmul(layerNorm(x), outputTable);",
     why: "Scores can be any size, and they do not add up to anything yet. GPT-2 reuses its token table here, which is called weight tying.",
   },
@@ -207,8 +214,8 @@ export const forwardSteps: FlowStep[] = [
       ];
     },
     note: (session) => `Showing ${modelState(session)}. The bar in a different blue is the right answer, "${TEST_ANSWER}".`,
-    formula: "p(i) = e^score(i) / Σ e^score(j)",
-    code: "const max = Math.max(...logits);\nconst exps = logits.map(l => Math.exp(l - max));\nconst sum = exps.reduce((a, b) => a + b, 0);\nreturn exps.map(e => e / sum);",
+    formula: { lines: ["p(i) = e^score(i) / Σ e^score(j)"] },
+    code: "const max = Math.max(...logits);\nconst exps = logits.map((l) => Math.exp(l - max));\nconst sum = exps.reduce((a, b) => a + b, 0);\nreturn exps.map((e) => e / sum);",
     why: "Exponents make gaps bigger and keep every value positive. Subtracting the largest score avoids overflow.",
   },
 ];
