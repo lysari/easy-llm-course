@@ -49,16 +49,26 @@ export interface RealNote {
   source: string;
 }
 
+export interface Amount {
+  value: number;
+  unit: string;
+  isOver?: boolean;
+}
+
 export interface RealFacts {
   shape: string;
   weightCount: number;
+  headline: Amount;
   input: string;
   output: string;
+  inputDetail?: string;
+  outputDetail?: string;
   notes?: RealNote[];
 }
 
 export interface StepFacts {
   shape: string;
+  headline: Amount;
   notes: RealNote[];
 }
 
@@ -72,6 +82,7 @@ export interface ModelPart {
   id: string;
   icon: string;
   title: string;
+  summary: string;
   copies: number;
   facts: RealFacts;
   tiny: TinyLink;
@@ -92,10 +103,15 @@ export interface RealModel {
   modes: Record<ModeId, ModelPart>;
 }
 
+export interface NoneToLearn {
+  reason: string;
+}
+
 export interface TinyReadout {
   title: string;
   shape: string;
   weightCount: number;
+  headline: Amount | NoneToLearn;
   live: string;
 }
 

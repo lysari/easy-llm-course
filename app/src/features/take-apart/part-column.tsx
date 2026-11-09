@@ -6,6 +6,7 @@ import { PartCard, titleOf } from "./part-card";
 
 interface PartColumnProps {
   root: ModelPart;
+  modelTitle: string;
   parent: ModelPart;
   parts: ModelPart[];
   selectedId: string | undefined;
@@ -18,7 +19,7 @@ interface PartColumnProps {
   onDetails: (id: string) => void;
 }
 
-export function PartColumn({ root, parent, parts, selectedId, openId, cards, tiny, hasLinks, width, onSelect, onDetails }: PartColumnProps) {
+export function PartColumn({ root, modelTitle, parent, parts, selectedId, openId, cards, tiny, hasLinks, width, onSelect, onDetails }: PartColumnProps) {
   const columnRef = useRef<HTMLElement>(null);
   const partIds = useMemo(() => parts.map((part) => part.id), [parts]);
   const isSteps = parent === root;
@@ -40,6 +41,7 @@ export function PartColumn({ root, parent, parts, selectedId, openId, cards, tin
             else cards.current.delete(part.id);
           }}
           root={root}
+          modelTitle={modelTitle}
           part={part}
           tiny={tiny}
           index={i}

@@ -10,7 +10,7 @@ interface DrawerProps {
   icon: string;
   title: string;
   lesson: string;
-  status: Status;
+  status?: Status;
   bodyKey: string;
   onClose: () => void;
   children: ReactNode;
@@ -25,7 +25,7 @@ export function Drawer({ ref, id, icon, title, lesson, status, bodyKey, onClose,
           <h2 className="card-title">{title}</h2>
           <p className="card-lesson">{lesson}</p>
         </div>
-        <StatusPill status={status} />
+        {status && <StatusPill status={status} />}
         <button type="button" className="drawer-close" aria-label="Close details" onClick={onClose}>
           <Icon name="close" />
         </button>

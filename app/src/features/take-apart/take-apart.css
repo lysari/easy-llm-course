@@ -177,29 +177,179 @@
   font-weight: var(--weight-medium);
 }
 
-.part-facts {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-tight) var(--space-block);
-  margin: 0;
-  font-size: var(--text-small);
+.part-card {
+  gap: var(--space-block);
+  padding: var(--space-surface) var(--space-wide);
 }
 
-.part-facts > div {
+.part-card-head {
+  display: grid;
+  grid-template-columns: var(--tile-size) minmax(0, 1fr) max-content;
+  align-items: start;
+  gap: var(--space-card);
+}
+
+.part-card-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-tight) var(--space-item);
+  min-width: 0;
+  min-height: var(--tile-size);
+}
+
+.part-card-name .pill {
+  padding: var(--space-edge) var(--space-control);
+  font-size: var(--text-caption);
+}
+
+.step-badge {
+  display: grid;
+  place-items: center;
+  width: var(--tile-size);
+  height: var(--tile-size);
+  border: var(--border-thin) solid var(--card-line);
+  border-radius: var(--radius-circle);
+  background: var(--tile);
+  font-weight: var(--weight-medium);
+  transition: background var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast);
+}
+
+.part-card.is-active .step-badge,
+.part-card.is-active .tile {
+  border-color: var(--link);
+  background: var(--selected-bg);
+  color: var(--selected-ink);
+}
+
+.lesson-tag {
+  margin-top: var(--space-control);
+  padding: var(--space-edge) var(--space-control);
+  border-radius: var(--radius-pill);
+  background: var(--group);
+  color: var(--ink-soft);
+  font-size: var(--text-caption);
+  white-space: nowrap;
+}
+
+.lesson-tag.is-muted {
+  background: transparent;
+  color: var(--ink-faint);
+}
+
+.part-summary {
+  color: var(--ink);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+}
+
+.in-out,
+.in-out-to {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-tight) var(--space-item);
+}
+
+.in-out {
+  font-size: var(--text-small);
+  line-height: var(--leading-link);
+}
+
+.in-out-chip {
+  min-width: 0;
+  padding: var(--space-label) var(--space-item);
+  border: var(--border-thin) solid var(--card-line);
+  border-radius: var(--radius-pill);
+  background: var(--tile);
+  overflow-wrap: anywhere;
+}
+
+.in-out-to {
+  flex-wrap: nowrap;
   min-width: 0;
 }
 
-.part-facts dt {
+.in-out-arrow {
+  flex: none;
+  color: var(--ink-faint);
+}
+
+.part-numbers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  padding-top: var(--space-block);
+  border-top: var(--border-thin) solid var(--card-line);
+}
+
+.part-numbers > div {
+  display: grid;
+  align-content: start;
+  gap: var(--space-edge);
+  min-width: 0;
+  padding-right: var(--space-block);
+}
+
+.part-numbers > div + div {
+  padding-right: 0;
+  padding-left: var(--space-block);
+  border-left: var(--border-thin) solid var(--card-line);
+}
+
+.part-numbers dt {
   color: var(--ink-soft);
   font-size: var(--text-caption);
 }
 
-.part-facts dd {
+.live-tag {
+  margin-left: var(--space-control);
+  padding: 0 var(--space-stack);
+  border-radius: var(--radius-pill);
+  background: var(--running-bg);
+  color: var(--running-ink);
+}
+
+.part-numbers dd {
   margin: 0;
+  color: var(--ink-soft);
+  font-size: var(--text-small);
   overflow-wrap: anywhere;
 }
 
+.part-numbers b {
+  color: var(--ink);
+  font-size: var(--text-title);
+  font-weight: var(--weight-medium);
+}
+
+.part-numbers .is-muted {
+  color: var(--ink-faint);
+}
+
+.part-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-block);
+  min-height: var(--card-foot-height);
+  color: var(--ink-soft);
+  font-size: var(--text-small);
+}
+
+.part-card-foot .action {
+  margin-left: auto;
+}
+
+@media (pointer: coarse) {
+  .part-card-foot .action {
+    min-height: var(--touch-target);
+  }
+}
+
 #take-apart {
+  --take-apart-column-width: 348px;
+
   display: flex;
   flex-direction: column;
   padding-bottom: var(--page-pad-side);
@@ -223,7 +373,7 @@
 
 .take-apart-column {
   align-content: start;
-  width: var(--part-width);
+  width: var(--take-apart-column-width);
 }
 
 @media (max-width: 960px) {

@@ -7,8 +7,10 @@ import { Drawer } from "@/shared/components/drawer";
 import { FormulaBlock } from "@/shared/components/formula-block";
 import { count } from "@/shared/utils/format";
 import { FactRows } from "./fact-rows";
+import { InOut } from "./in-out";
 import { LiveExample } from "./live-example";
-import { DRAWER_ID, numbersOf, statusOf, titleOf } from "./part-card";
+import { DRAWER_ID, NO_LESSON, numbersOf, partsOf, tagOf, titleOf } from "./part-card";
+import { PartNumbers } from "./part-numbers";
 import { readTinyPart } from "./tiny-parts";
 
 const REVERSE_TITLES: Record<string, string> = {
@@ -20,8 +22,6 @@ const REVERSE_TITLES: Record<string, string> = {
   "RL-05": "Weights, Not Wisdom",
   "RL-06": "Ground Zero",
 };
-
-const NO_LESSON = "No lesson yet";
 
 const GROUND_ZERO_TEXT = { "multiply-add": "one multiply on two numbers, added to a sum", "stored-number": "one stored number", action: "one small step that uses no stored numbers" };
 
@@ -37,22 +37,21 @@ function liveCaption(part: TinyPartId, sentence: Sentence) {
 interface PartDrawerProps {
   ref: Ref<HTMLElement>;
   root: ModelPart;
+  modelTitle: string;
   part: ModelPart;
   tiny: TinyView;
   sentence: Sentence;
   onClose: () => void;
 }
 
-export function PartDrawer({ ref, root, part, tiny, sentence, onClose }: PartDrawerProps) {
+export function PartDrawer({ ref, root, modelTitle, part, tiny, sentence, onClose }: PartDrawerProps) {
   const readout = readTinyPart(part.tiny, tiny);
   const notes = part.facts.notes ?? [];
   const sources = [...new Set(notes.map((note) => note.source))];
   const realRows: [string, string][] = [
     ["Shape", part.facts.shape],
     ["Numbers", numbersOf(part)],
-    ["In", part.facts.input],
-    ["Out", part.facts.output],
-    ["Inside", part.groundZero ? `Ground zero: ${GROUND_ZERO_TEXT[part.groundZero]}` : `${part.children?.length} ${part.children?.length === 1 ? "part" : "parts"}`],
+    ["Inside", part.groundZero ? `Ground zero: ${GROUND_ZERO_TEXT[part.groundZero]}` : partsOf(part.children ?? [])],
     ...notes.map((note): [string, string] => [note.label, note.value]),
   ];
   const tinyRows: [string, string][] = [
@@ -64,19 +63,30 @@ export function PartDrawer({ ref, root, part, tiny, sentence, onClose }: PartDra
   ];
 
   return (
-    <Drawer ref={ref} id={DRAWER_ID} icon={part.icon} title={titleOf(part, root)} lesson={`${part.lesson} · ${part.reverseLesson}`} status={statusOf(part, tiny)} bodyKey={part.id} onClose={onClose}>
-      <p className="note">{part.explanation}</p>
+    <Drawer ref={ref} id={DRAWER_ID} icon={part.icon} title={titleOf(part, root)} lesson={`${part.lesson} · ${part.reverseLesson}`} status={tagOf(part)} bodyKey={part.id} onClose={onClose}>
       <section className="section">
-        <p className="section-title">The real part</p>
-        <FactRows rows={realRows} />
-        {sources.length > 0 && <p className="card-lesson">{`Source: ${sources.join("; ")}`}</p>}
+        <p className="section-title">What it does</p>
+        <p className="part-summary">{part.summary}</p>
+        <p className="note">{part.explanation}</p>
+        <p className="why">{part.why}</p>
       </section>
       <section className="section">
-        <p className="section-title">{part.tiny.missing ? "Nearest part in our tiny model" : "The same part in our tiny model"}</p>
+        <p className="section-title">What goes in and out</p>
+        <InOut facts={part.facts} isDetailed />
+        <PartNumbers modelTitle={modelTitle} part={part} tiny={tiny} isExact />
+      </section>
+      <section className="section">
+        <p className="section-title">{part.tiny.missing ? "Nearest part in our tiny model" : "Live in our tiny model"}</p>
         {part.tiny.missing && <p className="note">{part.tiny.missing}</p>}
-        <FactRows rows={tinyRows} />
+        {!part.tiny.missing && "reason" in readout.headline && <p className="note">{readout.headline.reason}</p>}
         {!part.tiny.missing && <LiveExample link={part.tiny} tiny={tiny} />}
+        <FactRows rows={tinyRows} />
         <p className="card-lesson">{liveCaption(part.tiny.part, sentence)}</p>
+      </section>
+      <section className="section">
+        <p className="section-title">{`The real part in ${modelTitle}`}</p>
+        <FactRows rows={realRows} />
+        {sources.length > 0 && <p className="card-lesson">{`Source: ${sources.join("; ")}`}</p>}
       </section>
       {part.formula && <FormulaBlock formula={part.formula} />}
       {part.code && <CodeBlock code={part.code} />}
@@ -89,7 +99,6 @@ export function PartDrawer({ ref, root, part, tiny, sentence, onClose }: PartDra
           ]}
         />
       </section>
-      <p className="why">{part.why}</p>
     </Drawer>
   );
 }

@@ -58,6 +58,8 @@
   --ink-soft: var(--gray-600);
   --ink-faint: var(--gray-400);
   --link: var(--blue-425);
+  --selected-bg: var(--blue-100);
+  --selected-ink: var(--blue-800);
   --running-bg: var(--blue-100);
   --running-ink: var(--blue-800);
   --running-spin: var(--blue-550);
@@ -103,6 +105,8 @@
     --ink-soft: var(--slate-300);
     --ink-faint: var(--slate-400);
     --link: var(--blue-500);
+    --selected-bg: var(--blue-900);
+    --selected-ink: var(--blue-300);
     --running-bg: var(--blue-900);
     --running-ink: var(--blue-300);
     --running-spin: var(--blue-400);

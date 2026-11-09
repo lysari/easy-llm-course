@@ -35,6 +35,7 @@ export function TakeApartPage({ isOpen }: { isOpen: boolean }) {
             <PartColumn
               key={`${model.id}-${root.id}-${parent.id}`}
               root={root}
+              modelTitle={model.title}
               parent={parent}
               parts={parts}
               selectedId={path[level + 1]?.id}
@@ -49,7 +50,7 @@ export function TakeApartPage({ isOpen }: { isOpen: boolean }) {
           ))}
         </div>
       </div>
-      {openPart && <PartDrawer ref={takeApart.drawerRef} root={root} part={openPart} tiny={tiny} sentence={sentence} onClose={takeApart.closeDrawer} />}
+      {openPart && <PartDrawer ref={takeApart.drawerRef} root={root} modelTitle={model.title} part={openPart} tiny={tiny} sentence={sentence} onClose={takeApart.closeDrawer} />}
     </main>
   );
 }

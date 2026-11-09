@@ -24,6 +24,7 @@
 }
 
 .drawer-close {
+  grid-column: -2;
   display: grid;
   place-items: center;
   width: var(--tile-size);

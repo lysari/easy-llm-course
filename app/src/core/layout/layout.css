@@ -121,18 +121,28 @@
     padding-inline: max(var(--sidebar-pad), env(safe-area-inset-left, 0px)) max(var(--sidebar-pad), env(safe-area-inset-right, 0px));
   }
 
-  .brand,
-  .side-link {
-    white-space: nowrap;
+  .brand {
+    display: none;
   }
 
   .side-nav {
     flex: 1;
-    min-width: 0;
-    margin: calc(-1 * var(--space-tight));
+    grid-auto-columns: minmax(0, 1fr);
+  }
+
+  .side-link--page {
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-edge);
+    min-height: var(--touch-target);
     padding: var(--space-tight);
-    overflow-x: auto;
-    scrollbar-width: none;
+    font-size: var(--text-small);
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .side-link--page.is-on {
+    background: var(--group);
   }
 
   .page {

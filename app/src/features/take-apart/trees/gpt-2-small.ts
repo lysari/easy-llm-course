@@ -13,6 +13,7 @@ const wordTable = tablePart({
   id: "word-table",
   icon: "grid",
   title: "Word table",
+  summary: "Holds one list of numbers for every word the model knows.",
   copies: 1,
   rows: WORD_COUNT,
   cols: WIDTH,
@@ -29,6 +30,7 @@ const positionTable = tablePart({
   id: "position-table",
   icon: "order",
   title: "Position table",
+  summary: "Holds one list of numbers for each place in the text, so word order counts.",
   copies: 1,
   rows: CONTEXT,
   cols: WIDTH,
@@ -44,6 +46,7 @@ const finalNorm = normPart({
   id: "final-norm",
   icon: "gauge",
   title: "Final norm",
+  summary: "Keeps the last word's numbers in a steady range before they are scored.",
   copies: 1,
   size: WIDTH,
   hasShift: true,
@@ -58,8 +61,9 @@ const outputHead: ModelPart = {
   id: "output-head",
   icon: "percent",
   title: "Output table",
+  summary: "Scores every word against the last word's numbers, reusing the word table.",
   copies: 1,
-  facts: { shape: "768 × 50,257, the word table reused", weightCount: 0, input: "768 numbers for the last word", output: "50,257 scores" },
+  facts: { shape: "768 × 50,257, the word table reused", weightCount: 0, headline: { value: 0, unit: "numbers" }, input: "768 for last word", output: "50,257 scores", inputDetail: "768 numbers for the last word" },
   tiny: { part: "output-table", level: "whole" },
   lesson: "Lessons 11, 20",
   reverseLesson: "RL-04",
@@ -73,8 +77,9 @@ const outputHead: ModelPart = {
       id: "output-score",
       icon: "hash",
       title: "One word's score",
+      summary: "Scores one word: the last word's numbers times that word's row, added up.",
       copies: WORD_COUNT,
-      facts: { shape: "768 × 1", weightCount: 0, input: "768 numbers and one word's row", output: "1 score" },
+      facts: { shape: "768 × 1", weightCount: 0, headline: { value: 0, unit: "numbers" }, input: "768 numbers, 1 row", output: "1 score", inputDetail: "768 numbers and one word's row" },
       tiny: { part: "output-table", level: "number" },
       lesson: "Lesson 11",
       reverseLesson: "RL-04",
@@ -87,8 +92,9 @@ const outputHead: ModelPart = {
           id: "output-score-multiply-add",
           icon: "plus",
           title: "One multiply-and-add",
+          summary: "Multiplies one of the last word's numbers by one from the word table, and adds.",
           copies: WIDTH,
-          facts: { shape: "1 × 1", weightCount: 0, input: "1 number and 1 number from the word table", output: "the running sum" },
+          facts: { shape: "1 × 1", weightCount: 0, headline: { value: WIDTH, unit: "per output number" }, input: "1 number, 1 stored", output: "the running sum", inputDetail: "1 number and 1 number from the word table" },
           tiny: { part: "output-table", level: "multiply-add" },
           lesson: "Lessons 00, 11",
           reverseLesson: "RL-06",
@@ -107,8 +113,9 @@ const root: ModelPart = {
   id: "model",
   icon: "network",
   title: "GPT-2 small",
+  summary: "The whole model: word IDs go in, and a score for every word comes out.",
   copies: 1,
-  facts: { shape: "12 layers × 768 numbers per word", weightCount: 124_439_808, input: "up to 1,024 word ids", output: "50,257 scores, one per word it knows" },
+  facts: { shape: "12 layers × 768 numbers per word", weightCount: 124_439_808, headline: { value: 124_439_808, unit: "numbers" }, input: "up to 1,024 word IDs", output: "50,257 scores", outputDetail: "50,257 scores, one per word it knows" },
   tiny: { part: "model", level: "whole" },
   lesson: "Lessons 14, 20",
   reverseLesson: "RL-00",
@@ -148,6 +155,7 @@ export const GPT_2_SMALL: RealModel = {
       model: root,
       data: {
         shape: "WebText: 8 million+ documents, 40 GB",
+        headline: { value: 8_000_000, unit: "documents", isOver: true },
         notes: [
           { label: "Where from", value: "pages linked from Reddit posts with at least 3 karma, 45 million links", source: GPT_2_PAPER },
           { label: "Cleaning", value: "de-duplication and simple rules, leaving slightly over 8 million documents, 40 GB of text", source: GPT_2_PAPER },
@@ -156,6 +164,7 @@ export const GPT_2_SMALL: RealModel = {
       },
       tokenizer: {
         shape: "byte-level BPE · 50,257 words",
+        headline: { value: WORD_COUNT, unit: "words" },
         notes: [
           { label: "Start", value: "256 single bytes, so any text can be written", source: GPT_2_PAPER },
           { label: "Rule", value: "no merges across kinds of characters, such as letters and punctuation, except for spaces", source: GPT_2_PAPER },
@@ -164,6 +173,7 @@ export const GPT_2_SMALL: RealModel = {
       },
       preTraining: {
         shape: "WebText, 512 texts of 1,024 words per batch",
+        headline: { value: CONTEXT, unit: "words per text" },
         notes: [
           { label: "Batch", value: "512 texts, each up to 1,024 words", source: GPT_2_PAPER },
           { label: "Step size", value: "tuned by hand for each model size, on 5% of WebText held back", source: GPT_2_PAPER },
@@ -172,10 +182,12 @@ export const GPT_2_SMALL: RealModel = {
       },
       postTraining: {
         shape: "none: GPT-2 is a base model",
+        headline: { value: 0, unit: "example answers" },
         notes: [{ label: "Post-training", value: "none. GPT-2 was released as a base model; the paper's results use no fine-tuning", source: GPT_2_PAPER }],
       },
       benchmarks: {
         shape: "8 language tests, with no extra training",
+        headline: { value: 45.99, unit: "% right on LAMBADA" },
         notes: [
           { label: "Tests", value: "LAMBADA, Children's Book Test, WikiText-2, Penn Treebank, enwik8, text8, WikiText-103, One Billion Word", source: GPT_2_PAPER },
           { label: "Smallest size", value: "LAMBADA 45.99% right (the paper lists this size as 117M numbers)", source: GPT_2_PAPER },
@@ -184,10 +196,12 @@ export const GPT_2_SMALL: RealModel = {
       },
       safety: {
         shape: "not covered in the paper",
+        headline: { value: 0, unit: "safety tests reported" },
         notes: [{ label: "Safety checks", value: "not covered in the paper", source: GPT_2_PAPER }],
       },
       quantization: {
         shape: "not covered in the paper",
+        headline: { value: 124_439_808, unit: "numbers to round" },
         notes: [{ label: "Quantization", value: "not covered in the paper", source: GPT_2_PAPER }],
       },
     }),

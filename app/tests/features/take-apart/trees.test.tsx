@@ -6,14 +6,18 @@ import type { ModeId, ModelPart } from "@/features/take-apart/interfaces/model-p
 import { MODELS, matchingPath, openPath, pathUrl, readPath } from "@/features/take-apart/models";
 import { PartCard } from "@/features/take-apart/part-card";
 import { PartDrawer } from "@/features/take-apart/part-drawer";
+import { showAmount } from "@/features/take-apart/part-numbers";
 import { readSentence } from "@/features/take-apart/sentence";
-import { viewTiny } from "@/features/take-apart/tiny-parts";
+import { readTinyPart, viewTiny } from "@/features/take-apart/tiny-parts";
 
 const TOTALS = { "gpt-2-small": 124_439_808, "llama-3-8b": 8_030_261_248 };
 const STEP_IDS: Record<ModeId, string[]> = {
   use: ["tokenize", "embedding", "layers", "output", "generate"],
   build: ["data", "tokenizer", "architecture", "pre-training", "post-training", "evaluation"],
 };
+const SUMMARY_LIMIT = 90;
+const CHIP_LIMIT = 21;
+const IN_OUT_LIMIT = 35;
 const SENTENCES = ["my dog is hungry , so i give it a", "My ELEPHANT is hungry, so", ""];
 
 const allParts = (part: ModelPart): ModelPart[] => [part, ...(part.children ?? []).flatMap(allParts)];
@@ -75,6 +79,53 @@ describe.each(MODELS)("$title", (model) => {
       }
     });
 
+    test("every part says what it does in one short plain sentence", () => {
+      for (const part of parts) {
+        expect(part.summary.length, part.id).toBeGreaterThan(20);
+        expect(part.summary.length, part.id).toBeLessThanOrEqual(SUMMARY_LIMIT);
+        expect(part.summary, part.id).toMatch(/^[A-Z0-9].*\.$/);
+        expect(part.summary.slice(0, -1), part.id).not.toMatch(/\. /);
+      }
+    });
+
+    test("every part has what goes in and out", () => {
+      for (const part of parts) {
+        expect(part.facts.input.trim().length, part.id).toBeGreaterThan(2);
+        expect(part.facts.output.trim().length, part.id).toBeGreaterThan(2);
+      }
+    });
+
+    test("the card's in and out labels are short enough to sit on one line", () => {
+      for (const { id, facts } of parts) {
+        expect(facts.input.length, id).toBeLessThanOrEqual(CHIP_LIMIT);
+        expect(facts.output.length, id).toBeLessThanOrEqual(CHIP_LIMIT);
+        expect(facts.input.length + facts.output.length, id).toBeLessThanOrEqual(IN_OUT_LIMIT);
+        if (facts.inputDetail) expect(facts.inputDetail.length, id).toBeGreaterThan(facts.input.length);
+        if (facts.outputDetail) expect(facts.outputDetail.length, id).toBeGreaterThan(facts.output.length);
+      }
+    });
+
+    test("every part has one real headline number, and a tiny one or says the tiny model lacks it", () => {
+      const tiny = viewTiny(new ModelLab(), readSentence(SENTENCES[0]).words);
+      for (const part of parts) {
+        const { headline } = part.facts;
+        expect(Number.isFinite(headline.value) && headline.value >= 0, part.id).toBe(true);
+        expect(headline.unit.length, part.id).toBeGreaterThan(0);
+        if (part.tiny.missing) {
+          expect(part.tiny.missing.length, part.id).toBeGreaterThan(10);
+          continue;
+        }
+        const tinyHeadline = readTinyPart(part.tiny, tiny).headline;
+        if ("reason" in tinyHeadline) {
+          expect(tinyHeadline.reason, part.id).toMatch(/^[A-Z].*\.$/);
+          continue;
+        }
+        expect(Number.isFinite(tinyHeadline.value) && tinyHeadline.value >= 0, part.id).toBe(true);
+        expect(tinyHeadline.unit.length, part.id).toBeGreaterThan(0);
+        if (/^numbers?$/.test(tinyHeadline.unit)) expect(tinyHeadline.value, part.id).toBeGreaterThan(0);
+      }
+    });
+
     test.each([
       ["fresh", () => new ModelLab()],
       ["trained a little", trainedLab],
@@ -86,11 +137,16 @@ describe.each(MODELS)("$title", (model) => {
         for (const part of parts) {
           const html = renderToStaticMarkup(
             <>
-              <PartCard ref={null} root={root} part={part} tiny={tiny} index={0} isSelected={false} isOpen={false} onSelect={() => {}} onDetails={() => {}} />
-              <PartDrawer ref={null} root={root} part={part} tiny={tiny} sentence={sentence} onClose={() => {}} />
+              <PartCard ref={null} root={root} modelTitle={model.title} part={part} tiny={tiny} index={0} isSelected={false} isOpen={false} onSelect={() => {}} onDetails={() => {}} />
+              <PartDrawer ref={null} root={root} modelTitle={model.title} part={part} tiny={tiny} sentence={sentence} onClose={() => {}} />
             </>,
           );
           expect(html, `${part.id} on "${text}"`).not.toMatch(/undefined|NaN|Infinity|\[object|\$\{/);
+          expect(html, part.id).toContain(part.summary.replaceAll("'", "&#x27;").replaceAll('"', "&quot;"));
+          expect(html, part.id).toContain(part.tiny.missing ? "Not in the tiny model" : `Real ${model.title}`);
+          for (const tinyNumbers of html.split("<dt>Tiny model").slice(1)) {
+            expect(tinyNumbers.slice(0, tinyNumbers.indexOf("</dl>")), part.id).not.toMatch(/<b>0<\/b> numbers?</);
+          }
         }
       }
     });
@@ -100,6 +156,15 @@ describe.each(MODELS)("$title", (model) => {
     const steps = model.modes.use.children ?? [];
     expect(steps.find((step) => step.id === "tokenize")?.facts.weightCount).toBe(0);
     expect(steps.find((step) => step.id === "generate")?.facts.weightCount).toBe(0);
+  });
+});
+
+describe("card numbers", () => {
+  test("big numbers are compact on the card and exact in the drawer", () => {
+    expect(showAmount(124_439_808, false)).toBe("124M");
+    expect(showAmount(8_030_261_248, false)).toBe("8.03B");
+    expect(showAmount(50_257, false)).toBe("50,257");
+    expect(showAmount(8_030_261_248, true)).toBe("8,030,261,248");
   });
 });
 

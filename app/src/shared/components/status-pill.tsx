@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { Status } from "@/shared/interfaces/card.interface";
 
-const STATUS_TEXT: Record<Status, string> = { running: " Running", done: "✓ Done", needs: " Needs you", queued: "• Queued", lesson: "◦ Lesson only" };
+const STATUS_TEXT: Record<Status, string> = { running: " Running", done: "✓ Done", needs: " Needs you", queued: "• Queued", lesson: "◦ Lesson only", "ground-zero": "◆ Ground zero" };
 const STATUS_ICONS: Partial<Record<Status, ReactNode>> = {
   running: <i className="spinner" />,
   needs: (

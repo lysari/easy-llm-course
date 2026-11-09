@@ -4,7 +4,7 @@ import { TARGET_ROUNDS, type ModelLab } from "@/core/model/lab";
 import { seededRandom } from "@/core/model/random";
 import { type Tensor, layerNorm, multiply, parameter } from "@/core/model/tensor";
 import { LAYER_COUNT, VECTOR_SIZE, countWeights, predictNext, traceForward } from "@/core/model/tiny-gpt";
-import type { TinyLevel, TinyLink, TinyReadout, TinyView } from "@/features/take-apart/interfaces/model-part.interface";
+import type { Amount, NoneToLearn, TinyLevel, TinyLink, TinyReadout, TinyView } from "@/features/take-apart/interfaces/model-part.interface";
 import type { RankedToken } from "@/shared/interfaces/model.interface";
 import { percent, shortList, showWord } from "@/shared/utils/format";
 
@@ -43,23 +43,27 @@ const normalize = (values: number[]) => Array.from(layerNorm(rowOf(values), []).
 const times = (table: Tensor, values: number[]) => Array.from(multiply(rowOf(values), table, []).data);
 const sizeOf = (tables: Tensor[]) => tables.reduce((sum, table) => sum + table.data.length, 0);
 
+const numbers = (value: number): Amount => ({ value, unit: value === 1 ? "number" : "numbers" });
+
 function tableReadout(title: string, table: Tensor, row: number[], level: TinyLevel): TinyReadout {
-  if (level === "number") return { title: `${title}: one stored number`, shape: "1", weightCount: 1, live: row[0].toFixed(3) };
-  if (level === "row") return { title: `${title}: one row`, shape: `1 × ${table.cols}`, weightCount: table.cols, live: shortList(row) };
-  return { title, shape: `${table.rows} × ${table.cols}`, weightCount: table.data.length, live: shortList(row) };
+  if (level === "number") return { title: `${title}: one stored number`, shape: "1", weightCount: 1, headline: { value: table.data.length, unit: "in the table" }, live: row[0].toFixed(3) };
+  if (level === "row") return { title: `${title}: one row`, shape: `1 × ${table.cols}`, weightCount: table.cols, headline: numbers(table.cols), live: shortList(row) };
+  return { title, shape: `${table.rows} × ${table.cols}`, weightCount: table.data.length, headline: numbers(table.data.length), live: shortList(row) };
 }
 
 function matrixReadout(title: string, table: Tensor, input: number[], output: number[], level: TinyLevel): TinyReadout {
-  if (level === "number") return { title: `${title}: one output number`, shape: `${table.rows} × 1`, weightCount: table.rows, live: output[0].toFixed(3) };
+  if (level === "number") return { title: `${title}: one output number`, shape: `${table.rows} × 1`, weightCount: table.rows, headline: numbers(table.rows), live: output[0].toFixed(3) };
   if (level === "multiply-add") {
     const weight = table.data[0];
-    return { title: `${title}: one multiply-and-add`, shape: "1 × 1", weightCount: 1, live: `${input[0].toFixed(2)} × ${weight.toFixed(2)} = ${(input[0] * weight).toFixed(3)}` };
+    return { title: `${title}: one multiply-and-add`, shape: "1 × 1", weightCount: 1, headline: { value: table.rows, unit: "per output number" }, live: `${input[0].toFixed(2)} × ${weight.toFixed(2)} = ${(input[0] * weight).toFixed(3)}` };
   }
-  return { title, shape: `${table.rows} × ${table.cols}`, weightCount: table.data.length, live: shortList(output) };
+  return { title, shape: `${table.rows} × ${table.cols}`, weightCount: table.data.length, headline: numbers(table.data.length), live: shortList(output) };
 }
 
-function noWeights(title: string, shape: string, live: string): TinyReadout {
-  return { title, shape, weightCount: 0, live };
+const noScale = (name: string): NoneToLearn => ({ reason: `Our tiny model's ${name} has no scale or shift numbers, so it has nothing to learn.` });
+
+function noWeights(title: string, shape: string, headline: Amount | NoneToLearn, live: string): TinyReadout {
+  return { title, shape, weightCount: 0, headline, live };
 }
 
 export function readTinyPart({ part, level }: TinyLink, tiny: TinyView): TinyReadout {
@@ -74,22 +78,30 @@ export function readTinyPart({ part, level }: TinyLink, tiny: TinyView): TinyRea
   const ffOutput = steps.afterFeedForward[last].map((value, i) => value - steps.afterAttention[last][i]);
   const finalInput = normalize(trace.layers[LAYER_COUNT - 1].afterFeedForward[last]);
   switch (part) {
-    case "model":
-      return { title: "Tiny GPT", shape: `${LAYER_COUNT} layers × ${VECTOR_SIZE} numbers per word`, weightCount: countWeights(weights), live: `next word "${showWord(top.token)}" ${percent(top.chance)}` };
+    case "model": {
+      const modelNumbers = countWeights(weights);
+      return { title: "Tiny GPT", shape: `${LAYER_COUNT} layers × ${VECTOR_SIZE} numbers per word`, weightCount: modelNumbers, headline: numbers(modelNumbers), live: `next word "${showWord(top.token)}" ${percent(top.chance)}` };
+    }
     case "word-table":
       return tableReadout("Word table", weights.tokenTable, trace.tokenVectors[last], level);
     case "position-table":
       return tableReadout("Position table", weights.positionTable, trace.positionVectors[last], level);
-    case "layers":
-      return { title: "Layer stack", shape: `${LAYER_COUNT} layers`, weightCount: countWeights(weights) - sizeOf([weights.tokenTable, weights.positionTable, weights.outputTable]), live: shortList(trace.layers[LAYER_COUNT - 1].afterFeedForward[last]) };
-    case "layer":
-      return { title: "Layer 1", shape: "norm, attention, norm, feed-forward", weightCount: sizeOf([layer.query, layer.key, layer.value, layer.expand, layer.contract]), live: shortList(steps.afterFeedForward[last]) };
+    case "layers": {
+      const layerNumbers = countWeights(weights) - sizeOf([weights.tokenTable, weights.positionTable, weights.outputTable]);
+      return { title: "Layer stack", shape: `${LAYER_COUNT} layers`, weightCount: layerNumbers, headline: numbers(layerNumbers), live: shortList(trace.layers[LAYER_COUNT - 1].afterFeedForward[last]) };
+    }
+    case "layer": {
+      const layerNumbers = sizeOf([layer.query, layer.key, layer.value, layer.expand, layer.contract]);
+      return { title: "Layer 1", shape: "norm, attention, norm, feed-forward", weightCount: layerNumbers, headline: numbers(layerNumbers), live: shortList(steps.afterFeedForward[last]) };
+    }
     case "norm":
-      return level === "number" ? noWeights("Layer 1 norm: one number", "1", steps.normalized[last][0].toFixed(3)) : noWeights("Layer 1 norm", `1 × ${VECTOR_SIZE}`, shortList(steps.normalized[last]));
+      return level === "number" ? noWeights("Layer 1 norm: one number", "1", noScale("norm"), steps.normalized[last][0].toFixed(3)) : noWeights("Layer 1 norm", `1 × ${VECTOR_SIZE}`, noScale("norm"), shortList(steps.normalized[last]));
     case "final-norm":
-      return level === "number" ? noWeights("Final norm: one number", "1", finalInput[0].toFixed(3)) : noWeights("Final norm", `1 × ${VECTOR_SIZE}`, shortList(finalInput));
-    case "attention":
-      return { title: "Layer 1 attention, one head", shape: `3 tables of ${VECTOR_SIZE} × ${VECTOR_SIZE}`, weightCount: sizeOf([layer.query, layer.key, layer.value]), live: shortList(steps.collected[last]) };
+      return level === "number" ? noWeights("Final norm: one number", "1", noScale("final norm"), finalInput[0].toFixed(3)) : noWeights("Final norm", `1 × ${VECTOR_SIZE}`, noScale("final norm"), shortList(finalInput));
+    case "attention": {
+      const attentionNumbers = sizeOf([layer.query, layer.key, layer.value]);
+      return { title: "Layer 1 attention, one head", shape: `3 tables of ${VECTOR_SIZE} × ${VECTOR_SIZE}`, weightCount: attentionNumbers, headline: numbers(attentionNumbers), live: shortList(steps.collected[last]) };
+    }
     case "query":
       return matrixReadout("Layer 1 query table", layer.query, steps.normalized[last], steps.queries[last], level);
     case "key":
@@ -97,63 +109,66 @@ export function readTinyPart({ part, level }: TinyLink, tiny: TinyView): TinyRea
     case "value":
       return matrixReadout("Layer 1 value table", layer.value, steps.normalized[last], steps.values[last], level);
     case "scores": {
-      if (level === "number") return noWeights("Layer 1: one match score", "1", steps.scores[last][0].toFixed(3));
-      if (level === "multiply-add") return noWeights("Layer 1 score: one multiply-and-add", "1 × 1", `${steps.queries[last][0].toFixed(2)} × ${steps.keys[0][0].toFixed(2)}`);
-      return noWeights("Layer 1 match scores", `${ids.length} × ${ids.length}`, `shares ${shortList(steps.attention[last])}`);
+      if (level === "number") return noWeights("Layer 1: one match score", "1", { value: VECTOR_SIZE, unit: "pairs multiplied" }, steps.scores[last][0].toFixed(3));
+      if (level === "multiply-add") return noWeights("Layer 1 score: one multiply-and-add", "1 × 1", { value: VECTOR_SIZE, unit: "per score" }, `${steps.queries[last][0].toFixed(2)} × ${steps.keys[0][0].toFixed(2)}`);
+      return noWeights("Layer 1 match scores", `${ids.length} × ${ids.length}`, { value: MAX_CONTEXT, unit: "words at most" }, `shares ${shortList(steps.attention[last])}`);
     }
     case "mix": {
-      if (level === "number") return noWeights("Layer 1: one mixed number", "1", steps.collected[last][0].toFixed(3));
-      if (level === "multiply-add") return noWeights("Layer 1 mix: one multiply-and-add", "1 × 1", `${steps.attention[last][0].toFixed(2)} × ${steps.values[0][0].toFixed(2)}`);
-      return noWeights("Layer 1 weighted mix", `${ids.length} × ${VECTOR_SIZE}`, shortList(steps.collected[last]));
+      if (level === "number") return noWeights("Layer 1: one mixed number", "1", { value: MAX_CONTEXT, unit: "words at most" }, steps.collected[last][0].toFixed(3));
+      if (level === "multiply-add") return noWeights("Layer 1 mix: one multiply-and-add", "1 × 1", { value: MAX_CONTEXT, unit: "per mixed number" }, `${steps.attention[last][0].toFixed(2)} × ${steps.values[0][0].toFixed(2)}`);
+      return noWeights("Layer 1 weighted mix", `${ids.length} × ${VECTOR_SIZE}`, { value: VECTOR_SIZE, unit: "numbers per word" }, shortList(steps.collected[last]));
     }
-    case "feed-forward":
-      return { title: "Layer 1 feed-forward", shape: `${VECTOR_SIZE} × ${layer.expand.cols} + ${layer.expand.cols} × ${VECTOR_SIZE}`, weightCount: sizeOf([layer.expand, layer.contract]), live: shortList(ffOutput) };
+    case "feed-forward": {
+      const feedForwardNumbers = sizeOf([layer.expand, layer.contract]);
+      return { title: "Layer 1 feed-forward", shape: `${VECTOR_SIZE} × ${layer.expand.cols} + ${layer.expand.cols} × ${VECTOR_SIZE}`, weightCount: feedForwardNumbers, headline: numbers(feedForwardNumbers), live: shortList(ffOutput) };
+    }
     case "expand":
       return matrixReadout("Layer 1 expand table", layer.expand, ffInput, times(layer.expand, ffInput), level);
     case "relu": {
       const before = times(layer.expand, ffInput);
-      if (level === "number") return noWeights("Layer 1 ReLU: one number", "1", `max(0, ${before[0].toFixed(2)}) = ${steps.expanded[last][0].toFixed(2)}`);
+      if (level === "number") return noWeights("Layer 1 ReLU: one number", "1", { value: before.length, unit: "per word" }, `max(0, ${before[0].toFixed(2)}) = ${steps.expanded[last][0].toFixed(2)}`);
       const zeros = steps.expanded[last].filter((value) => value === 0).length;
-      return noWeights("Layer 1 ReLU", `1 × ${before.length}`, `${zeros} of ${before.length} set to 0`);
+      return noWeights("Layer 1 ReLU", `1 × ${before.length}`, { value: before.length, unit: "numbers per word" }, `${zeros} of ${before.length} set to 0`);
     }
     case "contract":
       return matrixReadout("Layer 1 contract table", layer.contract, steps.expanded[last], ffOutput, level);
     case "output-table":
       return matrixReadout("Output table", weights.outputTable, finalInput, trace.logits[last], level);
     case "tokens":
-      return noWeights("Tiny tokenizer: split on spaces", `${words.length} words`, idList(words));
+      return noWeights("Tiny tokenizer: split on spaces", `${words.length} words`, { value: VOCABULARY.length, unit: "words" }, idList(words));
     case "lookup":
-      return noWeights("Tiny word list: one lookup", "1 row", `"${words[last]}" → ${ids[last]}`);
+      return noWeights("Tiny word list: one lookup", "1 row", { value: VOCABULARY.length, unit: "words in the list" }, `"${words[last]}" → ${ids[last]}`);
     case "embedding":
-      return { title: "Word row + position row", shape: `${ids.length} × ${VECTOR_SIZE}`, weightCount: sizeOf([weights.tokenTable, weights.positionTable]), live: shortList(trace.combined[last]) };
+      return { title: "Word row + position row", shape: `${ids.length} × ${VECTOR_SIZE}`, weightCount: sizeOf([weights.tokenTable, weights.positionTable]), headline: { value: VECTOR_SIZE, unit: "numbers per word" }, live: shortList(trace.combined[last]) };
     case "chances":
-      return noWeights(level === "number" ? "One word's chance" : "Tiny softmax", level === "number" ? "1" : `${VOCABULARY.length} chances`, `"${showWord(top.token)}" ${percent(top.chance)}`);
+      return noWeights(level === "number" ? "One word's chance" : "Tiny softmax", level === "number" ? "1" : `${VOCABULARY.length} chances`, { value: VOCABULARY.length, unit: level === "number" ? "per new word" : "chances" }, `"${showWord(top.token)}" ${percent(top.chance)}`);
     case "pick":
-      if (level === "number") return noWeights("One pick", "1 roll", `roll ${tiny.roll.toFixed(2)} → "${picked}"`);
-      return noWeights("Add it to the end", `${words.length + 1} words`, `… ${showWord(words[last])} + ${picked}`);
+      if (level === "number") return noWeights("One pick", "1 roll", { value: VOCABULARY.length, unit: "words to pick from" }, `roll ${tiny.roll.toFixed(2)} → "${picked}"`);
+      return noWeights("Add it to the end", `${words.length + 1} words`, { value: MAX_CONTEXT, unit: "words at most" }, `… ${showWord(words[last])} + ${picked}`);
     case "write": {
-      if (level === "row") return noWeights("One writing round", "1 word", `+ "${picked}"`);
-      if (level === "number") return noWeights("Stop check", "2 checks", tiny.isStopped ? `picked stop after ${tiny.written.length} words` : `full at ${MAX_CONTEXT} words`);
+      if (level === "row") return noWeights("One writing round", "1 word", { value: 1, unit: "word added" }, `+ "${picked}"`);
+      if (level === "number") return noWeights("Stop check", "2 checks", { value: 2, unit: "checks" }, tiny.isStopped ? `picked stop after ${tiny.written.length} words` : `full at ${MAX_CONTEXT} words`);
       const added = tiny.written.map((round) => round.word);
-      return noWeights("Tiny writing loop", `up to ${MAX_CONTEXT} words`, added.length > 0 ? `"… ${joinTokens([words[last], ...added])}"` : "stops right away");
+      return noWeights("Tiny writing loop", `up to ${MAX_CONTEXT} words`, { value: MAX_CONTEXT, unit: "words at most" }, added.length > 0 ? `"… ${joinTokens([words[last], ...added])}"` : "stops right away");
     }
     case "corpus":
-      if (level === "row") return noWeights("One sentence", "1 sentence", joinTokens(TRAINING_LINES[0].text.split(" ")));
-      return noWeights("Tiny corpus", `${TRAINING_LINES.length} sentences`, `${TRAINING_SEQUENCES.length} with repeats · ${QUESTION_COUNT} questions`);
+      if (level === "row") return noWeights("One sentence", "1 sentence", { value: 1, unit: "sentence at a time" }, joinTokens(TRAINING_LINES[0].text.split(" ")));
+      return noWeights("Tiny corpus", `${TRAINING_LINES.length} sentences`, { value: TRAINING_LINES.length, unit: "sentences" }, `${TRAINING_SEQUENCES.length} with repeats · ${QUESTION_COUNT} questions`);
     case "vocabulary":
-      if (level === "number") return noWeights("Tiny word list: one row", "1 row", `"${words[last]}" = ${ids[last]}`);
-      return noWeights("Tiny word list", `${VOCABULARY.length} words`, idList(VOCABULARY));
+      if (level === "number") return noWeights("Tiny word list: one row", "1 row", { value: VOCABULARY.length, unit: "IDs given" }, `"${words[last]}" = ${ids[last]}`);
+      return noWeights("Tiny word list", `${VOCABULARY.length} words`, { value: VOCABULARY.length, unit: "words" }, idList(VOCABULARY));
     case "training":
-      return noWeights(level === "row" ? "One tiny training round" : "Tiny pre-training", `${TARGET_ROUNDS} rounds on ${TRAINING_SEQUENCES.length} sentences`, loss);
+      if (level === "row") return noWeights("One tiny training round", `${TARGET_ROUNDS} rounds on ${TRAINING_SEQUENCES.length} sentences`, { value: 4, unit: "steps" }, loss);
+      return noWeights("Tiny pre-training", `${TARGET_ROUNDS} rounds on ${TRAINING_SEQUENCES.length} sentences`, { value: MAX_CONTEXT, unit: "words per text" }, loss);
     case "loss":
-      if (level === "row") return noWeights(`Guess: chance of "${TEST_ANSWER}"`, "1 chance", percent(test.now));
-      return noWeights("One loss term", "1 number", `−ln(${test.now.toFixed(3)}) = ${(-Math.log(test.now)).toFixed(2)}`);
+      if (level === "row") return noWeights(`Guess: chance of "${TEST_ANSWER}"`, "1 chance", { value: 1, unit: "chance per word" }, percent(test.now));
+      return noWeights("One loss term", "1 number", { value: 1, unit: "number per word" }, `−ln(${test.now.toFixed(3)}) = ${(-Math.log(test.now)).toFixed(2)}`);
     case "slope":
-      return noWeights(`Slope of the first number of "${VOCABULARY[0]}"`, "1 number", weights.tokenTable.grad[0].toFixed(4));
+      return noWeights(`Slope of the first number of "${VOCABULARY[0]}"`, "1 number", { value: 1, unit: "multiply-and-add" }, weights.tokenTable.grad[0].toFixed(4));
     case "adam":
-      return { title: `Word table: first number of "${VOCABULARY[0]}"`, shape: "1 stored number", weightCount: 1, live: `${lab.untrained.tokenTable.data[0].toFixed(3)} → ${weights.tokenTable.data[0].toFixed(3)}` };
+      return { title: `Word table: first number of "${VOCABULARY[0]}"`, shape: "1 stored number", weightCount: 1, headline: { value: 1, unit: "number nudged" }, live: `${lab.untrained.tokenTable.data[0].toFixed(3)} → ${weights.tokenTable.data[0].toFixed(3)}` };
     case "evaluation":
-      if (level === "number") return noWeights("One test question", "1 question", `top "${showWord(test.top)}": ${test.top === TEST_ANSWER ? "right" : "wrong"}`);
-      return noWeights("Tiny test sentence", "1 question", `"${TEST_ANSWER}" ${percent(test.before)} → ${percent(test.now)}`);
+      if (level === "number") return noWeights("One test question", "1 question", { value: 1, unit: "question" }, `top "${showWord(test.top)}": ${test.top === TEST_ANSWER ? "right" : "wrong"}`);
+      return noWeights("Tiny test sentence", "1 question", { value: Math.round(test.now * 100), unit: "% sure of the right word" }, `"${TEST_ANSWER}" ${percent(test.before)} → ${percent(test.now)}`);
   }
 }
