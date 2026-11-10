@@ -50,7 +50,22 @@ export interface TinyLink {
   missing?: string;
 }
 
-export type DemoId = "copy-document";
+export type DemoId =
+  | "copy-document"
+  | "data-pipeline"
+  | "quality-check"
+  | "dedupe"
+  | "gpt-2-tokenizer"
+  | "bpe-learn"
+  | "architecture"
+  | "tiny-part"
+  | "training"
+  | "chat-format"
+  | "answer-loss"
+  | "preference"
+  | "tiny-test"
+  | "safety"
+  | "quantize";
 
 export interface PartStory {
   problem: string;
@@ -77,6 +92,12 @@ export interface ModelPart {
   code?: string;
   groundZero?: GroundZero;
   children?: ModelPart[];
+}
+
+export interface DemoProps {
+  part: ModelPart;
+  modelId: ModelId;
+  tiny: TinyView;
 }
 
 export interface RealModel {

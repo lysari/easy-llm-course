@@ -1,6 +1,6 @@
 import { NavLink } from "react-router";
 import { STAGES } from "@/features/lessons/flow";
-import { TAKE_APART_PATH } from "@/features/take-apart/models";
+import { TAKE_APART_PATH } from "@/features/take-apart/take-apart-path";
 import type { StageId } from "@/features/lessons/interfaces/story.interface";
 import { Icon, SparkleIcon } from "@/shared/components/icon";
 

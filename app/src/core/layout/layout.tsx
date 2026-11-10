@@ -1,15 +1,15 @@
 import "./layout.css";
-import { useState } from "react";
+import { Suspense, lazy, useState } from "react";
 import { Navigate, Route, Routes, useLocation, useMatch } from "react-router";
 import type { StageId } from "@/features/lessons/interfaces/story.interface";
 import { LessonsPage } from "@/features/lessons/lessons-page";
 import { PlaygroundPage } from "@/features/playground/playground-page";
-import { TAKE_APART_PATH } from "@/features/take-apart/models";
-import { TakeApartPage } from "@/features/take-apart/take-apart-page";
+import { TAKE_APART_PATH } from "@/features/take-apart/take-apart-path";
 import { Sidebar } from "./sidebar";
 
 const LESSONS_PATH = "/";
 const PLAYGROUND_PATH = "/playground";
+const TakeApartPage = lazy(() => import("@/features/take-apart/take-apart-page").then((module) => ({ default: module.TakeApartPage })));
 const OLD_HASH_PATHS: Partial<Record<string, string>> = { "#lessons": LESSONS_PATH, "#playground": PLAYGROUND_PATH };
 
 export function Layout() {
@@ -39,7 +39,9 @@ function Shell() {
       <Sidebar isLessons={isLessons} stageId={stageId} onSelectStage={setStageId} />
       <LessonsPage isOpen={isLessons} stageId={stageId} onSelectStage={setStageId} />
       <PlaygroundPage isOpen={isPlayground} />
-      <TakeApartPage isOpen={isTakeApart} />
+      <Suspense fallback={null}>
+        <TakeApartPage isOpen={isTakeApart} />
+      </Suspense>
     </>
   );
 }

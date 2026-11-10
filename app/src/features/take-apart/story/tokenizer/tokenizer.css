@@ -1,0 +1,19 @@
+.merge-steps {
+  display: grid;
+  gap: var(--space-item);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.merge-steps > li {
+  display: grid;
+  gap: var(--space-tight);
+  padding-bottom: var(--space-item);
+  border-bottom: var(--border-thin) solid var(--card-line);
+}
+
+.merge-steps > li:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}

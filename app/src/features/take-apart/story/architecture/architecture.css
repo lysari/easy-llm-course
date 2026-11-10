@@ -1,0 +1,35 @@
+.term-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--term-width), 1fr));
+  gap: var(--space-edge) var(--space-item);
+  max-height: var(--watch-list-height);
+  margin: 0;
+  padding: var(--space-stack);
+  overflow: auto;
+  border-radius: var(--radius-pill);
+  background: var(--group);
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  --term-width: 11rem;
+}
+
+.term-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-item);
+}
+
+.term-list b {
+  font-weight: var(--weight-medium);
+}
+
+.formula-line {
+  justify-self: start;
+  padding: var(--space-stack) var(--space-card);
+  border: var(--border-thin) solid var(--card-line);
+  border-radius: var(--radius-pill);
+  background: var(--card);
+  font-family: var(--font-math);
+  font-size: var(--text-small);
+}

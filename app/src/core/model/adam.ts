@@ -4,7 +4,7 @@ import { allTables } from "./tiny-gpt";
 export const LEARNING_RATE = 0.004;
 export const MOMENTUM_DECAY = 0.9;
 export const VARIANCE_DECAY = 0.999;
-const EPSILON = 1e-8;
+export const EPSILON = 1e-8;
 
 export class Adam {
   private round = 0;

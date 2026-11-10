@@ -19,6 +19,13 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
     reverseLesson: "RL-00",
     explanation: "Before release the model is tested on question sets it never trained on, checked for harmful answers, and often made smaller and faster by storing its numbers with fewer bits.",
     why: "A test score says how often the guesses match the answer key, not whether the model understands.",
+    story: {
+      problem: "Training only shows how well the model guesses its own training text. Without separate tests, nobody would know how good, safe or fast it really is.",
+      demo: "tiny-test",
+      when: "Last, before release, and again after any change such as making it smaller.",
+      feeds: "The scores are published with the model, and the model ships.",
+      nextId: "benchmarks",
+    },
     formula: { lines: ["score = right answers / questions"] },
     children: [
       {
@@ -33,6 +40,13 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
         reverseLesson: "RL-04",
         explanation: "Sets of questions with known answers. The model answers each one, and the score is how many it got right.",
         why: "Tests only count matches. Text seen in training can also leak into a test and raise the score.",
+        story: {
+          problem: "Saying \"it seems good\" can't be compared. Fixed question sets with known answers give one score that can be compared across models.",
+          demo: "tiny-test",
+          when: "After training, on question sets kept out of the training text.",
+          feeds: "The score is published, for example in a model card.",
+          nextId: "test-question",
+        },
         formula: { lines: ["score = right / total"] },
         children: [
           {
@@ -47,6 +61,13 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
             reverseLesson: "RL-04",
             explanation: "Ground zero. Ask one question, take the model's most likely answer, and compare it with the right one: 1 if it matches, 0 if not.",
             why: "A benchmark score is many of these 1s and 0s, averaged.",
+            story: {
+              problem: "A score is many single marks. Each question is marked right or wrong by comparing the model's top answer with the key.",
+              demo: "tiny-test",
+              when: "Once for each question in each test set.",
+              feeds: "The 1s and 0s are averaged into the test's score.",
+              nextId: "safety",
+            },
             formula: { lines: ["right = answer === key ? 1 : 0"] },
             code: "const right = answer === key ? 1 : 0;",
             groundZero: "action",
@@ -65,6 +86,13 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
         reverseLesson: "RL-00",
         explanation: "People and programs try to make the model give harmful answers (red teaming), and the answers are checked. Extra filter models can also check prompts and answers while it runs.",
         why: "Safety is tested from the outside, by trying prompts. Nothing inside the numbers says \"harmful\".",
+        story: {
+          problem: "A model that writes anything will also write harmful things. People try hard to make it misbehave, so the problems are found before release.",
+          demo: "safety",
+          when: "After post-training, before release, and again with each new version.",
+          feeds: "The failures found lead to more tuning, or to filters that check prompts and answers.",
+          nextId: "safety-check",
+        },
         formula: { lines: ["pass = answer follows the rule"] },
         children: [
           {
@@ -79,6 +107,13 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
             reverseLesson: "RL-00",
             explanation: "Ground zero. Send one risky prompt and check the answer against one safety rule: pass or fail.",
             why: "Like a test question, but the answer key is a rule about what not to say.",
+            story: {
+              problem: "Safety is tested one prompt at a time. Each risky prompt and its answer are checked against one rule: pass or fail.",
+              demo: "safety",
+              when: "For every attack prompt in a safety test.",
+              feeds: "The passes and fails add up to the safety test's result.",
+              nextId: "quantization",
+            },
             formula: { lines: ["pass = follows(answer, rule)"] },
             groundZero: "action",
           },
@@ -96,6 +131,13 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
         reverseLesson: "RL-05",
         explanation: "Store each number with fewer bits, for example 8 instead of 16. The model gets smaller, and tests show how much its answers change.",
         why: "Each answer comes from many numbers working together, so rounding each one a little can still leave the answers close.",
+        story: {
+          problem: "Big models need more memory than most computers have. Storing each number with fewer bits makes the model smaller and faster, at the cost of tiny rounding errors.",
+          demo: "quantize",
+          when: "After training, when you want the model to run on smaller machines.",
+          feeds: "The smaller model is tested again to see how much its answers changed.",
+          nextId: "round-number",
+        },
         formula: { lines: ["w8 = round(w / scale)"] },
         children: [
           {
@@ -110,6 +152,12 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
             reverseLesson: "RL-05",
             explanation: "Ground zero. Divide one stored number by a scale, round it to the nearest whole number that fits in the smaller size, and keep that instead.",
             why: "Rounding loses a tiny bit of each number, like rounding prices to whole dollars.",
+            story: {
+              problem: "Each stored number has more digits than it needs. Rounding it to the nearest step that fits in fewer bits is how the model shrinks.",
+              demo: "quantize",
+              when: "Once for every stored number, when the model is made smaller.",
+              feeds: "The rounded number is stored instead of the full one.",
+            },
             formula: { lines: ["w8 = round(w / scale)"] },
             code: "const w8 = Math.round(w / scale);",
             groundZero: "action",

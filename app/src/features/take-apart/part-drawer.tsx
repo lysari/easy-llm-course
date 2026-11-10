@@ -1,6 +1,6 @@
 import type { Ref } from "react";
 import { TEST_ANSWER, TEST_WORDS, joinTokens } from "@/core/model/corpus";
-import type { ModelPart, TinyPartId, TinyView } from "@/features/take-apart/interfaces/model-part.interface";
+import type { ModelId, ModelPart, TinyPartId, TinyView } from "@/features/take-apart/interfaces/model-part.interface";
 import type { Sentence } from "@/features/take-apart/interfaces/sentence.interface";
 import { CodeBlock } from "@/shared/components/code-block";
 import { Drawer } from "@/shared/components/drawer";
@@ -11,7 +11,7 @@ import { InOut } from "./in-out";
 import { LiveExample } from "./live-example";
 import { DRAWER_ID, NO_LESSON, numbersOf, partsOf, tagOf, titleOf } from "./part-card";
 import { NONE_TO_LEARN, PartNumbers } from "./part-numbers";
-import { StorySections } from "./story/story-sections";
+import { StoryDemo, StoryInfo } from "./story/story-sections";
 import { readTinyPart } from "./tiny-parts";
 import { SOURCES } from "./trees/sources";
 
@@ -39,6 +39,7 @@ function liveCaption(part: TinyPartId, sentence: Sentence) {
 interface PartDrawerProps {
   ref: Ref<HTMLElement>;
   root: ModelPart;
+  modelId: ModelId;
   modelTitle: string;
   part: ModelPart;
   tiny: TinyView;
@@ -48,7 +49,7 @@ interface PartDrawerProps {
   onClose: () => void;
 }
 
-export function PartDrawer({ ref, root, modelTitle, part, tiny, sentence, nextPart, onOpen, onClose }: PartDrawerProps) {
+export function PartDrawer({ ref, root, modelId, modelTitle, part, tiny, sentence, nextPart, onOpen, onClose }: PartDrawerProps) {
   const readout = readTinyPart(part.tiny, tiny);
   const notes = part.facts.notes ?? [];
   const sources = [...new Set([...part.facts.sources, ...notes.map((note) => note.source)])];
@@ -67,14 +68,14 @@ export function PartDrawer({ ref, root, modelTitle, part, tiny, sentence, nextPa
   ];
 
   return (
-    <Drawer ref={ref} id={DRAWER_ID} icon={part.icon} title={titleOf(part, root)} lesson={`${part.lesson} · ${part.reverseLesson}`} status={tagOf(part)} bodyKey={part.id} onClose={onClose}>
+    <Drawer ref={ref} id={DRAWER_ID} icon={part.icon} title={titleOf(part, root)} lesson={`${part.lesson} · ${part.reverseLesson}`} status={tagOf(part)} bodyKey={part.id} onClose={onClose} panel={part.story && <StoryDemo story={part.story} part={part} modelId={modelId} tiny={tiny} />}>
       <section className="section">
         <p className="section-title">What it does</p>
         <p className="part-summary">{part.summary}</p>
         <p className="note">{part.explanation}</p>
         <p className="why">{part.why}</p>
       </section>
-      {part.story && <StorySections story={part.story} reasons={part.facts.reasons ?? []} nextPart={nextPart} onOpen={onOpen} />}
+      {part.story && <StoryInfo story={part.story} reasons={part.facts.reasons ?? []} nextPart={nextPart} onOpen={onOpen} />}
       <section className="section">
         <p className="section-title">What goes in and out</p>
         <InOut facts={part.facts} isDetailed />

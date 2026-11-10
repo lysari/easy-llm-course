@@ -1,3 +1,4 @@
+import "./data.css";
 import { useId } from "react";
 import { usePageExtract } from "@/features/take-apart/hooks/use-page-extract";
 import { SOURCES } from "@/features/take-apart/trees/sources";

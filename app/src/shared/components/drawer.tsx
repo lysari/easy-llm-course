@@ -14,11 +14,12 @@ interface DrawerProps {
   bodyKey: string;
   onClose: () => void;
   children: ReactNode;
+  panel?: ReactNode;
 }
 
-export function Drawer({ ref, id, icon, title, lesson, status, bodyKey, onClose, children }: DrawerProps) {
+export function Drawer({ ref, id, icon, title, lesson, status, bodyKey, onClose, children, panel }: DrawerProps) {
   return (
-    <aside className="drawer" id={id} ref={ref} tabIndex={-1} aria-label={`${title} details`}>
+    <aside className={panel ? "drawer drawer--wide" : "drawer"} id={id} ref={ref} tabIndex={-1} aria-label={`${title} details`}>
       <header className="card-head drawer-head">
         <span className="tile"><Icon name={icon} /></span>
         <div>
@@ -30,9 +31,16 @@ export function Drawer({ ref, id, icon, title, lesson, status, bodyKey, onClose,
           <Icon name="close" />
         </button>
       </header>
-      <div className="drawer-body" key={bodyKey}>
-        {children}
-      </div>
+      {panel ? (
+        <div className="drawer-columns" key={bodyKey}>
+          <div className="drawer-body">{children}</div>
+          <div className="drawer-panel">{panel}</div>
+        </div>
+      ) : (
+        <div className="drawer-body" key={bodyKey}>
+          {children}
+        </div>
+      )}
     </aside>
   );
 }

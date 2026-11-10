@@ -13,6 +13,10 @@
   animation: slide-in var(--motion-draw);
 }
 
+.drawer--wide {
+  width: min(var(--drawer-wide-width), var(--drawer-wide-share), 100%);
+}
+
 .drawer:focus-visible {
   outline: none;
 }
@@ -52,6 +56,29 @@
   padding: var(--space-region) var(--space-section) var(--space-section);
 }
 
+.drawer-columns {
+  display: grid;
+  flex: 1;
+  grid-template-columns: var(--drawer-width) minmax(0, 1fr);
+  min-height: 0;
+}
+
+.drawer-columns > .drawer-body {
+  border-right: var(--border-thin) solid var(--card-line);
+}
+
+.drawer-panel {
+  display: grid;
+  align-content: start;
+  gap: var(--space-block);
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-region) var(--space-section) var(--space-section);
+  background: var(--canvas);
+}
+
 @keyframes slide-in {
   from {
     opacity: 0;
@@ -74,7 +101,24 @@
   }
 
   .drawer-head,
-  .drawer-body {
+  .drawer-body,
+  .drawer-panel {
     padding-inline: var(--space-wide);
+  }
+
+  .drawer-columns {
+    display: block;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .drawer-columns > .drawer-body,
+  .drawer-panel {
+    overflow: visible;
+  }
+
+  .drawer-columns > .drawer-body {
+    border-right: 0;
+    border-bottom: var(--border-thin) solid var(--card-line);
   }
 }

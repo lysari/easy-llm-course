@@ -3,6 +3,7 @@ import { inferenceRoot } from "./inference-steps";
 import { lifecycleRoot } from "./lifecycle-steps";
 import { LLAMA_3_BUILD } from "./llama-3-build-facts";
 import { llama3Layers } from "./llama-3-layer";
+import { LLAMA_3_AUTOREGRESSIVE, LLAMA_3_FINAL_NORM, LLAMA_3_NO_REASON, LLAMA_3_OUTPUT, LLAMA_3_RMS_NORM, LLAMA_3_TRANSFORMER, LLAMA_3_WORD_TABLE } from "./llama-3-reasons";
 import { normPart, projectionPart, tablePart } from "./part-builders";
 import { LLAMA_3_SETTINGS } from "./sources";
 
@@ -26,6 +27,15 @@ const wordTable = tablePart({
   reverseLesson: "RL-02",
   explanation: "One row of 4,096 numbers for each of the 128,256 words in Llama 3's list. A word's id picks its row.",
   why: "Each word becomes a point in a space with 4,096 directions. Only training decides where each point sits.",
+  story: {
+    problem: "The model computes with numbers, but a word ID is only a place in a list. Without the word table there would be nothing to multiply and add.",
+    demo: "tiny-part",
+    when: "First thing, every time text is read: each word ID picks its row. Training sets every number in it.",
+    feeds: "Each word's row goes straight into the first layer; word order is added later by RoPE.",
+    nextId: "word-table-row",
+  },
+  reasons: [LLAMA_3_WORD_TABLE, LLAMA_3_NO_REASON],
+  codeReasons: [LLAMA_3_WORD_TABLE],
 });
 
 const finalNorm = normPart({
@@ -43,6 +53,15 @@ const finalNorm = normPart({
   reverseLesson: "RL-04",
   explanation: "One last RMSNorm on the last word's 4,096 numbers, with its own 4,096 scale numbers, before they are scored.",
   why: "Each norm sits before its part, so the very last layer's output still needs one.",
+  story: {
+    problem: "Each norm sits before its part, so the last layer's output has not been steadied yet. Without this one, the scores would come from numbers of any size.",
+    demo: "tiny-part",
+    when: "Once, after the 32nd layer, on the last word's numbers, each time a new word is guessed.",
+    feeds: "The steadied numbers are scored against every word by the output table.",
+    nextId: "output-head",
+  },
+  reasons: [LLAMA_3_FINAL_NORM, LLAMA_3_RMS_NORM],
+  codeReasons: [LLAMA_3_RMS_NORM],
 });
 
 const outputHead = projectionPart({
@@ -64,6 +83,15 @@ const outputHead = projectionPart({
   reverseLesson: "RL-04",
   explanation: "Turns the last word's 4,096 numbers into one score per word. Llama 3 8B stores its own output table, separate from the word table, so it adds another 525,336,576 numbers.",
   why: "Softmax turns the scores into chances, and one word is picked. The top chance is not knowledge, only the best guess the numbers give.",
+  story: {
+    problem: "The layers end with 4,096 numbers, but the model has to say something about each of its 128,256 words. Without the output table there would be no score to turn into a chance.",
+    demo: "tiny-part",
+    when: "Once for each new word, at the very end of the pass.",
+    feeds: "The 128,256 scores go to softmax, which turns them into chances, and one word is picked.",
+    nextId: "output-head-number",
+  },
+  reasons: [LLAMA_3_OUTPUT],
+  codeReasons: [LLAMA_3_OUTPUT],
 });
 
 const root: ModelPart = {
@@ -85,6 +113,7 @@ const root: ModelPart = {
       { label: "Text length", value: "8,192 words (tokens)", source: "llama-3-card" },
       { label: "Released", value: "April 18, 2024", source: "llama-3-card" },
     ],
+    reasons: [LLAMA_3_TRANSFORMER, LLAMA_3_AUTOREGRESSIVE],
   },
   tiny: { part: "model", level: "whole" },
   lesson: "Lessons 25, 30",
@@ -92,6 +121,13 @@ const root: ModelPart = {
   explanation:
     "The whole model, released by Meta in 2024. Words go in as ids, and out comes one score for every word in its list. It has no position table: word order is added inside attention by RoPE. Everything inside is stored numbers, multiplied and added.",
   why: "Its answers look like understanding, but every step is arithmetic on 8,030,261,248 stored numbers. Take it apart to see.",
+  story: {
+    problem: "The parts only work in one order: rows in, 32 layers, a norm, scores out. Without the whole model wired together, no part would get its input or hand on its output.",
+    demo: "architecture",
+    when: "You write the whole model once, at the Architecture stage, then train it, then use it to write text.",
+    feeds: "Its scores, turned into chances, are what picks each next word when the model writes.",
+    nextId: "word-table",
+  },
   formula: { lines: ["x = word rows", "chances = softmax(head(norm(layers(x))))"] },
   code: "const x = wordRows(ids);\nconst h = layers.reduce((x, layer) => layer(x), x);\nconst scores = outputHead(finalNorm(h));",
   children: [wordTable, llama3Layers, finalNorm, outputHead],

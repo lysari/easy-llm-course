@@ -57,6 +57,8 @@
   --card-foot-height: 28px;
   --touch-target: 44px;
   --drawer-width: 520px;
+  --drawer-wide-width: 1320px;
+  --drawer-wide-share: 94vw;
   --chance-word-width: 3.8rem;
   --chance-bar-min: 40px;
   --chance-bar-height: 10px;

@@ -1,8 +1,7 @@
 import type { ModelId, ModelPart, RealModel } from "@/features/take-apart/interfaces/model-part.interface";
 import { GPT_2_SMALL } from "./trees/gpt-2-small";
+import { TAKE_APART_PATH } from "./take-apart-path";
 import { LLAMA_3_8B } from "./trees/llama-3-8b";
-
-export const TAKE_APART_PATH = "/take-apart";
 
 export const MODELS: RealModel[] = [GPT_2_SMALL, LLAMA_3_8B];
 

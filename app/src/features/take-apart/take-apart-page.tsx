@@ -52,7 +52,7 @@ export function TakeApartPage({ isOpen }: { isOpen: boolean }) {
           ))}
         </div>
       </div>
-      {openPart && <PartDrawer ref={takeApart.drawerRef} root={root} modelTitle={model.title} part={openPart} tiny={tiny} sentence={sentence} nextPart={nextPart} onOpen={takeApart.showDetails} onClose={takeApart.closeDrawer} />}
+      {openPart && <PartDrawer ref={takeApart.drawerRef} root={root} modelId={model.id} modelTitle={model.title} part={openPart} tiny={tiny} sentence={sentence} nextPart={nextPart} onOpen={takeApart.showDetails} onClose={takeApart.closeDrawer} />}
     </main>
   );
 }

@@ -1,23 +1,18 @@
 import "./story.css";
-import type { ReactNode } from "react";
-import type { DemoId, ModelPart, PartStory } from "@/features/take-apart/interfaces/model-part.interface";
+import { Suspense } from "react";
+import type { DemoProps, ModelPart, PartStory } from "@/features/take-apart/interfaces/model-part.interface";
 import type { RealNote } from "@/features/take-apart/interfaces/real-facts.interface";
 import { SOURCES } from "@/features/take-apart/trees/sources";
-import { CopyDocumentDemo } from "./copy-document-demo";
+import { DEMOS } from "./story-demos";
 
-const DEMOS: Record<DemoId, () => ReactNode> = {
-  "copy-document": CopyDocumentDemo,
-};
-
-interface StorySectionsProps {
+interface StoryInfoProps {
   story: PartStory;
   reasons: RealNote[];
   nextPart: ModelPart | undefined;
   onOpen: (id: string) => void;
 }
 
-export function StorySections({ story, reasons, nextPart, onOpen }: StorySectionsProps) {
-  const Demo = DEMOS[story.demo];
+export function StoryInfo({ story, reasons, nextPart, onOpen }: StoryInfoProps) {
   return (
     <>
       <section className="section">
@@ -35,10 +30,6 @@ export function StorySections({ story, reasons, nextPart, onOpen }: StorySection
         </ul>
       </section>
       <section className="section">
-        <p className="section-title">Watch it happen</p>
-        <Demo />
-      </section>
-      <section className="section">
         <p className="section-title">When you'd do this</p>
         <p className="note">{story.when}</p>
         <p className="why">{story.feeds}</p>
@@ -49,5 +40,18 @@ export function StorySections({ story, reasons, nextPart, onOpen }: StorySection
         )}
       </section>
     </>
+  );
+}
+
+export function StoryDemo({ story, ...props }: DemoProps & { story: PartStory }) {
+  const Demo = DEMOS[story.demo];
+  return (
+    <section className="section watch-section" aria-label="Watch it happen">
+      <h3 className="watch-heading">Watch it happen</h3>
+      <p className="card-lesson">Try it here while you read. Everything below runs live in your browser on real data.</p>
+      <Suspense fallback={<p className="note">Loading the demo…</p>}>
+        <Demo {...props} />
+      </Suspense>
+    </section>
   );
 }

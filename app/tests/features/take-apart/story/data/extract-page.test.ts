@@ -1,9 +1,9 @@
 import { afterAll, describe, expect, test } from "bun:test";
 import { Window } from "happy-dom";
-import packageJson from "../../../../package.json";
+import packageJson from "../../../../../package.json";
 import type { PageExtract } from "@/features/take-apart/interfaces/page-extract.interface";
-import { MAX_PAGE_LENGTH, READABILITY_VERSION, extractPage, pageProblem } from "@/features/take-apart/story/extract-page";
-import { SAVED_PAGE } from "@/features/take-apart/story/saved-page";
+import { MAX_PAGE_LENGTH, READABILITY_VERSION, extractPage, pageProblem } from "@/features/take-apart/story/data/extract-page";
+import { SAVED_PAGE } from "@/features/take-apart/story/data/saved-page";
 
 const window = new Window({ settings: { disableJavaScriptEvaluation: true, disableJavaScriptFileLoading: true, disableCSSFileLoading: true, disableIframePageLoading: true } });
 

@@ -86,7 +86,7 @@ describe.each(MODELS)("$title real facts", (model) => {
     for (const id of ["gather", "tokenizer", "pre-training"]) {
       const part = partIn(root, id);
       if (!part) throw new Error(id);
-      const html = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelTitle={model.title} part={part} tiny={tiny} sentence={readSentence("")} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
+      const html = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelId={model.id} modelTitle={model.title} part={part} tiny={tiny} sentence={readSentence("")} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
       expect(html, id).toContain("<span>Numbers</span><span>None to learn</span>");
       expect(html, id).not.toContain("<span>Numbers</span><span>0</span>");
     }

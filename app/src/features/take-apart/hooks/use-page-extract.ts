@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { PageExtract } from "@/features/take-apart/interfaces/page-extract.interface";
-import { extractPage, pageProblem } from "@/features/take-apart/story/extract-page";
-import { SAVED_PAGE } from "@/features/take-apart/story/saved-page";
+import { extractPage, pageProblem } from "@/features/take-apart/story/data/extract-page";
+import { SAVED_PAGE } from "@/features/take-apart/story/data/saved-page";
 
 type PageFrom = "saved" | "pasted";
 
@@ -11,6 +11,8 @@ interface ShownExtract {
 }
 
 const extractHtml = (html: string) => extractPage(new DOMParser().parseFromString(html, "text/html"), html);
+
+export const useSavedPageExtract = () => useMemo(() => extractHtml(SAVED_PAGE.html), []);
 
 export function usePageExtract() {
   const [shown, setShown] = useState<ShownExtract | null>(null);

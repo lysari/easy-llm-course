@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useLocation, useMatch, useNavigate } from "react-router";
 import type { ModeId, ModelPart } from "@/features/take-apart/interfaces/model-part.interface";
-import { DEFAULT_MODEL, TAKE_APART_PATH, findModel, matchingPath, pathUrl, readPath } from "@/features/take-apart/models";
+import { DEFAULT_MODEL, findModel, matchingPath, pathUrl, readPath } from "@/features/take-apart/models";
+import { TAKE_APART_PATH } from "@/features/take-apart/take-apart-path";
 import { useDrawer } from "@/shared/hooks/use-drawer";
 import { useTinyLab } from "./use-tiny-lab";
 

@@ -8,7 +8,7 @@ import { readSentence } from "@/features/take-apart/sentence";
 import { viewTiny } from "@/features/take-apart/tiny-parts";
 import { SOURCES } from "@/features/take-apart/trees/sources";
 
-const SECTION_TITLES = ["What it does", "Why it exists", "Watch it happen", "When you&#x27;d do this", "What goes in and out"];
+const INFO_TITLES = ["What it does", "Why it exists", "When you&#x27;d do this", "What goes in and out"];
 
 const allParts = (part: ModelPart): ModelPart[] => [part, ...(part.children ?? []).flatMap(allParts)];
 
@@ -27,7 +27,7 @@ describe.each(MODELS)("$title why, watch and when", (model) => {
     for (const { step, missing } of steps.filter((each) => each.mode === mode)) {
       const name = `${step.title}: every part says why, shows it happen and says when`;
       const check = () => expect(missing).toEqual([]);
-      if (missing.length > 0) test.todo(`${name} (still missing: ${missing.join(", ")})`, check);
+      if (mode === "use" && missing.length > 0) test.todo(`${name} (still missing: ${missing.join(", ")})`, check);
       else test(name, check);
     }
   });
@@ -52,16 +52,27 @@ describe.each(MODELS)("$title why, watch and when", (model) => {
     }
   });
 
-  test("the drawer shows the three sections after What it does and before the numbers", () => {
+  test("the wide drawer puts why and when after What it does, and the demo in its own column", () => {
     const root = model.modes.build;
     for (const part of told.filter((each) => allParts(root).includes(each))) {
       const nextPart = parts.find((each) => each.id === part.story?.nextId);
-      const html = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelTitle={model.title} part={part} tiny={tiny} sentence={readSentence("")} nextPart={nextPart} onOpen={() => {}} onClose={() => {}} />);
-      const places = SECTION_TITLES.map((title) => html.indexOf(`<p class="section-title">${title}</p>`));
-      expect(places.every((place) => place >= 0), part.id).toBe(true);
+      const html = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelId={model.id} modelTitle={model.title} part={part} tiny={tiny} sentence={readSentence("")} nextPart={nextPart} onOpen={() => {}} onClose={() => {}} />);
+      const places = INFO_TITLES.map((title) => html.indexOf(`<p class="section-title">${title}</p>`));
+      const panel = html.indexOf('<div class="drawer-panel">');
+      expect(html, part.id).toContain('class="drawer drawer--wide"');
+      expect(places.every((place) => place >= 0 && place < panel), part.id).toBe(true);
       expect([...places].sort((a, b) => a - b), part.id).toEqual(places);
-      if (nextPart) expect(html, part.id).toContain(`Next step: ${nextPart.title}`);
+      expect(html.indexOf("Watch it happen", panel), part.id).toBeGreaterThan(panel);
+      if (nextPart) expect(html, part.id).toContain(`Next step: ${nextPart.title.replaceAll("'", "&#x27;")}`);
     }
+  });
+
+  test("a part with no story keeps the narrow drawer", () => {
+    const part = allParts(model.modes.use).find((each) => !each.story);
+    if (!part) return;
+    const html = renderToStaticMarkup(<PartDrawer ref={null} root={model.modes.use} modelId={model.id} modelTitle={model.title} part={part} tiny={tiny} sentence={readSentence("")} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
+    expect(html).toContain('class="drawer"');
+    expect(html).not.toContain("drawer-panel");
   });
 });
 
