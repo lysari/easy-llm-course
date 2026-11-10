@@ -68,7 +68,7 @@ export function PartCard({ ref, root, modelTitle, part, place, index, isSelected
           <h3 className="card-title">{nameOf(part)}</h3>
           {tag && <StatusPill status={tag} />}
         </div>
-        <span className={`lesson-tag${part.lesson === NO_LESSON ? " is-muted" : ""}`}>{part.lesson}</span>
+        <p className={`card-lesson${part.lesson === NO_LESSON ? " is-muted" : ""}`}>{part.lesson}</p>
       </div>
       <div className="card-body">
         <p className="part-summary">{part.summary}</p>
