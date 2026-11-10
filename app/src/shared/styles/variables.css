@@ -40,7 +40,9 @@
   --border-mid: 1.5px;
   --border-thick: 2px;
   --stroke-plot: 3px;
+  --stroke-glow: 6px;
   --dash-baseline: 5 5;
+  --dash-glow: 0.14px;
   --card-band-height: 64px;
   --card-gradient:
     linear-gradient(180deg, var(--band-fade-top) var(--card-band-height), var(--card-shell) calc(var(--card-band-height) * 2)),
@@ -57,8 +59,10 @@
   --shadow-group: 0 1px 4px var(--shadow);
   --shadow-result: 0 2px 10px var(--shadow);
   --opacity-dim: 0.5;
+  --opacity-glow: 0.5;
   --motion-fast: 150ms ease-out;
   --motion-draw: 280ms ease-out;
+  --motion-flow: 1600ms ease-in-out;
   --motion-spin: 900ms linear;
   --motion-rise: 4px;
   --icon-small: 12px;

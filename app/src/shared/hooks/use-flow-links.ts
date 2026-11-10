@@ -29,7 +29,11 @@ function pathBetween(x1: number, y1: number, trunk: number, x2: number, y2: numb
   return `M ${x1} ${y1} H ${trunk - r} Q ${trunk} ${y1} ${trunk} ${y1 + direction * r} V ${y2 - direction * r} Q ${trunk} ${y2} ${trunk + r} ${y2} H ${x2}`;
 }
 
-function measureLinks({ flowRef, childColumnRef, parentCards, childCards }: FlowLinkElements, { parentId, childIds, nestedIds = NO_NESTED }: FlowLinkTargets): LinkDrawing | null {
+/**
+ * Measures the lines from a parent card to its child cards; `useFlowLinks` calls it after layout.
+ * Each path and dot keeps the id of the card it starts from (`fromId`), so `FlowLinks` can colour the lines of an active card from `startX` to `endX`.
+ */
+export function measureLinks({ flowRef, childColumnRef, parentCards, childCards }: FlowLinkElements, { parentId, childIds, nestedIds = NO_NESTED }: FlowLinkTargets): LinkDrawing | null {
   const parentCard = parentCards.current.get(parentId);
   if (!flowRef.current || !childColumnRef.current || !parentCard) return null;
   const flow = flowRef.current.getBoundingClientRect();
@@ -37,8 +41,8 @@ function measureLinks({ flowRef, childColumnRef, parentCards, childCards }: Flow
   const startX = parent.right - flow.left;
   const startY = parent.top + parent.height / 2 - flow.top;
   const trunk = (startX + childColumnRef.current.getBoundingClientRect().left - flow.left) / 2;
-  const drawing: LinkDrawing = { paths: [], dots: [{ id: "start", x: startX, y: startY }] };
-  let previous: DOMRect | null = null;
+  const drawing: LinkDrawing = { paths: [], dots: [{ id: "start", fromId: parentId, x: startX, y: startY }] };
+  let previous: { id: string; box: DOMRect } | null = null;
   for (const id of childIds) {
     const card = childCards.current.get(id);
     if (!card) return null;
@@ -46,13 +50,13 @@ function measureLinks({ flowRef, childColumnRef, parentCards, childCards }: Flow
     const y2 = box.top + box.height / 2 - flow.top;
     const endX = box.left - flow.left;
     if (nestedIds.includes(id) && previous) {
-      const x = previous.right - flow.left;
-      drawing.paths.push({ id, d: `M ${x} ${y2} H ${endX}` });
-      drawing.dots.push({ id, x, y: y2 });
+      const x = previous.box.right - flow.left;
+      drawing.paths.push({ id, fromId: previous.id, d: `M ${x} ${y2} H ${endX}`, startX: x, endX });
+      drawing.dots.push({ id, fromId: previous.id, x, y: y2 });
     } else {
-      drawing.paths.push({ id, d: pathBetween(startX, startY, trunk, endX, y2) });
+      drawing.paths.push({ id, fromId: parentId, d: pathBetween(startX, startY, trunk, endX, y2), startX, endX });
     }
-    previous = box;
+    previous = { id, box };
   }
   return drawing;
 }

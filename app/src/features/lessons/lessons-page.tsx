@@ -78,7 +78,7 @@ export function LessonsPage({ isOpen, stageId, onSelectStage }: LessonsPageProps
           </p>
         </header>
         <div className="flow" id="flow" ref={flowRef}>
-          <FlowLinks id="links" drawing={links} />
+          <FlowLinks id="links" drawing={links} activeIds={lessons.activeStepId ? [stageId, lessons.activeStepId] : [stageId]} />
           <div className="column" id="stages">
             {STAGES.map((stage) => (
               <Fragment key={stage.id}>

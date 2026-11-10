@@ -32,7 +32,7 @@ export function PartColumn({ model, root, parent, parts, selectedId, activeId, o
 
   return (
     <section className="column part-column inside-real-models-column" ref={columnRef} aria-label={title}>
-      {!isSteps && <FlowLinks id={`inside-real-models-links-${parent.id}`} drawing={links} />}
+      {!isSteps && <FlowLinks id={`inside-real-models-links-${parent.id}`} drawing={links} activeIds={[activeId]} />}
       <p className="section-title">{title}</p>
       {parts.map((part, i) => (
         <PartCard

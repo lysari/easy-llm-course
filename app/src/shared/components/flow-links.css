@@ -7,19 +7,49 @@
   pointer-events: none;
 }
 
+.link-stop-indigo {
+  stop-color: var(--link-indigo);
+}
+
+.link-stop-sky {
+  stop-color: var(--link-sky);
+}
+
+.link-stop-lavender {
+  stop-color: var(--link-lavender);
+}
+
+.link-stop-pink {
+  stop-color: var(--link-pink);
+}
+
 .link-path {
   fill: none;
-  stroke: var(--link);
+  stroke: var(--link-quiet);
   stroke-width: var(--border-thick);
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
   animation: draw var(--motion-draw) forwards;
 }
 
+.link-glow {
+  fill: none;
+  stroke-width: var(--stroke-glow);
+  stroke-linecap: round;
+  stroke-opacity: var(--opacity-glow);
+  stroke-dasharray: var(--dash-glow) 2px;
+  stroke-dashoffset: var(--dash-glow);
+  animation: flow var(--motion-flow) infinite;
+}
+
 .link-dot {
   fill: var(--card);
-  stroke: var(--link);
+  stroke: var(--link-quiet);
   stroke-width: var(--border-thick);
+}
+
+.link-dot.is-active {
+  stroke: var(--link-indigo);
 }
 
 @keyframes draw {
@@ -28,10 +58,20 @@
   }
 }
 
+@keyframes flow {
+  to {
+    stroke-dashoffset: calc(-1px - var(--dash-glow));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .link-path {
     animation: none;
     stroke-dashoffset: 0;
+  }
+
+  .link-glow {
+    display: none;
   }
 }
 

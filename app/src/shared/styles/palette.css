@@ -9,6 +9,7 @@
   --gray-200: #ededed;
   --gray-225: #ececec;
   --gray-300: #d9d9d9;
+  --gray-350: #b4b4b4;
   --gray-400: #9a9a9a;
   --gray-600: #6b6b6b;
   --gray-900: #1a1a1a;
@@ -24,12 +25,16 @@
   --slate-800: #242426;
   --slate-850: #202022;
   --slate-900: #1a1a1c;
+  --indigo-400: #8090e6;
   --indigo-700: #3b4ba0;
   --indigo-800: #38468b;
+  --sky-400: #64a0ec;
   --sky-700: #3f6fb0;
   --sky-750: #2b67b5;
+  --lavender-400: #9a94ec;
   --lavender-650: #5a5fc0;
   --lavender-700: #655ea6;
+  --pink-400: #d47ec0;
   --pink-650: #a3488f;
   --pink-700: #964e86;
   --blue-100: #e1efff;
@@ -87,6 +92,11 @@
   --ink-soft: var(--gray-600);
   --ink-faint: var(--gray-400);
   --link: var(--blue-425);
+  --link-quiet: var(--gray-350);
+  --link-indigo: var(--indigo-700);
+  --link-sky: var(--sky-750);
+  --link-lavender: var(--lavender-650);
+  --link-pink: var(--pink-650);
   --selected-bg: var(--blue-100);
   --selected-ink: var(--blue-800);
   --running-bg: var(--blue-100);
@@ -147,6 +157,11 @@
     --ink-soft: var(--slate-300);
     --ink-faint: var(--slate-400);
     --link: var(--blue-500);
+    --link-quiet: var(--slate-600);
+    --link-indigo: var(--indigo-400);
+    --link-sky: var(--sky-400);
+    --link-lavender: var(--lavender-400);
+    --link-pink: var(--pink-400);
     --selected-bg: var(--blue-900);
     --selected-ink: var(--blue-300);
     --running-bg: var(--blue-900);
