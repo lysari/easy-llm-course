@@ -1,6 +1,6 @@
 import { NavLink } from "react-router";
 import { STAGES } from "@/features/lessons/flow";
-import { TAKE_APART_PATH } from "@/features/take-apart/take-apart-path";
+import { INSIDE_REAL_MODELS_PATH } from "@/features/inside-real-models/inside-real-models-path";
 import type { StageId } from "@/features/lessons/interfaces/story.interface";
 import { Icon, SparkleIcon } from "@/shared/components/icon";
 
@@ -34,8 +34,10 @@ export function Sidebar({ isLessons, stageId, onSelectStage }: SidebarProps) {
         <NavLink className={({ isActive }) => `side-link side-link--page${isActive ? " is-on" : ""}`} id="nav-playground" to="/playground">
           <Icon name="play" /> Playground
         </NavLink>
-        <NavLink className={({ isActive }) => `side-link side-link--page${isActive ? " is-on" : ""}`} id="nav-take-apart" to={TAKE_APART_PATH}>
-          <Icon name="split" /> Take apart
+        <NavLink className={({ isActive }) => `side-link side-link--page${isActive ? " is-on" : ""}`} id="nav-inside-real-models" to={INSIDE_REAL_MODELS_PATH}>
+          <Icon name="split" />
+          <span className="side-label--full">Inside real models</span>
+          <span className="side-label--short">Real models</span>
         </NavLink>
       </nav>
     </aside>

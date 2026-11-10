@@ -63,6 +63,10 @@
   color: var(--ink);
 }
 
+.side-label--short {
+  display: none;
+}
+
 .side-link.is-selected {
   background: var(--group);
   color: var(--ink);
@@ -143,6 +147,14 @@
 
   .side-link--page.is-on {
     background: var(--group);
+  }
+
+  .side-label--full {
+    display: none;
+  }
+
+  .side-label--short {
+    display: inline;
   }
 
   .page {
