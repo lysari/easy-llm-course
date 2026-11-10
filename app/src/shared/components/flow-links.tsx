@@ -6,13 +6,14 @@ export const STAGGER_MS = 70;
 interface FlowLinksProps {
   id: string;
   drawing: LinkDrawing | null;
-  activeIds: string[];
+  pathIds: string[];
+  glowIds: string[];
 }
 
-export function FlowLinks({ id, drawing, activeIds }: FlowLinksProps) {
+export function FlowLinks({ id, drawing, pathIds, glowIds }: FlowLinksProps) {
   const paths = drawing?.paths ?? [];
-  const isIncoming = (path: LinkPath) => activeIds.includes(path.toId);
-  const isGradient = (path: LinkPath) => isIncoming(path) || activeIds.includes(path.fromId);
+  const isGradient = (path: LinkPath) => pathIds.includes(path.fromId) && pathIds.includes(path.toId);
+  const isGlowing = (path: LinkPath) => isGradient(path) && glowIds.includes(path.toId);
   const strokeOf = (path: LinkPath) => ({ stroke: `url(#${id}-gradient-${path.toId})` });
   const delayOf = (i: number) => ({ animationDelay: `${i * STAGGER_MS}ms` });
   return (
@@ -31,9 +32,10 @@ export function FlowLinks({ id, drawing, activeIds }: FlowLinksProps) {
         )}
       </defs>
       {paths.map((path, i) => (
-        <path key={path.toId} className="link-path" pathLength={1} style={isGradient(path) ? { ...delayOf(i), ...strokeOf(path) } : delayOf(i)} d={path.d} />
+        <path key={path.toId} className="link-path" pathLength={1} style={delayOf(i)} d={path.d} />
       ))}
-      {paths.map((path) => isIncoming(path) && <path key={path.toId} className="link-glow" pathLength={1} style={strokeOf(path)} d={path.d} />)}
+      {paths.map((path) => isGradient(path) && <path key={path.toId} className="link-path" pathLength={1} style={strokeOf(path)} d={path.d} />)}
+      {paths.map((path) => isGlowing(path) && <path key={path.toId} className="link-glow" pathLength={1} style={strokeOf(path)} d={path.d} />)}
       {drawing?.dots.map((dot) => (
         <circle key={dot.id} className={`link-dot${paths.some((path) => path.fromId === dot.fromId && isGradient(path)) ? " is-active" : ""}`} cx={dot.x} cy={dot.y} r={4} />
       ))}

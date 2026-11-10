@@ -23,11 +23,19 @@ export const STEP_ORDER_MS = 450;
 
 export const RUN_GLOW_STYLE = { "--links-glow-duration": `${STEP_ORDER_MS}ms` } as CSSProperties;
 
+function chainTo(stageId: StageId, stepId: string): string[] {
+  const steps = stepsOf(stageId);
+  const before = steps[steps.findIndex((step) => step.id === stepId) - 1];
+  return NESTED_STEPS.includes(stepId) && before ? [...chainTo(stageId, before.id), stepId] : [stageId, stepId];
+}
+
 export function activeIdsOf(stageId: StageId, openStepId: string | undefined, runningStepId: string | null) {
   const focusId = openStepId ?? stageId;
+  const lineId = runningStepId ?? openStepId;
   return {
     activeCardIds: runningStepId ? [focusId, runningStepId] : [focusId],
-    activeLinkIds: runningStepId ? [stageId, runningStepId] : [focusId],
+    pathIds: lineId ? chainTo(stageId, lineId) : [stageId],
+    glowIds: lineId ? [lineId] : [],
   };
 }
 

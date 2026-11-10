@@ -113,14 +113,19 @@ describe("the flow", () => {
 });
 
 describe("the active card", () => {
-  test("the selected stage is active until a part's drawer opens, then that part is", () => {
-    expect(activeIdsOf("forward", undefined, null)).toEqual({ activeCardIds: ["forward"], activeLinkIds: ["forward"] });
-    expect(activeIdsOf("forward", "attention", null)).toEqual({ activeCardIds: ["attention"], activeLinkIds: ["attention"] });
+  test("the selected stage is active and nothing is coloured until a part's drawer opens, then the path to that part is", () => {
+    expect(activeIdsOf("forward", undefined, null)).toEqual({ activeCardIds: ["forward"], pathIds: ["forward"], glowIds: [] });
+    expect(activeIdsOf("forward", "attention", null)).toEqual({ activeCardIds: ["attention"], pathIds: ["forward", "attention"], glowIds: ["attention"] });
+  });
+
+  test("an open nested part colours the whole chain to it, through the part before it", () => {
+    expect(activeIdsOf("learn", "train-loop", null)).toEqual({ activeCardIds: ["train-loop"], pathIds: ["learn", "adam", "train-loop"], glowIds: ["train-loop"] });
   });
 
   test("during a training run the lines follow the running part, and the open part keeps its band", () => {
-    expect(activeIdsOf("forward", undefined, "ffn")).toEqual({ activeCardIds: ["forward", "ffn"], activeLinkIds: ["forward", "ffn"] });
-    expect(activeIdsOf("forward", "attention", "ffn")).toEqual({ activeCardIds: ["attention", "ffn"], activeLinkIds: ["forward", "ffn"] });
+    expect(activeIdsOf("forward", undefined, "ffn")).toEqual({ activeCardIds: ["forward", "ffn"], pathIds: ["forward", "ffn"], glowIds: ["ffn"] });
+    expect(activeIdsOf("forward", "attention", "repeat-layer")).toEqual({ activeCardIds: ["attention", "repeat-layer"], pathIds: ["forward", "ffn", "repeat-layer"], glowIds: ["repeat-layer"] });
+    expect(activeIdsOf("data", undefined, "ffn")).toEqual({ activeCardIds: ["data", "ffn"], pathIds: ["data", "ffn"], glowIds: ["ffn"] });
   });
 
   test("the glow passes once per training step during a run", () => {

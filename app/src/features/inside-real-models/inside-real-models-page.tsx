@@ -4,7 +4,7 @@ import { Navigate } from "react-router";
 import { NARROW_WIDTH, useWindowWidth } from "@/shared/hooks/use-window-width";
 import { Breadcrumb } from "./breadcrumb";
 import { useInsideRealModels } from "./hooks/use-inside-real-models";
-import { activeIdOf } from "./models";
+import { activeIdOf, pathIdsOf } from "./models";
 import { PartColumn } from "./part-column";
 import { PartDrawer } from "./part-drawer";
 import { placeOf } from "./real-place";
@@ -27,6 +27,7 @@ export function InsideRealModelsPage({ isOpen }: { isOpen: boolean }) {
   const openPart = shownParts.find((part) => part.id === openId);
   const nextPart = shownParts.find((part) => part.id === openPart?.story?.nextId);
   const activeId = activeIdOf(path, openPart);
+  const pathIds = pathIdsOf(path, openPart);
 
   return (
     <main className="page" id="inside-real-models" hidden={!isOpen}>
@@ -45,6 +46,7 @@ export function InsideRealModelsPage({ isOpen }: { isOpen: boolean }) {
               parts={parts}
               selectedId={path[level + 1]?.id}
               activeId={activeId}
+              pathIds={pathIds}
               openId={openId}
               cards={insideRealModels.cards}
               hasLinks={isOpen && !isNarrow}

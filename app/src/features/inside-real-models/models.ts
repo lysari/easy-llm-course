@@ -45,3 +45,8 @@ export function readPath(model: RealModel, ids: string[]): ModelPart[] {
 export const pathUrl = (modelId: ModelId, path: ModelPart[]) => [INSIDE_REAL_MODELS_PATH, modelId, ...path.map((part) => part.id)].join("/");
 
 export const activeIdOf = (path: ModelPart[], openPart: ModelPart | undefined) => (openPart ?? path[path.length - 1]).id;
+
+export function pathIdsOf(path: ModelPart[], openPart: ModelPart | undefined) {
+  const ids = path.map((part) => part.id);
+  return openPart && !ids.includes(openPart.id) ? [...ids, openPart.id] : ids;
+}

@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { MAX_CONTEXT } from "@/core/model/corpus";
 import { ModelLab } from "@/core/model/lab";
 import type { ModeId, ModelPart } from "@/features/inside-real-models/interfaces/model-part.interface";
-import { MODELS, activeIdOf, matchingPath, openPath, pathUrl, readPath } from "@/features/inside-real-models/models";
+import { MODELS, activeIdOf, matchingPath, openPath, pathIdsOf, pathUrl, readPath } from "@/features/inside-real-models/models";
 import { PartCard } from "@/features/inside-real-models/part-card";
 import { PartDrawer } from "@/features/inside-real-models/part-drawer";
 import { RUNS_LABEL, keyFactOf, placeOf, runsOf, shareOf, showAmount } from "@/features/inside-real-models/real-place";
@@ -260,6 +260,15 @@ describe("paths", () => {
     expect(activeIdOf(data, copyIn)).toBe("gather");
     expect(activeIdOf(data, data[1])).toBe("data");
     expect(activeIdOf(data, undefined)).toBe("data");
+  });
+
+  test("the coloured path is the selected path plus the open card", () => {
+    const architecture = readPath(gpt2, ["build", "architecture", "model"]);
+    const layers = architecture[architecture.length - 1].children?.find((part) => part.id === "layers");
+    expect(layers).toBeDefined();
+    expect(pathIdsOf(architecture, layers)).toEqual(["build", "architecture", "model", "layers"]);
+    expect(pathIdsOf(architecture, architecture[1])).toEqual(["build", "architecture", "model"]);
+    expect(pathIdsOf(architecture, undefined)).toEqual(["build", "architecture", "model"]);
   });
 
   test("openPath still walks the model tree", () => {

@@ -12,6 +12,7 @@ interface PartColumnProps {
   parts: ModelPart[];
   selectedId: string | undefined;
   activeId: string;
+  pathIds: string[];
   openId: string | null;
   cards: RefObject<Map<string, HTMLElement>>;
   hasLinks: boolean;
@@ -20,7 +21,7 @@ interface PartColumnProps {
   onDetails: (id: string) => void;
 }
 
-export function PartColumn({ model, root, parent, parts, selectedId, activeId, openId, cards, hasLinks, width, onSelect, onDetails }: PartColumnProps) {
+export function PartColumn({ model, root, parent, parts, selectedId, activeId, pathIds, openId, cards, hasLinks, width, onSelect, onDetails }: PartColumnProps) {
   const columnRef = useRef<HTMLElement>(null);
   const partIds = useMemo(() => parts.map((part) => part.id), [parts]);
   const isSteps = parent === root;
@@ -32,7 +33,7 @@ export function PartColumn({ model, root, parent, parts, selectedId, activeId, o
 
   return (
     <section className="column part-column inside-real-models-column" ref={columnRef} aria-label={title}>
-      {!isSteps && <FlowLinks id={`inside-real-models-links-${parent.id}`} drawing={links} activeIds={[activeId]} />}
+      {!isSteps && <FlowLinks id={`inside-real-models-links-${parent.id}`} drawing={links} pathIds={pathIds} glowIds={[activeId]} />}
       <p className="section-title">{title}</p>
       {parts.map((part, i) => (
         <PartCard
