@@ -163,7 +163,7 @@
 
 .part-card-head {
   display: grid;
-  grid-template-columns: var(--tile-size) minmax(0, 1fr) max-content;
+  grid-template-columns: var(--tile-size) minmax(0, 1fr);
   align-items: start;
   gap: var(--space-card);
   padding: var(--space-item) var(--space-wide) var(--space-control);
@@ -179,24 +179,13 @@
   min-height: var(--tile-size);
 }
 
-.part-card.is-active .part-card-name .card-title,
-.part-card.is-active .part-card-head > .card-lesson {
+.part-card.is-active .part-card-name .card-title {
   color: var(--band-ink);
 }
 
 .part-card-name .pill {
   padding: var(--space-edge) var(--space-control);
   font-size: var(--text-caption);
-}
-
-.part-card-head > .card-lesson {
-  align-self: baseline;
-  font-size: var(--text-caption);
-  white-space: nowrap;
-}
-
-.part-card-head > .card-lesson.is-muted {
-  color: var(--ink-faint);
 }
 
 .step-badge {

@@ -22,8 +22,6 @@ const wordTable = tablePart({
   rowName: "word",
   tinyPart: "word-table",
   sources: GPT_2_SETTINGS,
-  lesson: "Lessons 10, 18",
-  reverseLesson: "RL-02",
   explanation:
     "One row of 768 numbers for each of the 50,257 words in GPT-2's list. A word's id picks its row. The same table is used again at the very end to score every word.",
   why: "Each word becomes a point in a space with 768 directions. Only training decides where each point sits.",
@@ -49,8 +47,6 @@ const positionTable = tablePart({
   rowName: "place",
   tinyPart: "position-table",
   sources: GPT_2_SETTINGS,
-  lesson: "Lessons 14, 25",
-  reverseLesson: "RL-02",
   explanation: "One learned row of 768 numbers for each place from 1 to 1,024. It is added to the word's row so the model knows the order.",
   why: "Without it, \"dog bites man\" and \"man bites dog\" would look the same. It also caps GPT-2 at 1,024 words.",
   story: {
@@ -74,8 +70,6 @@ const finalNorm = normPart({
   hasShift: true,
   tinyPart: "final-norm",
   sources: [...GPT_2_SETTINGS, "gpt-2-paper"],
-  lesson: "Lesson 20",
-  reverseLesson: "RL-04",
   explanation: "One last LayerNorm on the last word's 768 numbers, with its own 768 scale and 768 shift numbers, before they are scored.",
   why: "GPT-2 puts each norm before its part, so the very last layer's output still needs one.",
   story: {
@@ -97,8 +91,6 @@ const outputHead: ModelPart = {
   copies: 1,
   facts: { shape: "768 × 50,257, the word table reused", weightCount: 0, headline: { value: 0, unit: "new numbers", isComputed: true }, input: "768 for last word", output: "50,257 scores", inputDetail: "768 numbers for the last word", sources: GPT_2_SETTINGS, reasons: [GPT_2_OUTPUT] },
   tiny: { part: "output-table", level: "whole" },
-  lesson: "Lessons 11, 20",
-  reverseLesson: "RL-04",
   explanation:
     "Turns the last word's 768 numbers into one score per word. GPT-2 reuses the word table here instead of storing a second table, so it adds 0 numbers.",
   why: "Softmax turns the scores into chances, and one word is picked. The top chance is not knowledge, only the best guess the numbers give.",
@@ -120,8 +112,6 @@ const outputHead: ModelPart = {
       copies: WORD_COUNT,
       facts: { shape: "768 × 1", weightCount: 0, headline: { value: WIDTH, unit: "pairs multiplied" }, input: "768 numbers, 1 row", output: "1 score", inputDetail: "768 numbers and one word's row", sources: GPT_2_SETTINGS, reasons: [GPT_2_OUTPUT] },
       tiny: { part: "output-table", level: "number" },
-      lesson: "Lesson 11",
-      reverseLesson: "RL-04",
       explanation: "The score for one word: the last word's 768 numbers times that word's row in the word table, added up.",
       why: "A word scores high when its row points the same way as the last word's numbers.",
       story: {
@@ -142,8 +132,6 @@ const outputHead: ModelPart = {
           copies: WIDTH,
           facts: { shape: "1 × 1", weightCount: 0, headline: { value: WIDTH, unit: "per output number" }, input: "1 number, 1 stored", output: "the running sum", inputDetail: "1 number and 1 number from the word table", sources: GPT_2_SETTINGS, reasons: [GPT_2_OUTPUT] },
           tiny: { part: "output-table", level: "multiply-add" },
-          lesson: "Lessons 00, 11",
-          reverseLesson: "RL-06",
           explanation: "Ground zero. One of the last word's numbers times one number from the word table, added to the running sum. The number is counted once, in the word table.",
           why: "Choosing the next word comes down to this, done 768 × 50,257 times.",
           story: {
@@ -182,8 +170,6 @@ const root: ModelPart = {
     ],
     reasons: [GPT_2_TRANSFORMER, GPT_2_SIZE_HELPS, GPT_2_RANDOM_START],
   },
-  lesson: "Lessons 14, 20",
-  reverseLesson: "RL-00",
   explanation:
     "The whole model, released by OpenAI in 2019. Words go in as ids, and out comes one score for every word in its list. The highest scores are the likely next words. Everything inside is stored numbers, multiplied and added.",
   why: "Its writing looks like understanding, but every step is arithmetic on 124,439,808 stored numbers. Take it apart to see.",
@@ -229,7 +215,6 @@ export const GPT_2_SMALL: RealModel = {
       },
       writingNotes: GPT_2_WRITING_NOTES,
       reasons: GPT_2_USE_REASONS,
-      embeddingLesson: "Lessons 10, 14",
       embeddingText:
         "Each word ID picks its row of 768 numbers from the word table. GPT-2 then adds a learned row for the word's place, 1 to 1,024, from the position table, so the same word at a different place gets different numbers.",
       embedding: [wordTable, positionTable],

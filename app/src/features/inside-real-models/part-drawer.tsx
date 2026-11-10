@@ -6,21 +6,11 @@ import { Drawer } from "@/shared/components/drawer";
 import { FormulaBlock } from "@/shared/components/formula-block";
 import { FactRows } from "./fact-rows";
 import { InOut } from "./in-out";
-import { DRAWER_ID, NO_LESSON, numbersOf, partsOf, tagOf, titleOf } from "./part-card";
+import { DRAWER_ID, numbersOf, partsOf, tagOf, titleOf } from "./part-card";
 import { PartNumbers } from "./part-numbers";
 import { RUNS_LABEL, SHARE_LABEL, runsOf, shareOf } from "./real-place";
 import { StoryDemo, StoryInfo } from "./story/story-sections";
 import { SOURCES } from "./trees/sources";
-
-const REVERSE_TITLES: Record<string, string> = {
-  "RL-00": "The Illusion",
-  "RL-01": "Text Is Numbers",
-  "RL-02": "Meaning Is Position",
-  "RL-03": "Attention Is Arithmetic",
-  "RL-04": "Prediction, Not Knowing",
-  "RL-05": "Weights, Not Wisdom",
-  "RL-06": "Ground Zero",
-};
 
 const GROUND_ZERO_TEXT = { "multiply-add": "one multiply on two numbers, added to a sum", "stored-number": "one stored number", action: "one small step that uses no stored numbers" };
 
@@ -59,7 +49,7 @@ export function PartDrawer({ ref, root, modelId, modelTitle, part, place, tiny, 
   ];
 
   return (
-    <Drawer ref={ref} id={DRAWER_ID} icon={part.icon} title={titleOf(part, root)} lesson={`${part.lesson} · ${part.reverseLesson}`} status={tagOf(part)} bodyKey={part.id} onClose={onClose} panel={part.story && <StoryDemo story={part.story} part={part} modelId={modelId} tiny={tiny} />}>
+    <Drawer ref={ref} id={DRAWER_ID} icon={part.icon} title={titleOf(part, root)} status={tagOf(part)} bodyKey={part.id} onClose={onClose} panel={part.story && <StoryDemo story={part.story} part={part} modelId={modelId} tiny={tiny} />}>
       <section className="section">
         <p className="section-title">What it does</p>
         <p className="part-summary">{part.summary}</p>
@@ -88,15 +78,6 @@ export function PartDrawer({ ref, root, modelId, modelTitle, part, place, tiny, 
       </section>
       {part.formula && <FormulaBlock formula={part.formula} />}
       {part.code && <CodeBlock code={part.code} />}
-      <section className="section">
-        <p className="section-title">Read more</p>
-        <FactRows
-          rows={[
-            [part.lesson, part.lesson === NO_LESSON ? "not in the course yet" : "build it, bottom-up"],
-            [part.reverseLesson, REVERSE_TITLES[part.reverseLesson]],
-          ]}
-        />
-      </section>
     </Drawer>
   );
 }

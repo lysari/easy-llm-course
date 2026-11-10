@@ -73,8 +73,6 @@ export interface ModelPart {
   copies: number;
   facts: RealFacts;
   tiny?: TinyLink;
-  lesson: string;
-  reverseLesson: string;
   explanation: string;
   why: string;
   story?: PartStory;

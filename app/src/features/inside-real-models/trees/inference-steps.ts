@@ -16,8 +16,6 @@ function tokenizeStep(spec: InferenceSpec): ModelPart {
     summary: "Splits your text into small pieces and gives each piece an ID.",
     copies: 1,
     facts: { shape: `${spec.tokenizer} · ${count(spec.wordCount)} words`, weightCount: 0, headline: { value: spec.wordCount, unit: "words" }, input: "text", output: "word IDs", sources: [...new Set([...spec.sources, ...sourcesOf(spec.tokenizerNotes)])], notes: spec.tokenizerNotes, reasons: spec.reasons.tokenize },
-    lesson: "Lessons 09, 18",
-    reverseLesson: "RL-01",
     explanation: `Your text is cut into pieces, and each piece is swapped for its number in ${spec.modelTitle}'s list of ${count(spec.wordCount)} words. From here on the model only sees those numbers.`,
     why: "The model never sees letters. \"dog\" is just an ID, a position in a list, with no meaning attached yet.",
     story: {
@@ -37,8 +35,6 @@ function tokenizeStep(spec: InferenceSpec): ModelPart {
         summary: "Cuts the text into pieces from the word list, joining letters step by step.",
         copies: 1,
         facts: { shape: "merge rules, in the order learned", weightCount: 0, headline: spec.merges, input: "text as bytes", output: "pieces", sources: sourcesOf(spec.mergeNotes), notes: spec.mergeNotes, reasons: spec.reasons.split },
-        lesson: "Lesson 18",
-        reverseLesson: "RL-01",
         explanation: "The text starts as single bytes. Merge rules join neighbouring pieces into bigger ones, so common words become one piece and rare words stay split.",
         why: "Any text can be split this way, even words the list has never seen, because single bytes are always in the list.",
         story: {
@@ -57,8 +53,6 @@ function tokenizeStep(spec: InferenceSpec): ModelPart {
             summary: "Joins two side-by-side pieces into one, when a learned rule names them.",
             copies: 1,
             facts: { shape: "1 rule", weightCount: 0, headline: spec.merges, input: "two pieces", output: "one joined piece", inputDetail: "two neighbouring pieces", outputDetail: "one joined piece, or no change", sources: sourcesOf(spec.mergeNotes), notes: spec.mergeNotes, reasons: spec.reasons["apply-merge"] },
-            lesson: "Lesson 18",
-            reverseLesson: "RL-01",
             explanation: "Ground zero. One learned rule, such as \"do\" + \"g\" → \"dog\". If those two pieces sit side by side, join them into one.",
             why: "It is a find-and-replace. Nothing here knows what a dog is.",
             story: {
@@ -80,8 +74,6 @@ function tokenizeStep(spec: InferenceSpec): ModelPart {
         summary: "Finds one piece in the word list and writes down its place number.",
         copies: 1,
         facts: { shape: "1 row of the list", weightCount: 0, headline: { value: spec.wordCount, unit: "words in the list" }, input: "one piece", output: "its ID", sources: spec.sources, notes: [{ label: "IDs", value: `0 to ${count(spec.wordCount - 1)}, one for each word in the list`, source: spec.sources[0] }], reasons: spec.reasons.lookup },
-        lesson: "Lesson 09",
-        reverseLesson: "RL-01",
         explanation: "Ground zero. Look up one piece in the vocabulary, the list of words, and write down its place in the list.",
         why: "This is the whole trick of turning text into numbers: a lookup in a list.",
         story: {
@@ -108,8 +100,6 @@ function embeddingStep(spec: InferenceSpec): ModelPart {
     copies: 1,
     facts: { shape: `${count(spec.width)} numbers per word`, weightCount: numbersIn(spec.embedding), headline: { value: spec.width, unit: "numbers per word" }, input: "word IDs", output: "vectors", sources: spec.sources, reasons: spec.reasons.embedding },
     tiny: { part: "embedding", level: "whole" },
-    lesson: spec.embeddingLesson,
-    reverseLesson: "RL-02",
     explanation: spec.embeddingText,
     why: "From here on each word is a list of numbers, a point in space. Meaning is only where that point sits.",
     story: {
@@ -133,8 +123,6 @@ function outputStep(spec: InferenceSpec): ModelPart {
     summary: "Turns the scores into chances that add up to 100%.",
     copies: 1,
     facts: { shape: `${count(spec.wordCount)} chances`, weightCount: 0, headline: { value: spec.wordCount, unit: "chances" }, input: `${count(spec.wordCount)} scores`, output: "chances adding to 1", outputDetail: "chances that add up to 1", sources: spec.sources, notes: [spec.writingNotes.softmax], reasons: spec.reasons.softmax },
-    lesson: "Lesson 11",
-    reverseLesson: "RL-04",
     explanation: "Turns the scores into chances. Each score is raised as a power of e, so bigger scores grow much bigger, then all are divided by their total.",
     why: "The chances are not beliefs. They are scores squashed so they add up to 1.",
     story: {
@@ -153,8 +141,6 @@ function outputStep(spec: InferenceSpec): ModelPart {
         summary: "Turns one word's score into its chance, by comparing it with all the others.",
         copies: spec.wordCount,
         facts: { shape: "1", weightCount: 0, headline: { value: spec.wordCount, unit: "per new word" }, input: "1 score, the total", output: "1 chance", inputDetail: "one score and the total", sources: spec.sources, notes: [spec.writingNotes.chance], reasons: spec.reasons.chance },
-        lesson: "Lesson 11",
-        reverseLesson: "RL-04",
         explanation: "Ground zero. e to the power of one word's score, divided by the total for all words.",
         why: "One power and one divide. That is all a \"chance\" is here.",
         story: {
@@ -178,8 +164,6 @@ function outputStep(spec: InferenceSpec): ModelPart {
     summary: "Scores every word in the list and turns the scores into chances.",
     copies: 1,
     facts: { shape: "final norm, output table, softmax", weightCount: numbersIn(parts), headline: { value: spec.wordCount, unit: "chances" }, input: "last word's vector", output: "chances", inputDetail: "the last word's vector", sources: spec.sources, reasons: spec.reasons.output },
-    lesson: "Lessons 11, 20",
-    reverseLesson: "RL-04",
     explanation: `The last word's ${count(spec.width)} numbers are steadied by one last norm, scored against every word in the list, and the scores are turned into chances.`,
     why: "Only the last word's numbers are used to guess what comes next. The top chance is the best guess, not knowledge.",
     story: {
@@ -203,8 +187,6 @@ export function inferenceRoot(spec: InferenceSpec): ModelPart {
     summary: "How a model turns your text into the next word, in 5 steps.",
     copies: 1,
     facts: { shape: "5 steps", weightCount: numbersIn(steps), headline: { value: numbersIn(steps), unit: "numbers", isComputed: true }, input: "your text", output: "the next words", sources: spec.sources },
-    lesson: "Lessons 14, 20",
-    reverseLesson: "RL-00",
     explanation: `How ${spec.modelTitle} turns your text into the next word: cut it into word IDs, look up their vectors, run the layers, score every word, and pick one.`,
     why: "Every step is a lookup, a multiply-and-add or a random pick. None of them needs understanding.",
     formula: { lines: ["text → IDs → vectors → layers → chances → word"] },

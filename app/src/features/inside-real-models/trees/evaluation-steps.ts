@@ -10,8 +10,6 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
     summary: "Tests the finished model, checks it for harm, and makes it smaller.",
     copies: 1,
     facts: stepFacts(facts.evaluation, "a trained model", "ready to ship", { outputDetail: "a model ready to ship" }),
-    lesson: "Lesson 30",
-    reverseLesson: "RL-00",
     explanation: "Before release the model is tested on question sets it never trained on, checked for harmful answers, and often made smaller and faster by storing its numbers with fewer bits.",
     why: "A test score says how often the guesses match the answer key, not whether the model understands.",
     story: {
@@ -30,8 +28,6 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
         summary: "Asks sets of test questions with known answers and counts the right ones.",
         copies: 1,
         facts: stepFacts(facts.benchmarks, "test questions", "a score", { inputDetail: "test questions with known answers" }),
-        lesson: "Lessons 22, 30",
-        reverseLesson: "RL-04",
         explanation: "Sets of questions with known answers. The model answers each one, and the score is how many it got right.",
         why: "Tests only count matches. Text seen in training can also leak into a test and raise the score.",
         story: {
@@ -50,8 +46,6 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
             summary: "Asks one question and marks the model's top answer right or wrong.",
             copies: 1,
             facts: stepFacts(facts["test-question"], "one question", "right or wrong"),
-            lesson: "Lesson 30",
-            reverseLesson: "RL-04",
             explanation: "Ground zero. Ask one question, take the model's most likely answer, and compare it with the right one: 1 if it matches, 0 if not.",
             why: "A benchmark score is many of these 1s and 0s, averaged.",
             story: {
@@ -74,8 +68,6 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
         summary: "Tries risky questions on the model and checks its answers against rules.",
         copies: 1,
         facts: stepFacts(facts.safety, "risky prompts", "checked answers", { outputDetail: "answers checked against rules" }),
-        lesson: "Lesson 30",
-        reverseLesson: "RL-00",
         explanation: "People and programs try to make the model give harmful answers (red teaming), and the answers are checked. Extra filter models can also check prompts and answers while it runs.",
         why: "Safety is tested from the outside, by trying prompts. Nothing inside the numbers says \"harmful\".",
         story: {
@@ -94,8 +86,6 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
             summary: "Sends one risky question and checks the answer against one rule.",
             copies: 1,
             facts: stepFacts(facts["safety-check"], "one risky prompt", "pass or fail"),
-            lesson: "Lesson 30",
-            reverseLesson: "RL-00",
             explanation: "Ground zero. Send one risky prompt and check the answer against one safety rule: pass or fail.",
             why: "Like a test question, but the answer key is a rule about what not to say.",
             story: {
@@ -117,8 +107,6 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
         summary: "Stores every number with fewer digits, so the model is smaller and faster.",
         copies: 1,
         facts: stepFacts(facts.quantization, "full-size numbers", "fewer bits each", { inputDetail: "stored numbers at full size", outputDetail: "the same numbers in fewer bits" }),
-        lesson: "No lesson yet",
-        reverseLesson: "RL-05",
         explanation: "Store each number with fewer bits, for example 8 instead of 16. The model gets smaller, and tests show how much its answers change.",
         why: "Each answer comes from many numbers working together, so rounding each one a little can still leave the answers close.",
         story: {
@@ -137,8 +125,6 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
             summary: "Rounds one stored number so it fits in less space.",
             copies: 1,
             facts: stepFacts(facts["round-number"], "1 full-size number", "1 smaller number", { inputDetail: "one number, full size", outputDetail: "the nearest smaller-size number" }),
-            lesson: "No lesson yet",
-            reverseLesson: "RL-05",
             explanation: "Ground zero. Divide one stored number by a scale, round it to the nearest whole number that fits in the smaller size, and keep that instead.",
             why: "Rounding loses a tiny bit of each number, like rounding prices to whole dollars.",
             story: {

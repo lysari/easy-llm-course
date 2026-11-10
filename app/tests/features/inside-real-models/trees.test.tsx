@@ -70,12 +70,10 @@ describe.each(MODELS)("$title", (model) => {
       expect(new Set(ids).size).toBe(ids.length);
     });
 
-    test("every part has text, lesson labels and a formula or code", () => {
+    test("every part has text and a formula or code", () => {
       for (const part of parts) {
         expect(part.explanation.length, part.id).toBeGreaterThan(20);
         expect(part.why.length, part.id).toBeGreaterThan(20);
-        expect(part.lesson, part.id).toMatch(/^(Lessons? \d\d((, |–)\d\d)*|No lesson yet)$/);
-        expect(part.reverseLesson, part.id).toMatch(/^RL-0[0-6]$/);
         expect(Boolean(part.formula || part.code), part.id).toBe(true);
         expect(part.copies, part.id).toBeGreaterThanOrEqual(1);
       }

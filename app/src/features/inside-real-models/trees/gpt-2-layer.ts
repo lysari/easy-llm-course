@@ -16,8 +16,6 @@ const layer: ModelPart = {
   copies: LAYER_COUNT,
   facts: { shape: "norm, attention, norm, feed-forward", weightCount: 7_087_872, headline: { value: 7_087_872, unit: "numbers", isComputed: true }, input: "768 per word", output: "768 per word", inputDetail: "768 numbers per word", outputDetail: "768 numbers per word", sources: [...GPT_2_SETTINGS, "gpt-2-paper"], reasons: [GPT_2_ADD_BACK, GPT_2_NORM_PLACE] },
   tiny: { part: "layer", level: "whole" },
-  lesson: "Lessons 13, 20",
-  reverseLesson: "RL-03",
   explanation:
     "One of 12 identical layers. A norm, then attention, added back on; a second norm, then the feed-forward, added back on. GPT-2 puts each norm before its part, not after.",
   why: "Adding each result back (x + part(x)) lets the numbers flow straight through 12 layers, so training can reach the first one.",
@@ -41,8 +39,6 @@ const layer: ModelPart = {
       hasShift: true,
       tinyPart: "norm",
       sources: [...GPT_2_SETTINGS, "gpt-2-paper"],
-      lesson: "Lessons 13, 20",
-      reverseLesson: "RL-06",
       explanation: "LayerNorm. Shifts a word's 768 numbers to an average of 0 and a spread of 1, then scales and shifts each one by its own 2 stored numbers.",
       why: "Keeps the numbers in a steady range however many layers came before, so training stays stable.",
       story: {
@@ -66,8 +62,6 @@ const layer: ModelPart = {
       hasShift: true,
       tinyPart: "norm",
       sources: [...GPT_2_SETTINGS, "gpt-2-paper"],
-      lesson: "Lessons 13, 20",
-      reverseLesson: "RL-06",
       explanation: "The same kind of LayerNorm with its own 768 scale and 768 shift numbers, run before the feed-forward.",
       why: "Each part gets inputs in a steady range, whatever attention just added.",
       story: {
@@ -92,8 +86,6 @@ export const gpt2Layers: ModelPart = {
   copies: 1,
   facts: { shape: "12 layers", weightCount: 85_054_464, headline: { value: 85_054_464, unit: "numbers", isComputed: true }, input: "word vectors", output: "updated word vectors", sources: GPT_2_SETTINGS, reasons: [GPT_2_LAYER_LOOP, GPT_2_DEPTH, GPT_2_SIZE_HELPS] },
   tiny: { part: "layers", level: "whole" },
-  lesson: "Lessons 13, 20",
-  reverseLesson: "RL-03",
   explanation: "12 layers of the same shape, one after another. Each one reads every word's 768 numbers and adds a little more onto them.",
   why: `The same small recipe, stacked. Each of the ${LAYER_COUNT} layers has its own numbers, so each can learn something different.`,
   story: {

@@ -23,8 +23,6 @@ const wordTable = tablePart({
   rowName: "word",
   tinyPart: "word-table",
   sources: LLAMA_3_SETTINGS,
-  lesson: "Lessons 10, 18",
-  reverseLesson: "RL-02",
   explanation: "One row of 4,096 numbers for each of the 128,256 words in Llama 3's list. A word's id picks its row.",
   why: "Each word becomes a point in a space with 4,096 directions. Only training decides where each point sits.",
   story: {
@@ -48,8 +46,6 @@ const finalNorm = normPart({
   hasShift: false,
   tinyPart: "final-norm",
   sources: LLAMA_3_SETTINGS,
-  lesson: "Lesson 20",
-  reverseLesson: "RL-04",
   explanation: "One last RMSNorm on the last word's 4,096 numbers, with its own 4,096 scale numbers, before they are scored.",
   why: "Each norm sits before its part, so the very last layer's output still needs one.",
   story: {
@@ -78,8 +74,6 @@ const outputHead = projectionPart({
   outputDetail: "128,256 scores, one per word",
   tinyPart: "output-table",
   sources: LLAMA_3_SETTINGS,
-  lesson: "Lessons 11, 20",
-  reverseLesson: "RL-04",
   explanation: "Turns the last word's 4,096 numbers into one score per word. Llama 3 8B stores its own output table, separate from the word table, so it adds another 525,336,576 numbers.",
   why: "Softmax turns the scores into chances, and one word is picked. The top chance is not knowledge, only the best guess the numbers give.",
   story: {
@@ -114,8 +108,6 @@ const root: ModelPart = {
     ],
     reasons: [LLAMA_3_TRANSFORMER, LLAMA_3_AUTOREGRESSIVE],
   },
-  lesson: "Lessons 25, 30",
-  reverseLesson: "RL-00",
   explanation:
     "The whole model, released by Meta in 2024. Words go in as ids, and out comes one score for every word in its list. It has no position table: word order is added inside attention by RoPE. Everything inside is stored numbers, multiplied and added.",
   why: "Its answers look like understanding, but every step is arithmetic on 8,030,261,248 stored numbers. Take it apart to see.",
@@ -139,8 +131,6 @@ const wordOrder: ModelPart = {
   copies: 1,
   facts: { shape: "nothing stored here", weightCount: 0, headline: { value: 0, unit: "numbers added here" }, input: "word vectors", output: "the same vectors", sources: LLAMA_3_SETTINGS, notes: [{ label: "Order comes in", value: "inside attention, by RoPE with θ 500,000", source: "llama-3-settings" }], reasons: [LLAMA_3_ROPE, LLAMA_3_NO_REASON] },
   tiny: { part: "position-table", level: "whole" },
-  lesson: "Lesson 25",
-  reverseLesson: "RL-02",
   explanation:
     "Ground zero. Nothing is added here: Llama 3 has no position table. Word order comes in later through RoPE, inside each attention head of step 3, which turns every query and key pair by an angle that grows with the word's place.",
   why: "Turning queries and keys makes their match depend on how far apart two words are, and adds no stored numbers.",
@@ -186,7 +176,6 @@ export const LLAMA_3_8B: RealModel = {
           { label: "Stop word", value: "<|end_of_text|>, ID 128,001: the 2nd special word after the 128,000 regular ones", source: "llama-3-tokenizer" },
         ],
       },
-      embeddingLesson: "Lessons 10, 25",
       embeddingText:
         "Each word ID picks its row of 4,096 numbers from the word table. Llama 3 adds no place numbers here: word order is added later by RoPE, inside attention.",
       embedding: [wordTable, wordOrder],

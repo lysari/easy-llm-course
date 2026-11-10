@@ -12,8 +12,6 @@ function dataStep(facts: BuildFacts): ModelPart {
     summary: "Gathers a huge pile of text and cleans it up for training.",
     copies: 1,
     facts: stepFacts(facts.data, "online text", "clean training text", { inputDetail: "publicly available online text" }),
-    lesson: "Lessons 22, 30",
-    reverseLesson: "RL-04",
     explanation: "Gather a huge amount of text, drop the low-quality and harmful parts, and remove copies. What is left is all the model will ever learn from.",
     why: "The model can only echo patterns in this text. Its \"knowledge\" is whatever this pile happened to contain.",
     story: {
@@ -32,8 +30,6 @@ function dataStep(facts: BuildFacts): ModelPart {
         summary: "Copies the plain text of one web page into the pile.",
         copies: 1,
         facts: stepFacts(facts.gather, "one web page", "its plain text"),
-        lesson: "Lesson 30",
-        reverseLesson: "RL-04",
         explanation: "Ground zero. Take one web page, strip out the menus and code, and keep its plain text as one document.",
         why: "Nobody reads it first. It goes in as a long run of characters.",
         story: {
@@ -53,8 +49,6 @@ function dataStep(facts: BuildFacts): ModelPart {
         summary: "Checks one document against one rule, then keeps it or drops it.",
         copies: 1,
         facts: stepFacts(facts.filter, "one document", "keep or drop"),
-        lesson: "No lesson yet",
-        reverseLesson: "RL-04",
         explanation: "Ground zero. Check one document against one rule, and keep it or drop it. The rules the makers say they used are listed below.",
         why: "Rules and small scoring models decide what counts as good text, long before training starts.",
         story: {
@@ -74,8 +68,6 @@ function dataStep(facts: BuildFacts): ModelPart {
         summary: "Drops a document if it copies, or nearly copies, one already kept.",
         copies: 1,
         facts: stepFacts(facts.dedupe, "one document", "keep or drop", { inputDetail: "one document and those kept", outputDetail: "keep, or drop as a copy" }),
-        lesson: "No lesson yet",
-        reverseLesson: "RL-04",
         explanation: "Ground zero. Compare one document with the ones already kept, and drop it if it is a copy or nearly one.",
         why: "Text seen many times gets copied back word for word, so copies are removed.",
         story: {
@@ -100,8 +92,6 @@ function tokenizerStep(facts: BuildFacts): ModelPart {
     summary: "Builds the word list the model will use, by counting common pairs of letters.",
     copies: 1,
     facts: stepFacts(facts.tokenizer, "clean text", "a word list", { inputDetail: "clean training text", outputDetail: "a word list: piece ↔ ID" }),
-    lesson: "Lessons 09, 18",
-    reverseLesson: "RL-01",
     explanation: "Build the list of words the model will use. BPE starts from single bytes, then keeps joining the most common pair of neighbouring pieces into a new piece, until the list is full.",
     why: "The list is made by counting, not by meaning. Common words become one piece; rare words stay in parts.",
     story: {
@@ -120,8 +110,6 @@ function tokenizerStep(facts: BuildFacts): ModelPart {
         summary: "Joins the most common pair of pieces into one new piece.",
         copies: 1,
         facts: stepFacts(facts["merge-round"], "text in pieces", "1 new piece, 1 rule", { inputDetail: "the text, split into pieces", outputDetail: "one new piece and one rule" }),
-        lesson: "Lesson 18",
-        reverseLesson: "RL-01",
         explanation: "Count every pair of neighbouring pieces in the text, join the most common pair into one new piece, and write that down as a merge rule.",
         why: "The rules are kept in order. Using the model later replays them on new text.",
         story: {
@@ -140,8 +128,6 @@ function tokenizerStep(facts: BuildFacts): ModelPart {
             summary: "Adds 1 to the count for one pair of side-by-side pieces.",
             copies: 1,
             facts: stepFacts(facts["count-pair"], "two pieces", "their count, plus 1", { inputDetail: "two neighbouring pieces" }),
-            lesson: "Lesson 18",
-            reverseLesson: "RL-01",
             explanation: "Ground zero. Add 1 to the count for one pair of neighbouring pieces, such as \"d\" then \"o\".",
             why: "The tokenizer is built from counts like this, nothing more.",
             story: {
@@ -161,8 +147,6 @@ function tokenizerStep(facts: BuildFacts): ModelPart {
             summary: "Writes down one join rule and adds the joined piece to the list.",
             copies: 1,
             facts: stepFacts(facts["learn-merge"], "the most common pair", "one new piece"),
-            lesson: "Lesson 18",
-            reverseLesson: "RL-01",
             explanation: "Ground zero. Write down one rule, such as \"do\" + \"g\" → \"dog\", and add the joined piece to the list.",
             why: "\"dog\" becomes one piece because it was common, not because anything knows it is an animal.",
             story: {
@@ -184,8 +168,6 @@ function tokenizerStep(facts: BuildFacts): ModelPart {
         summary: "Writes one piece into the list, and its place number becomes its ID.",
         copies: 1,
         facts: stepFacts(facts["assign-id"], "one piece", "its number"),
-        lesson: "Lesson 09",
-        reverseLesson: "RL-01",
         explanation: "Ground zero. Write one piece and its place number into the list. That number is its ID from now on.",
         why: "The ID is only a place in a list. Nearby IDs mean nothing.",
         story: {
@@ -210,8 +192,6 @@ function architectureStep(model: ModelPart): ModelPart {
     summary: "Writes the model as code, with every stored number starting out random.",
     copies: 1,
     facts: { shape: model.facts.shape, weightCount: model.facts.weightCount, headline: model.facts.headline, input: "sizes and parts", output: "a random model", outputDetail: "code with random numbers", sources: model.facts.sources, reasons: model.facts.reasons },
-    lesson: "Lessons 13, 14, 20",
-    reverseLesson: "RL-05",
     explanation: "Write the model as code: the word table, the layers of attention and feed-forward with their norms and add-backs, and the output head. Every stored number starts random.",
     why: "Before training, this exact code with random numbers writes nonsense. The shape alone knows nothing.",
     story: {
@@ -234,8 +214,6 @@ export function lifecycleRoot(model: ModelPart, facts: BuildFacts): ModelPart {
     summary: "How a model is made, from raw text to a model you can use, in 6 stages.",
     copies: 1,
     facts: { shape: "6 stages", weightCount: model.facts.weightCount, headline: model.facts.headline, input: "online text", output: "a model ready to use", inputDetail: "publicly available online text", sources: model.facts.sources },
-    lesson: "Lessons 14, 30",
-    reverseLesson: "RL-05",
     explanation: "How a model is made: collect text, build the word list, write the model code, train it to guess the next word, teach it to answer, then test and shrink it.",
     why: "Only the architecture stage holds stored numbers. Every other stage shapes what those numbers end up being.",
     formula: { lines: ["data → word list → code → pre-train → post-train → test"] },

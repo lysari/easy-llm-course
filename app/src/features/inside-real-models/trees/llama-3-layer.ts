@@ -16,8 +16,6 @@ const layer: ModelPart = {
   copies: LAYER_COUNT,
   facts: { shape: "norm, attention, norm, feed-forward", weightCount: 218_112_000, headline: { value: 218_112_000, unit: "numbers", isComputed: true }, input: "4,096 per word", output: "4,096 per word", inputDetail: "4,096 numbers per word", outputDetail: "4,096 numbers per word", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_ADD_BACK, LLAMA_3_NO_REASON] },
   tiny: { part: "layer", level: "whole" },
-  lesson: "Lessons 13, 20",
-  reverseLesson: "RL-03",
   explanation: "One of 32 identical layers. An RMSNorm, then attention, added back on; a second RMSNorm, then the feed-forward, added back on.",
   why: "Adding each result back (x + part(x)) lets the numbers flow straight through 32 layers, so training can reach the first one.",
   story: {
@@ -40,8 +38,6 @@ const layer: ModelPart = {
       hasShift: false,
       tinyPart: "norm",
       sources: LLAMA_3_SETTINGS,
-      lesson: "Lessons 13, 20",
-      reverseLesson: "RL-06",
       explanation: "RMSNorm. Divides a word's 4,096 numbers by their root mean square, so their size is about 1, then scales each one by its own stored number. It does not subtract the average and has no shift.",
       why: "Llama 3's code writes it as x × 1/√(mean(x²) + 0.00001), then times each scale number.",
       story: {
@@ -65,8 +61,6 @@ const layer: ModelPart = {
       hasShift: false,
       tinyPart: "norm",
       sources: LLAMA_3_SETTINGS,
-      lesson: "Lessons 13, 20",
-      reverseLesson: "RL-06",
       explanation: "The same kind of RMSNorm with its own 4,096 scale numbers, run before the feed-forward.",
       why: "Each part gets inputs of a steady size, whatever attention just added.",
       story: {
@@ -91,8 +85,6 @@ export const llama3Layers: ModelPart = {
   copies: 1,
   facts: { shape: "32 layers", weightCount: 6_979_584_000, headline: { value: 6_979_584_000, unit: "numbers", isComputed: true }, input: "word vectors", output: "updated word vectors", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_LAYER_LOOP, LLAMA_3_NO_REASON] },
   tiny: { part: "layers", level: "whole" },
-  lesson: "Lessons 13, 20",
-  reverseLesson: "RL-03",
   explanation: "32 layers of the same shape, one after another. Each one reads every word's 4,096 numbers and adds a little more onto them.",
   why: `The same small recipe, stacked. Each of the ${LAYER_COUNT} layers has its own numbers, so each can learn something different.`,
   story: {

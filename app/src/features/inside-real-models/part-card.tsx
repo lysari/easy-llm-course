@@ -12,8 +12,6 @@ import { PartNumbers } from "./part-numbers";
 
 export const DRAWER_ID = "inside-real-models-drawer";
 
-export const NO_LESSON = "No lesson yet";
-
 interface PartCardProps {
   ref: Ref<HTMLElement>;
   root: ModelPart;
@@ -68,7 +66,6 @@ export function PartCard({ ref, root, modelTitle, part, place, index, isSelected
           <h3 className="card-title">{nameOf(part)}</h3>
           {tag && <StatusPill status={tag} />}
         </div>
-        <p className={`card-lesson${part.lesson === NO_LESSON ? " is-muted" : ""}`}>{part.lesson}</p>
       </div>
       <div className="card-body">
         <p className="part-summary">{part.summary}</p>

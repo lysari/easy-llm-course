@@ -12,8 +12,6 @@ export function generateStep(spec: InferenceSpec): ModelPart {
     summary: "Picks a word, adds it to the end, and runs again until it stops.",
     copies: 1,
     facts: { shape: `1 word per round, up to ${count(spec.context)} words`, weightCount: 0, headline: { value: spec.context, unit: "words at most" }, input: "chances", output: "new words", outputDetail: "new words, one per round", sources: [...spec.sources, ...spec.textSources], notes: [spec.writingNotes.generate], reasons: spec.reasons.generate },
-    lesson: "Lessons 21, 23",
-    reverseLesson: "RL-04",
     explanation: "Pick one word from the chances, add it to the end, and run steps 1 to 4 again. Repeat until the stop word comes up or the text is too long.",
     why: "A whole answer is just this loop. Each word is picked without a plan for the next one.",
     story: {
@@ -32,8 +30,6 @@ export function generateStep(spec: InferenceSpec): ModelPart {
         summary: "One pass of the loop: pick a word, add it, then check whether to stop.",
         copies: 1,
         facts: { shape: "pick, add, check", weightCount: 0, headline: { value: 1, unit: "word added" }, input: "all words so far", output: "one more word", sources: spec.textSources, notes: [spec.writingNotes["write-round"]], reasons: spec.reasons["write-round"] },
-        lesson: "Lessons 14, 23",
-        reverseLesson: "RL-04",
         explanation: "One pass of the loop: pick a word from the chances, add it to the end, then check whether to stop.",
         why: "The model writes left to right and never goes back to change a word.",
         story: {
@@ -52,8 +48,6 @@ export function generateStep(spec: InferenceSpec): ModelPart {
             summary: "Rolls a random number and walks down the chances to choose one word.",
             copies: 1,
             facts: { shape: "1 random roll", weightCount: 0, headline: { value: spec.wordCount, unit: "words to pick from" }, input: "chances", output: "one word", sources: spec.sources, notes: [spec.writingNotes.pick], reasons: spec.reasons.pick },
-            lesson: "Lesson 23",
-            reverseLesson: "RL-04",
             explanation: "Ground zero. Roll a random number from 0 to 1, then walk down the chances, taking each away, until the roll runs out. That word is picked.",
             why: "Likely words are picked more often, but not always. That is why the same start can give different endings.",
             story: {
@@ -74,8 +68,6 @@ export function generateStep(spec: InferenceSpec): ModelPart {
             summary: "Adds the picked word's ID to the end of the text, ready for the next round.",
             copies: 1,
             facts: { shape: "1 more ID", weightCount: 0, headline: { value: spec.context, unit: "words at most" }, input: "words and the pick", output: "one word longer", inputDetail: "words so far and the picked word", sources: spec.sources, notes: [spec.writingNotes.append], reasons: spec.reasons.append },
-            lesson: "Lesson 14",
-            reverseLesson: "RL-04",
             explanation: "Ground zero. Append the picked word's ID to the input, ready for the next round.",
             why: "The model's own guess becomes part of what it reads next.",
             story: {
@@ -96,8 +88,6 @@ export function generateStep(spec: InferenceSpec): ModelPart {
             summary: "Stops when the stop word is picked or the text is full.",
             copies: 1,
             facts: { shape: "stop word, or full length", weightCount: 0, headline: { value: spec.stopWord.id, unit: "is the stop word's ID", isComputed: spec.stopWord.isComputed, isId: true }, input: "pick and length", output: "go on, or stop", inputDetail: "the picked word and the length", sources: stopSources, notes: spec.stopWord.notes, reasons: spec.reasons["stop-check"] },
-            lesson: "Lesson 14",
-            reverseLesson: "RL-04",
             explanation: `Ground zero. Compare the picked word with the stop word, and the length with ${count(spec.context)} words. Stop if either matches.`,
             why: "The model does not decide it is finished. It picks the stop word like any other word.",
             story: {
@@ -119,8 +109,6 @@ export function generateStep(spec: InferenceSpec): ModelPart {
         summary: "Saves work done for earlier words, so each new word runs faster.",
         copies: 1,
         facts: { shape: `2 × ${count(spec.kvWidth)} numbers per word, per layer`, weightCount: 0, headline: { value: 2 * spec.kvWidth, unit: "saved per word, per layer", isComputed: true }, input: "new keys and values", output: "saved for reuse", inputDetail: "each new word's keys and values", outputDetail: "earlier keys and values, ready to reuse", sources: spec.sources, notes: [{ label: "A full text", value: `${count(2 * spec.kvWidth * layerCount * spec.context)} numbers for ${count(spec.context)} words in all ${layerCount} layers, worked out`, source: spec.sources[0] }], reasons: spec.reasons["kv-cache"] },
-        lesson: "Lesson 21",
-        reverseLesson: "RL-03",
         explanation: "Ground zero. Save one word's key and value from one layer, so the next round reads them back instead of working them out again. Only the new word is run through the layers.",
         why: "It changes nothing about the answer, only the speed. These are saved results, not stored numbers learned in training.",
         story: {

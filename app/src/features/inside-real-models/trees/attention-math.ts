@@ -23,8 +23,6 @@ export function attentionMathParts({ headSize, context, sources, scoreReasons, m
       copies: 1,
       facts: { shape: `up to ${words} × ${words}`, weightCount: 0, headline: { value: context, unit: "words at most" }, input: "query and keys", output: "one share per word", inputDetail: "this word's query and every earlier word's key", outputDetail: "one share per earlier word, adding up to 1", sources, reasons: scoreReasons },
       tiny: { part: "scores", level: "whole" },
-      lesson: "Lessons 11, 12",
-      reverseLesson: "RL-03",
       explanation: "The query is compared with the key of every earlier word by a dot product. Softmax then turns the scores into shares that add up to 1. It stores no numbers of its own.",
       why: "This is all \"attention\" is: dot products and one softmax. A high score only means two lists of numbers point the same way.",
       story: {
@@ -45,8 +43,6 @@ export function attentionMathParts({ headSize, context, sources, scoreReasons, m
           copies: context,
           facts: { shape: "1", weightCount: 0, headline: { value: headSize, unit: "pairs multiplied", isComputed: true }, input: `${size} query, ${size} key`, output: "1 score", inputDetail: `${size} query numbers and ${size} key numbers`, sources, reasons: scoreReasons, isPerEarlierWord: true },
           tiny: { part: "scores", level: "number" },
-          lesson: "Lesson 12",
-          reverseLesson: "RL-03",
           explanation: `How well this word's query matches one earlier word's key: ${size} pairs of numbers, multiplied and added up.`,
           why: "One number per pair of words. Up to the full context, every word gets one against every earlier word.",
           story: {
@@ -67,8 +63,6 @@ export function attentionMathParts({ headSize, context, sources, scoreReasons, m
               copies: headSize,
               facts: { shape: "1 × 1", weightCount: 0, headline: { value: headSize, unit: "per score", isComputed: true }, input: "1 query, 1 key", output: "the running sum", inputDetail: "1 query number and 1 key number", sources, reasons: scoreReasons },
               tiny: { part: "scores", level: "multiply-add" },
-              lesson: "Lessons 00, 12",
-              reverseLesson: "RL-06",
               explanation: "Ground zero. One query number times one key number, added to the running sum. Neither is a stored number: both were made a moment ago from the words.",
               why: "The smallest piece of attention is the same multiply-and-add as everywhere else.",
               story: {
@@ -93,8 +87,6 @@ export function attentionMathParts({ headSize, context, sources, scoreReasons, m
       copies: 1,
       facts: { shape: `${words} × ${size}`, weightCount: 0, headline: { value: headSize, unit: "numbers per word", isComputed: true }, input: "shares and values", output: `${size} numbers`, inputDetail: "the shares and every earlier word's value", sources, reasons: mixReasons },
       tiny: { part: "mix", level: "whole" },
-      lesson: "Lesson 12",
-      reverseLesson: "RL-03",
       explanation: "Each earlier word's value is multiplied by its share, and they are all added together. Words with a big share count more. It stores no numbers of its own.",
       why: "The result is a weighted average of values. Information moves between words only through this mix.",
       story: {
@@ -115,8 +107,6 @@ export function attentionMathParts({ headSize, context, sources, scoreReasons, m
           copies: headSize,
           facts: { shape: "1", weightCount: 0, headline: { value: context, unit: "words at most" }, input: "shares and values", output: "1 number", inputDetail: `up to ${words} shares and ${words} value numbers`, sources, reasons: mixReasons },
           tiny: { part: "mix", level: "number" },
-          lesson: "Lesson 12",
-          reverseLesson: "RL-03",
           explanation: `One of the ${size} numbers that come out of the head: every earlier word's share times that word's value number, added up.`,
           why: "Same shape as every other number here: multiply, add, repeat.",
           story: {
@@ -137,8 +127,6 @@ export function attentionMathParts({ headSize, context, sources, scoreReasons, m
               copies: context,
               facts: { shape: "1 × 1", weightCount: 0, headline: { value: context, unit: "per mixed number" }, input: "1 share, 1 value", output: "the running sum", inputDetail: "1 share and 1 value number", sources, reasons: mixReasons, isPerEarlierWord: true },
               tiny: { part: "mix", level: "multiply-add" },
-              lesson: "Lessons 00, 12",
-              reverseLesson: "RL-06",
               explanation: "Ground zero. One share times one value number, added to the running sum.",
               why: "No stored number is used here. The shares and values were both made from the words a moment ago.",
               story: {

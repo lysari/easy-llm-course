@@ -9,8 +9,6 @@ interface PartText {
   title: string;
   summary: string;
   copies: number;
-  lesson: string;
-  reverseLesson: string;
   explanation: string;
   why: string;
   sources: SourceId[];
@@ -73,8 +71,6 @@ export function projectionPart(spec: ProjectionSpec): ModelPart {
     copies: inSize,
     facts: { shape: "1 × 1", weightCount: 1, headline: { value: inSize, unit: "per output number", isComputed: true }, input: "1 input, 1 stored", output: "the running sum", inputDetail: "1 input number and 1 stored number", outputDetail: "the running sum, a little bigger or smaller", sources, reasons: codeReasons },
     tiny: { part: tinyPart, level: "multiply-add", missing },
-    lesson: "Lessons 00, 01",
-    reverseLesson: "RL-06",
     explanation: `Ground zero. One input number times one stored number, added to a running sum. This happens ${sizeIn} times to make one output number.`,
     why: "There is nothing smaller inside. The whole part is this one line, repeated. No step here knows what a word means.",
     story: {
@@ -96,8 +92,6 @@ export function projectionPart(spec: ProjectionSpec): ModelPart {
     copies: 1,
     facts: { shape: "1", weightCount: 1, headline: { value: 1, unit: "number", isComputed: true }, input: "the finished sum", output: "sum plus 1 number", outputDetail: "the sum plus one stored number", sources, reasons: codeReasons },
     tiny: { part: tinyPart, level: "multiply-add" },
-    lesson: "Lesson 01",
-    reverseLesson: "RL-06",
     explanation: "Ground zero. One stored number added at the end, the b in y = w × x + b. It lets the output move up or down even when every input is zero.",
     why: "It is a single learned number, nothing more. Training nudges it like every other number.",
     story: {
@@ -118,8 +112,6 @@ export function projectionPart(spec: ProjectionSpec): ModelPart {
     copies: outSize,
     facts: { shape: `${sizeIn} × 1`, weightCount: inSize + (hasBias ? 1 : 0), headline: { value: inSize + (hasBias ? 1 : 0), unit: "numbers", isComputed: true }, input: `${sizeIn} numbers`, output: "1 number", sources, reasons: codeReasons },
     tiny: { part: tinyPart, level: "number", missing },
-    lesson: "Lesson 08",
-    reverseLesson: "RL-06",
     explanation: `One of the ${sizeOut} numbers that come out. It is a dot product: each of the ${sizeIn} input numbers times its own stored number, all added up${hasBias ? ", plus one bias" : ""}.`,
     why: "A matrix multiply is just many of these dot products side by side. Each one only multiplies and adds.",
     story: {
@@ -141,8 +133,6 @@ export function projectionPart(spec: ProjectionSpec): ModelPart {
     copies: spec.copies,
     facts: { shape: `${sizeIn} × ${sizeOut}`, weightCount: inSize * outSize + (hasBias ? outSize : 0), headline: { value: inSize * outSize + (hasBias ? outSize : 0), unit: "numbers", isComputed: true }, input: spec.input, output: spec.output, inputDetail: spec.inputDetail, outputDetail: spec.outputDetail, sources, reasons: spec.reasons },
     tiny: { part: tinyPart, level: "whole", missing },
-    lesson: spec.lesson,
-    reverseLesson: spec.reverseLesson,
     explanation: spec.explanation,
     why: spec.why,
     story: spec.story,
@@ -162,8 +152,6 @@ export function tablePart(spec: TableSpec): ModelPart {
     copies: cols,
     facts: { shape: "1", weightCount: 1, headline: { value: rows * cols, unit: "in the table", isComputed: true }, input: "nothing, only read", output: "1 number", inputDetail: "nothing, it is only read", sources, reasons: codeReasons },
     tiny: { part: tinyPart, level: "number" },
-    lesson: "Lessons 03, 10",
-    reverseLesson: "RL-06",
     explanation: "Ground zero. One stored number in the table. It started random, and training nudged it a tiny bit, round after round.",
     why: "There is no word inside, only this number. Meaning comes from where many such numbers sit next to each other.",
     story: {
@@ -184,8 +172,6 @@ export function tablePart(spec: TableSpec): ModelPart {
     copies: rows,
     facts: { shape: `1 × ${count(cols)}`, weightCount: cols, headline: { value: cols, unit: "numbers", isComputed: true }, input: `the ${rowName}'s id`, output: `${count(cols)} numbers`, sources, reasons: codeReasons },
     tiny: { part: tinyPart, level: "row" },
-    lesson: "Lesson 10",
-    reverseLesson: "RL-02",
     explanation: `The ${count(cols)} numbers for one ${rowName}. Looking it up is just copying this row out of the table.`,
     why: "The row is a point in a space with many directions. Training moves it; the row holds no word, only numbers.",
     story: {
@@ -207,8 +193,6 @@ export function tablePart(spec: TableSpec): ModelPart {
     copies: spec.copies,
     facts: { shape: `${count(rows)} × ${count(cols)}`, weightCount: rows * cols, headline: { value: rows * cols, unit: "numbers", isComputed: true }, input: `a ${rowName} id`, output: `${count(cols)} numbers`, sources, reasons: spec.reasons },
     tiny: { part: tinyPart, level: "whole" },
-    lesson: spec.lesson,
-    reverseLesson: spec.reverseLesson,
     explanation: spec.explanation,
     why: spec.why,
     story: spec.story,
@@ -228,8 +212,6 @@ export function normPart(spec: NormSpec): ModelPart {
     copies: size,
     facts: { shape: "1", weightCount: hasShift ? 2 : 1, headline: hasShift ? { value: 2, unit: "numbers", isComputed: true } : { value: 1, unit: "number", isComputed: true }, input: "1 rescaled number", output: "1 number", sources, reasons: codeReasons },
     tiny: { part: tinyPart, level: "number" },
-    lesson: "Lessons 13, 20",
-    reverseLesson: "RL-06",
     explanation: hasShift
       ? "Ground zero. One rescaled number times its own scale number, plus its own shift number. One multiply-and-add with 2 stored numbers."
       : "Ground zero. One rescaled number times its own scale number. A single multiply with 1 stored number.",
@@ -252,8 +234,6 @@ export function normPart(spec: NormSpec): ModelPart {
     copies: spec.copies,
     facts: { shape: hasShift ? `2 × ${count(size)}` : `1 × ${count(size)}`, weightCount: size * (hasShift ? 2 : 1), headline: { value: size * (hasShift ? 2 : 1), unit: "numbers", isComputed: true }, input: `${count(size)} numbers`, output: `${count(size)} steady numbers`, outputDetail: `${count(size)} numbers, in a steady range`, sources, reasons: spec.reasons },
     tiny: { part: tinyPart, level: "whole" },
-    lesson: spec.lesson,
-    reverseLesson: spec.reverseLesson,
     explanation: spec.explanation,
     why: spec.why,
     story: spec.story,

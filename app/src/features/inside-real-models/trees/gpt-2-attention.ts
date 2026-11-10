@@ -18,8 +18,6 @@ const head: ModelPart = {
   copies: HEAD_COUNT,
   facts: { shape: "768 × 192", weightCount: 147_648, headline: { value: 147_648, unit: "numbers", isComputed: true }, input: "768 per word", output: "64 per word", inputDetail: "768 numbers per word", outputDetail: "64 numbers per word", sources: GPT_2_SETTINGS, reasons: [GPT_2_HEADS, GPT_2_QKV, GPT_2_NO_REASON] },
   tiny: { part: "attention", level: "whole" },
-  lesson: "Lessons 12, 19",
-  reverseLesson: "RL-03",
   explanation:
     "One of 12 heads working side by side. From its own slice of the big 768 × 2,304 table it makes a query, a key and a value of 64 numbers for each word, then mixes the earlier words' values by how well they match.",
   why: "Each head has its own tables, so each can match words in its own way.",
@@ -48,8 +46,6 @@ const head: ModelPart = {
       outputDetail: "64 numbers: what this word looks for",
       tinyPart: "query",
       sources: GPT_2_SETTINGS,
-      lesson: "Lessons 12, 16",
-      reverseLesson: "RL-03",
       explanation: "Turns a word's 768 numbers into 64 query numbers. The query is what this word is looking for in the words before it.",
       why: "\"Looking for\" is a name we give it. It is a 768 × 64 table of stored numbers, plus 64 biases, that training shaped.",
       story: {
@@ -77,8 +73,6 @@ const head: ModelPart = {
       outputDetail: "64 numbers: what this word offers",
       tinyPart: "key",
       sources: GPT_2_SETTINGS,
-      lesson: "Lessons 12, 16",
-      reverseLesson: "RL-03",
       explanation: "Turns a word's 768 numbers into 64 key numbers, the name tag other words' queries are matched against.",
       why: "A query and a key match when their dot product is large, that is, when they point the same way.",
       story: {
@@ -106,8 +100,6 @@ const head: ModelPart = {
       outputDetail: "64 numbers: what this word passes on",
       tinyPart: "value",
       sources: GPT_2_SETTINGS,
-      lesson: "Lessons 12, 16",
-      reverseLesson: "RL-03",
       explanation: "Turns a word's 768 numbers into 64 value numbers, the information it hands to any later word that attends to it.",
       why: "Matching (query and key) and passing on (value) use separate tables, so what a word is found by can differ from what it gives.",
       story: {
@@ -132,8 +124,6 @@ export const gpt2Attention: ModelPart = {
   copies: 1,
   facts: { shape: "768 × 2,304 + 768 × 768", weightCount: 2_362_368, headline: { value: 2_362_368, unit: "numbers", isComputed: true }, input: "768 per word", output: "768 per word, mixed", inputDetail: "768 numbers per word", outputDetail: "768 numbers per word, mixed with earlier words", sources: GPT_2_SETTINGS, reasons: [GPT_2_TRANSFORMER, GPT_2_MASK, GPT_2_NO_REASON] },
   tiny: { part: "attention", level: "whole" },
-  lesson: "Lessons 12, 19",
-  reverseLesson: "RL-03",
   explanation:
     "Lets each word take in information from the words before it. 12 heads each do their own matching and mixing, then the output projection joins their 12 × 64 numbers back into 768. GPT-2 stores all 12 heads' query, key and value tables as one 768 × 2,304 table.",
   why: "This is the only part where words affect each other. It is dot products, one softmax and weighted sums, nothing more.",
@@ -163,8 +153,6 @@ export const gpt2Attention: ModelPart = {
       tinyPart: "mix",
       sources: GPT_2_SETTINGS,
       missing: "Our tiny model has no output projection. Its one head's mix is added straight back.",
-      lesson: "Lesson 19",
-      reverseLesson: "RL-03",
       explanation: "Mixes the 12 heads' results together into one list of 768 numbers, which is then added back onto the word's numbers.",
       why: "Each head only sees its own 64 numbers. This table lets what one head found change all 768 numbers.",
       story: {

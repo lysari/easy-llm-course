@@ -25,7 +25,6 @@ export interface InferenceSpec {
   stopWord: StopWord;
   writingNotes: WritingNotes;
   reasons: UseReasons;
-  embeddingLesson: string;
   embeddingText: string;
   embedding: ModelPart[];
   layers: ModelPart;

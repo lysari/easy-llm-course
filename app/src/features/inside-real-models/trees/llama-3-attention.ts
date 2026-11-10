@@ -16,8 +16,6 @@ const rope: ModelPart = {
   copies: 1,
   facts: { shape: "64 turned pairs", weightCount: 0, headline: { value: HEAD_SIZE / 2, unit: "pairs turned", isComputed: true }, input: "query and place", output: "128 turned numbers", inputDetail: "128 query numbers and the word's place", outputDetail: "128 turned query numbers", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_ROPE, LLAMA_3_NO_REASON] },
   tiny: { part: "position-table", level: "whole" },
-  lesson: "Lesson 25",
-  reverseLesson: "RL-02",
   explanation:
     "Rotary position. The 128 query numbers are taken as 64 pairs, and each pair is turned by an angle that grows with the word's place. The key is turned the same way, once per group. Llama 3 has no position table at all.",
   why: "After turning, a query-key dot product depends on how far apart two words are, not where they are. It stores no numbers, so it adds nothing to the count.",
@@ -39,8 +37,6 @@ const rope: ModelPart = {
       copies: HEAD_SIZE,
       facts: { shape: "1", weightCount: 0, headline: { value: HEAD_SIZE, unit: "per query", isComputed: true }, input: "2 numbers, 1 angle", output: "1 number", inputDetail: "a pair of numbers and an angle", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_ROPE] },
       tiny: { part: "position-table", level: "number" },
-      lesson: "Lesson 25",
-      reverseLesson: "RL-02",
       explanation: "One number of the turned pair: two multiply-and-adds, with cos and sin of the angle as the second numbers.",
       why: "The angle comes from a fixed formula, not from training.",
       story: {
@@ -61,8 +57,6 @@ const rope: ModelPart = {
           copies: 2,
           facts: { shape: "1 × 1", weightCount: 0, headline: { value: 2, unit: "per turned number", isComputed: true }, input: "1 number, cos or sin", output: "the running sum", inputDetail: "1 number and its cos or sin", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_ROPE] },
           tiny: { part: "position-table", level: "number" },
-          lesson: "Lessons 00, 25",
-          reverseLesson: "RL-06",
           explanation: "Ground zero. One query number times the cos (or minus sin) of its angle, added to the running sum.",
           why: "Even word order comes down to multiply and add.",
           story: {
@@ -88,8 +82,6 @@ const head: ModelPart = {
   copies: 4,
   facts: { shape: "4,096 × 128", weightCount: 524_288, headline: { value: 524_288, unit: "numbers", isComputed: true }, input: "4,096 per word", output: "128 per word", inputDetail: "4,096 numbers per word", outputDetail: "128 numbers per word", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_REPEAT_KV, LLAMA_3_NO_REASON] },
   tiny: { part: "attention", level: "whole" },
-  lesson: "Lessons 12, 19",
-  reverseLesson: "RL-03",
   explanation: "One of 4 query heads in this group. It makes its own 128-number query, turns it with RoPE, and matches it against the group's shared key, then mixes the shared values.",
   why: "Each head has its own query table, so each can match words in its own way. 32 query heads in all, 4 per group.",
   story: {
@@ -117,8 +109,6 @@ const head: ModelPart = {
       outputDetail: "128 numbers: what this word looks for",
       tinyPart: "query",
       sources: LLAMA_3_SETTINGS,
-      lesson: "Lessons 12, 16",
-      reverseLesson: "RL-03",
       explanation: "Turns a word's 4,096 numbers into 128 query numbers, what this word is looking for in the words before it. Llama 3 uses no biases anywhere.",
       why: "\"Looking for\" is a name we give it. It is a 4,096 × 128 table of stored numbers that training shaped.",
       story: {
@@ -144,8 +134,6 @@ const group: ModelPart = {
   copies: 8,
   facts: { shape: "4,096 × 768", weightCount: 3_145_728, headline: { value: 3_145_728, unit: "numbers", isComputed: true }, input: "4,096 per word", output: "4 heads × 128", inputDetail: "4,096 numbers per word", outputDetail: "4 heads × 128 numbers per word", sources: [...LLAMA_3_SETTINGS, "llama-3-card"], reasons: [LLAMA_3_GQA, LLAMA_3_REPEAT_KV] },
   tiny: { part: "attention", level: "whole", missing: "Our tiny model has one head with its own key and value. It never shares them between heads." },
-  lesson: "Lessons 19, 21",
-  reverseLesson: "RL-03",
   explanation: "Grouped-query attention. 4 query heads share one key and one value of 128 numbers each. 8 groups make 32 query heads but only 8 keys and 8 values.",
   why: "Sharing makes the saved keys and values (the KV cache) 4 times smaller. Meta says it uses GQA to make running the model more efficient.",
   story: {
@@ -174,8 +162,6 @@ const group: ModelPart = {
       outputDetail: "128 numbers, shared by 4 query heads",
       tinyPart: "key",
       sources: LLAMA_3_SETTINGS,
-      lesson: "Lessons 12, 16",
-      reverseLesson: "RL-03",
       explanation: "Turns a word's 4,096 numbers into 128 key numbers. All 4 query heads in the group match against this one key.",
       why: "A query and a key match when their dot product is large, that is, when they point the same way.",
       story: {
@@ -203,8 +189,6 @@ const group: ModelPart = {
       outputDetail: "128 numbers, shared by 4 query heads",
       tinyPart: "value",
       sources: LLAMA_3_SETTINGS,
-      lesson: "Lessons 12, 16",
-      reverseLesson: "RL-03",
       explanation: "Turns a word's 4,096 numbers into 128 value numbers, the information this word passes on. Shared by the group's 4 query heads.",
       why: "Matching (query and key) and passing on (value) use separate tables.",
       story: {
@@ -228,8 +212,6 @@ export const llama3Attention: ModelPart = {
   copies: 1,
   facts: { shape: "4,096 × 6,144 + 4,096 × 4,096", weightCount: 41_943_040, headline: { value: 41_943_040, unit: "numbers", isComputed: true }, input: "4,096 per word", output: "4,096 per word, mixed", inputDetail: "4,096 numbers per word", outputDetail: "4,096 numbers per word, mixed with earlier words", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_TRANSFORMER, LLAMA_3_MASK, LLAMA_3_DOCUMENT_MASK] },
   tiny: { part: "attention", level: "whole" },
-  lesson: "Lessons 12, 19",
-  reverseLesson: "RL-03",
   explanation: "Lets each word take in information from the words before it. 8 groups of 4 query heads match and mix, then the output projection joins their 32 × 128 numbers back into 4,096.",
   why: "This is the only part where words affect each other. It is dot products, one softmax and weighted sums, nothing more.",
   story: {
@@ -258,8 +240,6 @@ export const llama3Attention: ModelPart = {
       tinyPart: "mix",
       sources: LLAMA_3_SETTINGS,
       missing: "Our tiny model has no output projection. Its one head's mix is added straight back.",
-      lesson: "Lesson 19",
-      reverseLesson: "RL-03",
       explanation: "Mixes the 32 heads' results into one list of 4,096 numbers, which is added back onto the word's numbers.",
       why: "Each head only sees its own 128 numbers. This table lets what one head found change all 4,096.",
       story: {

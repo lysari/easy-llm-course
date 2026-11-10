@@ -15,8 +15,6 @@ const gelu: ModelPart = {
   copies: 1,
   facts: { shape: "3,072 numbers", weightCount: 0, headline: { value: EXPANDED, unit: "numbers per word", isComputed: true }, input: "3,072 numbers", output: "3,072 bent numbers", outputDetail: "3,072 numbers, negatives pushed to near 0", sources: GPT_2_SETTINGS, reasons: [GPT_2_GELU, GPT_2_NO_REASON] },
   tiny: { part: "relu", level: "whole" },
-  lesson: "Lessons 05, 15",
-  reverseLesson: "RL-06",
   explanation: "Bends each of the 3,072 numbers: big positive numbers pass, negative numbers shrink to near 0. It stores no numbers. GPT-2's code works out Φ(x) with a close tanh formula.",
   why: "Without a bend, two tables in a row would act like one table. The bend is what lets the layer learn more than a straight line.",
   story: {
@@ -37,8 +35,6 @@ const gelu: ModelPart = {
       copies: EXPANDED,
       facts: { shape: "1", weightCount: 0, headline: { value: EXPANDED, unit: "per word", isComputed: true }, input: "1 number", output: "1 number", sources: GPT_2_SETTINGS, reasons: [GPT_2_GELU] },
       tiny: { part: "relu", level: "number" },
-      lesson: "Lesson 05",
-      reverseLesson: "RL-06",
       explanation: "Ground zero. The number times its own chance Φ(x): one multiply on two numbers.",
       why: "Even the bend is a multiply. Φ(x) comes from a fixed formula, not from training.",
       story: {
@@ -62,8 +58,6 @@ export const gpt2FeedForward: ModelPart = {
   copies: 1,
   facts: { shape: "768 × 3,072 + 3,072 × 768", weightCount: 4_722_432, headline: { value: 4_722_432, unit: "numbers", isComputed: true }, input: "768 per word", output: "768 per word", inputDetail: "768 numbers per word", outputDetail: "768 numbers per word", sources: GPT_2_SETTINGS, reasons: [GPT_2_MLP, GPT_2_NO_REASON] },
   tiny: { part: "feed-forward", level: "whole" },
-  lesson: "Lesson 15",
-  reverseLesson: "RL-05",
   explanation: "Works on each word on its own: expand 768 numbers to 3,072, bend them with GELU, and contract back to 768. The result is added back onto the word's numbers.",
   why: "About two thirds of each layer's numbers live here: 4,722,432 of its 7,087,872.",
   story: {
@@ -90,8 +84,6 @@ export const gpt2FeedForward: ModelPart = {
       inputDetail: "768 numbers for one word",
       tinyPart: "expand",
       sources: GPT_2_SETTINGS,
-      lesson: "Lesson 15",
-      reverseLesson: "RL-05",
       explanation: "Spreads a word's 768 numbers out to 3,072, four times as many, so there is room to pick out many patterns at once.",
       why: "Each of the 3,072 numbers is one pattern detector: a dot product that is large when the word's numbers match it.",
       story: {
@@ -118,8 +110,6 @@ export const gpt2FeedForward: ModelPart = {
       output: "768 numbers",
       tinyPart: "contract",
       sources: GPT_2_SETTINGS,
-      lesson: "Lesson 15",
-      reverseLesson: "RL-05",
       explanation: "Squeezes the 3,072 numbers back to 768, so the result can be added onto the word's numbers.",
       why: "Each detector that fired writes its own pattern back. Adding instead of replacing keeps what was there before.",
       story: {

@@ -10,8 +10,6 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
     summary: "Trains the model to guess the next word, over and over, on all the text.",
     copies: 1,
     facts: stepFacts(facts["pre-training"], "a random model", "a base model", { inputDetail: "word IDs and random numbers" }),
-    lesson: "Lessons 02, 03, 17, 22",
-    reverseLesson: "RL-05",
     explanation: "The model reads huge amounts of text and keeps guessing the next word. After each guess it is scored, and every stored number is nudged so the right word gets a higher chance next time.",
     why: "Nobody writes the numbers by hand. They are whatever made the guesses on the training text a little less wrong, round after round.",
     story: {
@@ -30,8 +28,6 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
         summary: "Guess, score the guess, find what caused the error, and nudge every number.",
         copies: 1,
         facts: stepFacts(facts["training-round"], "a batch of text", "every number nudged", { outputDetail: "every number nudged a little" }),
-        lesson: "Lessons 03, 14",
-        reverseLesson: "RL-05",
         explanation: "One round: run the model on a batch of text, score its guesses with the loss, work out each number's slope, and nudge each number a small step against it.",
         why: "Each round fixes only a little, so training runs the same round over and over.",
         story: {
@@ -50,8 +46,6 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
             summary: "Reads the chance the model gives the word that really comes next.",
             copies: 1,
             facts: stepFacts(facts.guess, "words before", "right word's chance", { inputDetail: "the words before", outputDetail: "the chance of the right next word" }),
-            lesson: "Lesson 14",
-            reverseLesson: "RL-04",
             explanation: "Ground zero. Run the model on the words before, and read the chance it gives the word that really comes next. Use a model shows every step inside.",
             why: "The text itself is the answer key, so no person has to mark anything.",
             story: {
@@ -71,8 +65,6 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
             summary: "Turns that chance into one number saying how wrong the guess was.",
             copies: 1,
             facts: stepFacts(facts["loss-term"], "right word's chance", "how wrong it was", { inputDetail: "the chance of the right word", outputDetail: "how wrong the guess was" }),
-            lesson: "Lessons 02, 11",
-            reverseLesson: "RL-04",
             explanation: "Ground zero. One loss term for one word: minus the log of the chance the model gave the right word. A chance of 100% gives 0. A chance of 1% gives 4.6.",
             why: "The loss of a whole batch is just the average of these terms.",
             story: {
@@ -93,8 +85,6 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
             summary: "Works out which way to move one number to make the guess less wrong.",
             copies: 1,
             facts: stepFacts(facts.slope, "slope from above", "this number's slope", { inputDetail: "the slope from the part above" }),
-            lesson: "Lessons 07, 16",
-            reverseLesson: "RL-05",
             explanation: "Ground zero. One step of the chain rule: the slope from the part above times one local number, added to this number's slope. It says which way to move the number to lower the loss.",
             why: "Backpropagation is this one line, run backwards through every multiply in the model.",
             story: {
@@ -115,8 +105,6 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
             summary: "Moves one stored number a small step the right way.",
             copies: 1,
             facts: stepFacts(facts["adam-update"], "number and slope", "nudged number", { inputDetail: "one number and its slope", outputDetail: "the number, nudged" }),
-            lesson: "Lesson 17",
-            reverseLesson: "RL-05",
             explanation: "Ground zero. Move one stored number a small step against its slope. Adam, a common way to do it, keeps a running average of the slope and of the slope squared, then steps.",
             why: "This is all \"learning\" is: one number moved a tiny bit, round after round.",
             story: {
@@ -143,8 +131,6 @@ export function postTrainingStep(facts: BuildFacts): ModelPart {
     summary: "Teaches a model that only continues text to answer questions instead.",
     copies: 1,
     facts: stepFacts(facts["post-training"], "a base model", "a chat model"),
-    lesson: "Lessons 26–28",
-    reverseLesson: "RL-00",
     explanation: "A base model only continues text. Post-training teaches it to answer: first from example answers (SFT), then from people's choices between two answers (preference tuning, such as RLHF with PPO, or DPO).",
     why: "The helpful assistant you chat with is the same next-word guesser, nudged toward answers people preferred.",
     story: {
@@ -163,8 +149,6 @@ export function postTrainingStep(facts: BuildFacts): ModelPart {
         summary: "Trains on questions paired with good answers written by people.",
         copies: 1,
         facts: stepFacts(facts.sft, "example answers", "answers like them", { inputDetail: "a base model and example answers", outputDetail: "a model that answers in that style" }),
-        lesson: "Lesson 26",
-        reverseLesson: "RL-04",
         explanation: "The same training as before, on a much smaller set of prompts paired with good answers written by people.",
         why: "It learns the shape of an answer, not new understanding.",
         story: {
@@ -183,8 +167,6 @@ export function postTrainingStep(facts: BuildFacts): ModelPart {
             summary: "Scores one word of a written answer, the same way as in pre-training.",
             copies: 1,
             facts: stepFacts(facts["sft-term"], "1 answer word", "how wrong it was", { inputDetail: "the chance of one answer word" }),
-            lesson: "Lesson 26",
-            reverseLesson: "RL-04",
             explanation: "Ground zero. The same loss term as pre-training, minus the log of the chance, but counted only for one word of a written answer.",
             why: "The prompt's own words are not scored, so the model learns to answer, not to ask.",
             story: {
@@ -206,8 +188,6 @@ export function postTrainingStep(facts: BuildFacts): ModelPart {
         summary: "Nudges the model toward the answers people picked as better.",
         copies: 1,
         facts: stepFacts(facts.preference, "ranked answers", "leans to better ones", { inputDetail: "answers people compared", outputDetail: "a model that leans toward preferred answers" }),
-        lesson: "Lessons 27, 28",
-        reverseLesson: "RL-04",
         explanation: "People pick the better of two answers. RLHF trains a reward model on those picks and pushes the model toward high reward with PPO. DPO skips the reward model and learns from the pairs directly.",
         why: "\"Better\" here means what people chose, turned into numbers to push on.",
         story: {
@@ -226,8 +206,6 @@ export function postTrainingStep(facts: BuildFacts): ModelPart {
             summary: "Makes the better of two answers more likely than the worse one.",
             copies: 1,
             facts: stepFacts(facts["preference-pair"], "better, worse answer", "one gap to grow", { inputDetail: "one prompt, a better and a worse answer" }),
-            lesson: "Lesson 28",
-            reverseLesson: "RL-04",
             explanation: "Ground zero. Compare the chance the model gives the better answer with the chance it gives the worse one, and nudge the numbers so the gap grows.",
             why: "Only a comparison between two chances. No rule about right and wrong is written anywhere.",
             story: {

@@ -14,8 +14,6 @@ const swiglu: ModelPart = {
   copies: 1,
   facts: { shape: "14,336 numbers", weightCount: 0, headline: { value: EXPANDED, unit: "numbers per word", isComputed: true }, input: "gate and up numbers", output: "14,336 numbers", inputDetail: "14,336 gate numbers and 14,336 up numbers", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_FEED_FORWARD, LLAMA_3_NO_REASON] },
   tiny: { part: "relu", level: "whole" },
-  lesson: "Lessons 15, 30",
-  reverseLesson: "RL-05",
   explanation: "Bends each gate number with SiLU, then multiplies it by the matching up number. The gate decides how much of each up number gets through. It stores no numbers.",
   why: "Llama 3's code writes the whole feed-forward as w2(silu(w1(x)) × w3(x)). The gate adds no stored numbers.",
   story: {
@@ -36,8 +34,6 @@ const swiglu: ModelPart = {
       copies: EXPANDED,
       facts: { shape: "1", weightCount: 0, headline: { value: EXPANDED, unit: "per word", isComputed: true }, input: "1 gate, 1 up", output: "1 number", inputDetail: "1 gate number and 1 up number", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_FEED_FORWARD] },
       tiny: { part: "relu", level: "number" },
-      lesson: "Lesson 15",
-      reverseLesson: "RL-05",
       explanation: "One of the 14,336 mixed numbers: two multiplies, one for SiLU and one for the gate.",
       why: "Even the gate is a multiply on two numbers.",
       story: {
@@ -58,8 +54,6 @@ const swiglu: ModelPart = {
           copies: 1,
           facts: { shape: "1 × 1", weightCount: 0, headline: { value: 1, unit: "multiply", isComputed: true }, input: "1 gate, its sigmoid", output: "1 number", inputDetail: "1 gate number and its sigmoid", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_FEED_FORWARD] },
           tiny: { part: "relu", level: "number" },
-          lesson: "Lesson 05",
-          reverseLesson: "RL-06",
           explanation: "Ground zero. The gate number times its own sigmoid, a number from 0 to 1. One multiply on two numbers.",
           why: "Sigmoid comes from a fixed formula, not from training.",
           story: {
@@ -81,8 +75,6 @@ const swiglu: ModelPart = {
           copies: 1,
           facts: { shape: "1 × 1", weightCount: 0, headline: { value: 1, unit: "multiply", isComputed: true }, input: "1 SiLU, 1 up", output: "1 number", inputDetail: "1 SiLU number and 1 up number", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_FEED_FORWARD] },
           tiny: { part: "relu", level: "number" },
-          lesson: "Lesson 15",
-          reverseLesson: "RL-06",
           explanation: "Ground zero. The SiLU number times the matching up number. One multiply on two numbers.",
           why: "When the gate is near 0, the up number is shut out.",
           story: {
@@ -108,8 +100,6 @@ export const llama3FeedForward: ModelPart = {
   copies: 1,
   facts: { shape: "3 tables of 4,096 × 14,336", weightCount: 176_160_768, headline: { value: 176_160_768, unit: "numbers", isComputed: true }, input: "4,096 per word", output: "4,096 per word", inputDetail: "4,096 numbers per word", outputDetail: "4,096 numbers per word", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_FEED_FORWARD, LLAMA_3_NO_REASON] },
   tiny: { part: "feed-forward", level: "whole" },
-  lesson: "Lesson 15",
-  reverseLesson: "RL-05",
   explanation: "Works on each word on its own: two tables expand 4,096 numbers to 14,336 (gate and up), SwiGLU mixes them, and the down table contracts back to 4,096.",
   why: "About four fifths of each layer's numbers live here: 176,160,768 of its 218,112,000.",
   story: {
@@ -137,8 +127,6 @@ export const llama3FeedForward: ModelPart = {
       tinyPart: "expand",
       sources: LLAMA_3_SETTINGS,
       missing: "Our tiny model has no gate table. Its one expand table is the nearest part.",
-      lesson: "Lessons 15, 30",
-      reverseLesson: "RL-05",
       explanation: "Spreads a word's 4,096 numbers out to 14,336 gate numbers, which decide how much of each up number gets through.",
       why: "It is a second expand table, used only to switch the first one's numbers on and off.",
       story: {
@@ -165,8 +153,6 @@ export const llama3FeedForward: ModelPart = {
       inputDetail: "4,096 numbers for one word",
       tinyPart: "expand",
       sources: LLAMA_3_SETTINGS,
-      lesson: "Lesson 15",
-      reverseLesson: "RL-05",
       explanation: "Spreads a word's 4,096 numbers out to 14,336, so there is room to pick out many patterns at once.",
       why: "Each of the 14,336 numbers is one pattern detector: a dot product that is large when the word's numbers match it.",
       story: {
@@ -193,8 +179,6 @@ export const llama3FeedForward: ModelPart = {
       output: "4,096 numbers",
       tinyPart: "contract",
       sources: LLAMA_3_SETTINGS,
-      lesson: "Lesson 15",
-      reverseLesson: "RL-05",
       explanation: "Squeezes the 14,336 numbers back to 4,096, so the result can be added onto the word's numbers.",
       why: "Each detector that fired writes its own pattern back. Adding instead of replacing keeps what was there before.",
       story: {
