@@ -21,12 +21,12 @@ function elements(): Elements {
 }
 
 describe("measureLinks", () => {
-  test("each line and dot keeps the card it starts from", () => {
+  test("each line keeps the cards it runs from and to, and each dot the card it starts from", () => {
     const drawing = measureLinks(elements(), { parentId: "stage", childIds: ["part", "sub-part", "other"], nestedIds: ["sub-part"] });
-    expect(drawing?.paths.map((path) => [path.id, path.fromId])).toEqual([
-      ["part", "stage"],
-      ["sub-part", "part"],
-      ["other", "stage"],
+    expect(drawing?.paths.map((path) => [path.fromId, path.toId])).toEqual([
+      ["stage", "part"],
+      ["part", "sub-part"],
+      ["stage", "other"],
     ]);
     expect(drawing?.dots.map((dot) => [dot.id, dot.fromId])).toEqual([
       ["start", "stage"],

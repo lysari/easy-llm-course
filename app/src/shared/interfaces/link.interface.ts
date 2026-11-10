@@ -1,6 +1,6 @@
 export interface LinkPath {
-  id: string;
   fromId: string;
+  toId: string;
   d: string;
   startX: number;
   endX: number;

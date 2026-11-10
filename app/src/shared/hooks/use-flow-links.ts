@@ -31,7 +31,7 @@ function pathBetween(x1: number, y1: number, trunk: number, x2: number, y2: numb
 
 /**
  * Measures the lines from a parent card to its child cards; `useFlowLinks` calls it after layout.
- * Each path and dot keeps the id of the card it starts from (`fromId`), so `FlowLinks` can colour the lines of an active card from `startX` to `endX`.
+ * Each path keeps the cards it runs from and to (`fromId`, `toId`) and each dot the card it starts from, so `FlowLinks` can colour a line from `startX` to `endX`.
  */
 export function measureLinks({ flowRef, childColumnRef, parentCards, childCards }: FlowLinkElements, { parentId, childIds, nestedIds = NO_NESTED }: FlowLinkTargets): LinkDrawing | null {
   const parentCard = parentCards.current.get(parentId);
@@ -51,10 +51,10 @@ export function measureLinks({ flowRef, childColumnRef, parentCards, childCards 
     const endX = box.left - flow.left;
     if (nestedIds.includes(id) && previous) {
       const x = previous.box.right - flow.left;
-      drawing.paths.push({ id, fromId: previous.id, d: `M ${x} ${y2} H ${endX}`, startX: x, endX });
+      drawing.paths.push({ fromId: previous.id, toId: id, d: `M ${x} ${y2} H ${endX}`, startX: x, endX });
       drawing.dots.push({ id, fromId: previous.id, x, y: y2 });
     } else {
-      drawing.paths.push({ id, fromId: parentId, d: pathBetween(startX, startY, trunk, endX, y2), startX, endX });
+      drawing.paths.push({ fromId: parentId, toId: id, d: pathBetween(startX, startY, trunk, endX, y2), startX, endX });
     }
     previous = { id, box };
   }
