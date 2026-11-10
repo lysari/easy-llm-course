@@ -1,16 +1,18 @@
-import { END_TOKEN, MAX_CONTEXT, TEST_ANSWER, TEST_WORDS, TRAINING_LINES, TRAINING_SEQUENCES, VOCABULARY, joinTokens } from "@/core/model/corpus";
+import { END_ID, END_TOKEN, MAX_CONTEXT, TEST_ANSWER, TEST_WORDS, TRAINING_LINES, TRAINING_SEQUENCES, VOCABULARY, joinTokens } from "@/core/model/corpus";
 import { nextOptions, writeText } from "@/core/model/generate";
 import { TARGET_ROUNDS, type ModelLab } from "@/core/model/lab";
 import { seededRandom } from "@/core/model/random";
 import { type Tensor, layerNorm, multiply, parameter } from "@/core/model/tensor";
 import { LAYER_COUNT, VECTOR_SIZE, countWeights, predictNext, traceForward } from "@/core/model/tiny-gpt";
-import type { Amount, NoneToLearn, TinyLevel, TinyLink, TinyReadout, TinyView } from "@/features/take-apart/interfaces/model-part.interface";
+import type { NoneToLearn, TinyLevel, TinyLink, TinyReadout, TinyView } from "@/features/take-apart/interfaces/model-part.interface";
+import type { Amount } from "@/features/take-apart/interfaces/real-facts.interface";
 import type { RankedToken } from "@/shared/interfaces/model.interface";
 import { percent, shortList, showWord } from "@/shared/utils/format";
 
 const WRITE_SEED = 7;
 const TEST_IDS = TEST_WORDS.map((word) => VOCABULARY.indexOf(word));
 const QUESTION_COUNT = TRAINING_SEQUENCES.reduce((sum, sequence) => sum + sequence.length - 1, 0);
+const LONGEST_TEXT = Math.max(...TRAINING_SEQUENCES.map((sequence) => sequence.length));
 
 const chanceOf = (options: RankedToken[], word: string) => options.find((option) => option.token === word)?.chance ?? 0;
 
@@ -147,28 +149,28 @@ export function readTinyPart({ part, level }: TinyLink, tiny: TinyView): TinyRea
       return noWeights("Add it to the end", `${words.length + 1} words`, { value: MAX_CONTEXT, unit: "words at most" }, `… ${showWord(words[last])} + ${picked}`);
     case "write": {
       if (level === "row") return noWeights("One writing round", "1 word", { value: 1, unit: "word added" }, `+ "${picked}"`);
-      if (level === "number") return noWeights("Stop check", "2 checks", { value: 2, unit: "checks" }, tiny.isStopped ? `picked stop after ${tiny.written.length} words` : `full at ${MAX_CONTEXT} words`);
+      if (level === "number") return noWeights("Stop check", "stop word, or full length", { value: END_ID, unit: "is the stop word's ID" }, tiny.isStopped ? `picked stop after ${tiny.written.length} words` : `full at ${MAX_CONTEXT} words`);
       const added = tiny.written.map((round) => round.word);
       return noWeights("Tiny writing loop", `up to ${MAX_CONTEXT} words`, { value: MAX_CONTEXT, unit: "words at most" }, added.length > 0 ? `"… ${joinTokens([words[last], ...added])}"` : "stops right away");
     }
     case "corpus":
-      if (level === "row") return noWeights("One sentence", "1 sentence", { value: 1, unit: "sentence at a time" }, joinTokens(TRAINING_LINES[0].text.split(" ")));
-      return noWeights("Tiny corpus", `${TRAINING_LINES.length} sentences`, { value: TRAINING_LINES.length, unit: "sentences" }, `${TRAINING_SEQUENCES.length} with repeats · ${QUESTION_COUNT} questions`);
+      if (level === "row") return noWeights("One hand-written sentence", "1 sentence", { value: TRAINING_LINES.length, unit: "sentences, all hand-written" }, joinTokens(TRAINING_LINES[0].text.split(" ")));
+      return noWeights("Tiny corpus, written by hand for this course", `${TRAINING_LINES.length} sentences`, { value: TRAINING_LINES.length, unit: "sentences" }, `${TRAINING_SEQUENCES.length} with repeats · ${QUESTION_COUNT} questions`);
     case "vocabulary":
       if (level === "number") return noWeights("Tiny word list: one row", "1 row", { value: VOCABULARY.length, unit: "IDs given" }, `"${words[last]}" = ${ids[last]}`);
       return noWeights("Tiny word list", `${VOCABULARY.length} words`, { value: VOCABULARY.length, unit: "words" }, idList(VOCABULARY));
     case "training":
-      if (level === "row") return noWeights("One tiny training round", `${TARGET_ROUNDS} rounds on ${TRAINING_SEQUENCES.length} sentences`, { value: 4, unit: "steps" }, loss);
-      return noWeights("Tiny pre-training", `${TARGET_ROUNDS} rounds on ${TRAINING_SEQUENCES.length} sentences`, { value: MAX_CONTEXT, unit: "words per text" }, loss);
+      if (level === "row") return noWeights("One tiny training round", `${TARGET_ROUNDS} rounds on ${TRAINING_SEQUENCES.length} sentences`, { value: TRAINING_SEQUENCES.length, unit: "texts per round" }, loss);
+      return noWeights("Tiny pre-training", `${TARGET_ROUNDS} rounds on ${TRAINING_SEQUENCES.length} sentences`, { value: LONGEST_TEXT, unit: "words per text" }, loss);
     case "loss":
-      if (level === "row") return noWeights(`Guess: chance of "${TEST_ANSWER}"`, "1 chance", { value: 1, unit: "chance per word" }, percent(test.now));
+      if (level === "row") return noWeights(`Guess: chance of "${TEST_ANSWER}"`, "1 chance", { value: VOCABULARY.length, unit: "words to choose from" }, percent(test.now));
       return noWeights("One loss term", "1 number", { value: 1, unit: "number per word" }, `−ln(${test.now.toFixed(3)}) = ${(-Math.log(test.now)).toFixed(2)}`);
     case "slope":
-      return noWeights(`Slope of the first number of "${VOCABULARY[0]}"`, "1 number", { value: 1, unit: "multiply-and-add" }, weights.tokenTable.grad[0].toFixed(4));
+      return noWeights(`Slope of the first number of "${VOCABULARY[0]}"`, "1 number", { value: countWeights(weights), unit: "slopes per round" }, weights.tokenTable.grad[0].toFixed(4));
     case "adam":
-      return { title: `Word table: first number of "${VOCABULARY[0]}"`, shape: "1 stored number", weightCount: 1, headline: { value: 1, unit: "number nudged" }, live: `${lab.untrained.tokenTable.data[0].toFixed(3)} → ${weights.tokenTable.data[0].toFixed(3)}` };
+      return { title: `Word table: first number of "${VOCABULARY[0]}"`, shape: "1 stored number", weightCount: 1, headline: { value: countWeights(weights), unit: "numbers nudged per round" }, live: `${lab.untrained.tokenTable.data[0].toFixed(3)} → ${weights.tokenTable.data[0].toFixed(3)}` };
     case "evaluation":
-      if (level === "number") return noWeights("One test question", "1 question", { value: 1, unit: "question" }, `top "${showWord(test.top)}": ${test.top === TEST_ANSWER ? "right" : "wrong"}`);
+      if (level === "number") return noWeights("One test question", "1 question", { value: 0, unit: "examples shown first" }, `top "${showWord(test.top)}": ${test.top === TEST_ANSWER ? "right" : "wrong"}`);
       return noWeights("Tiny test sentence", "1 question", { value: Math.round(test.now * 100), unit: "% sure of the right word" }, `"${TEST_ANSWER}" ${percent(test.before)} → ${percent(test.now)}`);
   }
 }

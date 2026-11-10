@@ -1,29 +1,24 @@
-import type { ModelPart, StepFacts } from "@/features/take-apart/interfaces/model-part.interface";
-import { evaluationStep, postTrainingStep, preTrainingStep } from "./training-steps";
+import { TRAINING_LINES } from "@/core/model/corpus";
+import type { ModelPart } from "@/features/take-apart/interfaces/model-part.interface";
+import type { BuildFacts } from "@/features/take-apart/interfaces/real-facts.interface";
+import { evaluationStep } from "./evaluation-steps";
+import { stepFacts } from "./part-builders";
+import { postTrainingStep, preTrainingStep } from "./training-steps";
 
-interface LifecycleSpec {
-  model: ModelPart;
-  data: StepFacts;
-  tokenizer: StepFacts;
-  preTraining: StepFacts;
-  postTraining: StepFacts;
-  benchmarks: StepFacts;
-  safety: StepFacts;
-  quantization: StepFacts;
-}
-
-const HAND_WRITTEN = "Our tiny corpus is 12 sentences written by hand, so nothing is filtered out.";
-const REPEATS_ON_PURPOSE = "Our tiny corpus repeats some sentences on purpose, up to 3 times, so their endings come out more often. It skips this check.";
+const MOST_REPEATS = Math.max(...TRAINING_LINES.map((line) => line.times));
+const NOT_COPIED = `Our tiny model copies nothing in. Its ${TRAINING_LINES.length} sentences were written by hand for this course, not taken from the web.`;
+const HAND_WRITTEN = `Our tiny model's ${TRAINING_LINES.length} sentences were written by hand for this course, so nothing is filtered out.`;
+const REPEATS_ON_PURPOSE = `Our tiny corpus repeats some sentences on purpose, up to ${MOST_REPEATS} times, so their endings come out more often. It skips this check.`;
 const NO_LEARNED_MERGES = "Our tiny model learns no merge rules. Its list is every word in its sentences, split on spaces.";
 
-function dataStep(facts: StepFacts): ModelPart {
+function dataStep(facts: BuildFacts): ModelPart {
   return {
     id: "data",
     icon: "book",
     title: "Data collection and prep",
     summary: "Gathers a huge pile of text and cleans it up for training.",
     copies: 1,
-    facts: { shape: facts.shape, weightCount: 0, headline: facts.headline, input: "web pages", output: "clean training text", notes: facts.notes },
+    facts: stepFacts(facts.data, "online text", "clean training text", { inputDetail: "publicly available online text" }),
     tiny: { part: "corpus", level: "whole" },
     lesson: "Lessons 22, 30",
     reverseLesson: "RL-04",
@@ -37,8 +32,8 @@ function dataStep(facts: StepFacts): ModelPart {
         title: "Copy one document in",
         summary: "Copies the plain text of one web page into the pile.",
         copies: 1,
-        facts: { shape: "1 document", weightCount: 0, headline: { value: 1, unit: "document at a time" }, input: "one web page", output: "its plain text" },
-        tiny: { part: "corpus", level: "row" },
+        facts: stepFacts(facts.gather, "one web page", "its plain text"),
+        tiny: { part: "corpus", level: "row", missing: NOT_COPIED },
         lesson: "Lesson 30",
         reverseLesson: "RL-04",
         explanation: "Ground zero. Take one web page, strip out the menus and code, and keep its plain text as one document.",
@@ -52,11 +47,11 @@ function dataStep(facts: StepFacts): ModelPart {
         title: "One quality check",
         summary: "Checks one document against one rule, then keeps it or drops it.",
         copies: 1,
-        facts: { shape: "1 rule", weightCount: 0, headline: { value: 1, unit: "rule" }, input: "one document", output: "keep or drop" },
+        facts: stepFacts(facts.filter, "one document", "keep or drop"),
         tiny: { part: "corpus", level: "row", missing: HAND_WRITTEN },
         lesson: "No lesson yet",
         reverseLesson: "RL-04",
-        explanation: "Ground zero. Check one document against one rule, such as \"too many repeated lines\", and keep it or drop it.",
+        explanation: "Ground zero. Check one document against one rule, and keep it or drop it. The rules the makers say they used are listed below.",
         why: "Rules and small scoring models decide what counts as good text, long before training starts.",
         formula: { lines: ["keep = passes(document, rule)"] },
         groundZero: "action",
@@ -67,7 +62,7 @@ function dataStep(facts: StepFacts): ModelPart {
         title: "One deduplication check",
         summary: "Drops a document if it copies, or nearly copies, one already kept.",
         copies: 1,
-        facts: { shape: "1 comparison", weightCount: 0, headline: { value: 1, unit: "comparison" }, input: "one document", output: "keep or drop", inputDetail: "one document and those kept", outputDetail: "keep, or drop as a copy" },
+        facts: stepFacts(facts.dedupe, "one document", "keep or drop", { inputDetail: "one document and those kept", outputDetail: "keep, or drop as a copy" }),
         tiny: { part: "corpus", level: "row", missing: REPEATS_ON_PURPOSE },
         lesson: "No lesson yet",
         reverseLesson: "RL-04",
@@ -80,14 +75,14 @@ function dataStep(facts: StepFacts): ModelPart {
   };
 }
 
-function tokenizerStep(facts: StepFacts): ModelPart {
+function tokenizerStep(facts: BuildFacts): ModelPart {
   return {
     id: "tokenizer",
     icon: "text",
     title: "Tokenizer",
     summary: "Builds the word list the model will use, by counting common pairs of letters.",
     copies: 1,
-    facts: { shape: facts.shape, weightCount: 0, headline: facts.headline, input: "clean text", output: "a word list", inputDetail: "clean training text", outputDetail: "a word list: piece ↔ ID", notes: facts.notes },
+    facts: stepFacts(facts.tokenizer, "clean text", "a word list", { inputDetail: "clean training text", outputDetail: "a word list: piece ↔ ID" }),
     tiny: { part: "vocabulary", level: "whole" },
     lesson: "Lessons 09, 18",
     reverseLesson: "RL-01",
@@ -101,7 +96,7 @@ function tokenizerStep(facts: StepFacts): ModelPart {
         title: "One merge round",
         summary: "Joins the most common pair of pieces into one new piece.",
         copies: 1,
-        facts: { shape: "1 new piece per round", weightCount: 0, headline: { value: 1, unit: "new piece" }, input: "text in pieces", output: "1 new piece, 1 rule", inputDetail: "the text, split into pieces", outputDetail: "one new piece and one rule" },
+        facts: stepFacts(facts["merge-round"], "text in pieces", "1 new piece, 1 rule", { inputDetail: "the text, split into pieces", outputDetail: "one new piece and one rule" }),
         tiny: { part: "vocabulary", level: "whole", missing: NO_LEARNED_MERGES },
         lesson: "Lesson 18",
         reverseLesson: "RL-01",
@@ -115,7 +110,7 @@ function tokenizerStep(facts: StepFacts): ModelPart {
             title: "Count one pair",
             summary: "Adds 1 to the count for one pair of side-by-side pieces.",
             copies: 1,
-            facts: { shape: "1 count", weightCount: 0, headline: { value: 1, unit: "count" }, input: "two pieces", output: "their count, plus 1", inputDetail: "two neighbouring pieces" },
+            facts: stepFacts(facts["count-pair"], "two pieces", "their count, plus 1", { inputDetail: "two neighbouring pieces" }),
             tiny: { part: "vocabulary", level: "whole", missing: NO_LEARNED_MERGES },
             lesson: "Lesson 18",
             reverseLesson: "RL-01",
@@ -130,7 +125,7 @@ function tokenizerStep(facts: StepFacts): ModelPart {
             title: "One merge rule",
             summary: "Writes down one join rule and adds the joined piece to the list.",
             copies: 1,
-            facts: { shape: "1 rule", weightCount: 0, headline: { value: 1, unit: "rule" }, input: "the most common pair", output: "one new piece" },
+            facts: stepFacts(facts["learn-merge"], "the most common pair", "one new piece"),
             tiny: { part: "vocabulary", level: "whole", missing: NO_LEARNED_MERGES },
             lesson: "Lesson 18",
             reverseLesson: "RL-01",
@@ -147,7 +142,7 @@ function tokenizerStep(facts: StepFacts): ModelPart {
         title: "Give one piece an ID",
         summary: "Writes one piece into the list, and its place number becomes its ID.",
         copies: 1,
-        facts: { shape: "1 row of the list", weightCount: 0, headline: { value: facts.headline.value, unit: "IDs given" }, input: "one piece", output: "its number" },
+        facts: stepFacts(facts["assign-id"], "one piece", "its number"),
         tiny: { part: "vocabulary", level: "number" },
         lesson: "Lesson 09",
         reverseLesson: "RL-01",
@@ -167,7 +162,7 @@ function architectureStep(model: ModelPart): ModelPart {
     title: "Architecture",
     summary: "Writes the model as code, with every stored number starting out random.",
     copies: 1,
-    facts: { shape: model.facts.shape, weightCount: model.facts.weightCount, headline: model.facts.headline, input: "sizes and parts", output: "a random model", outputDetail: "code with random numbers" },
+    facts: { shape: model.facts.shape, weightCount: model.facts.weightCount, headline: model.facts.headline, input: "sizes and parts", output: "a random model", outputDetail: "code with random numbers", sources: model.facts.sources },
     tiny: { part: "model", level: "whole" },
     lesson: "Lessons 13, 14, 20",
     reverseLesson: "RL-05",
@@ -178,14 +173,14 @@ function architectureStep(model: ModelPart): ModelPart {
   };
 }
 
-export function lifecycleRoot(spec: LifecycleSpec): ModelPart {
+export function lifecycleRoot(model: ModelPart, facts: BuildFacts): ModelPart {
   return {
     id: "build",
     icon: "pen",
     title: "Build a model",
     summary: "How a model is made, from raw text to a model you can use, in 6 stages.",
     copies: 1,
-    facts: { shape: "6 stages", weightCount: spec.model.facts.weightCount, headline: spec.model.facts.headline, input: "web text", output: "a model ready to use", inputDetail: "text from the web" },
+    facts: { shape: "6 stages", weightCount: model.facts.weightCount, headline: model.facts.headline, input: "online text", output: "a model ready to use", inputDetail: "publicly available online text", sources: model.facts.sources },
     tiny: { part: "model", level: "whole" },
     lesson: "Lessons 14, 30",
     reverseLesson: "RL-05",
@@ -193,12 +188,12 @@ export function lifecycleRoot(spec: LifecycleSpec): ModelPart {
     why: "Only the architecture stage holds stored numbers. Every other stage shapes what those numbers end up being.",
     formula: { lines: ["data → word list → code → pre-train → post-train → test"] },
     children: [
-      dataStep(spec.data),
-      tokenizerStep(spec.tokenizer),
-      architectureStep(spec.model),
-      preTrainingStep(spec.preTraining),
-      postTrainingStep(spec.postTraining),
-      evaluationStep(spec.benchmarks, spec.safety, spec.quantization),
+      dataStep(facts),
+      tokenizerStep(facts),
+      architectureStep(model),
+      preTrainingStep(facts),
+      postTrainingStep(facts),
+      evaluationStep(facts),
     ],
   };
 }

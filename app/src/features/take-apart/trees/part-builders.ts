@@ -1,5 +1,7 @@
 import type { ModelPart, TinyPartId } from "@/features/take-apart/interfaces/model-part.interface";
+import type { RealFacts, StepFacts } from "@/features/take-apart/interfaces/real-facts.interface";
 import { count } from "@/shared/utils/format";
+import type { SourceId } from "./sources";
 
 interface PartText {
   id: string;
@@ -11,6 +13,7 @@ interface PartText {
   reverseLesson: string;
   explanation: string;
   why: string;
+  sources: SourceId[];
   missing?: string;
 }
 
@@ -38,11 +41,27 @@ interface NormSpec extends PartText {
   tinyPart: TinyPartId;
 }
 
+interface InOutDetail {
+  inputDetail?: string;
+  outputDetail?: string;
+}
+
+export const stepFacts = (facts: StepFacts, input: string, output: string, detail: InOutDetail = {}): RealFacts => ({
+  shape: facts.shape,
+  weightCount: 0,
+  headline: facts.headline,
+  input,
+  output,
+  ...detail,
+  sources: facts.sources,
+  notes: facts.notes,
+});
+
 const NO_BIAS = "Our tiny model has no biases. Its numbers come from the multiply-and-adds alone.";
 const NO_SCALE = "Our tiny model's norm has no stored scale or shift numbers. It only centres and rescales.";
 
 export function projectionPart(spec: ProjectionSpec): ModelPart {
-  const { id, inSize, outSize, hasBias, tinyPart, missing } = spec;
+  const { id, inSize, outSize, hasBias, tinyPart, missing, sources } = spec;
   const sizeIn = count(inSize);
   const sizeOut = count(outSize);
   const multiplyAdd: ModelPart = {
@@ -51,7 +70,7 @@ export function projectionPart(spec: ProjectionSpec): ModelPart {
     title: "One multiply-and-add",
     summary: "Multiplies one input number by one stored number and adds it to a running sum.",
     copies: inSize,
-    facts: { shape: "1 × 1", weightCount: 1, headline: { value: inSize, unit: "per output number" }, input: "1 input, 1 stored", output: "the running sum", inputDetail: "1 input number and 1 stored number", outputDetail: "the running sum, a little bigger or smaller" },
+    facts: { shape: "1 × 1", weightCount: 1, headline: { value: inSize, unit: "per output number", isComputed: true }, input: "1 input, 1 stored", output: "the running sum", inputDetail: "1 input number and 1 stored number", outputDetail: "the running sum, a little bigger or smaller", sources },
     tiny: { part: tinyPart, level: "multiply-add", missing },
     lesson: "Lessons 00, 01",
     reverseLesson: "RL-06",
@@ -67,7 +86,7 @@ export function projectionPart(spec: ProjectionSpec): ModelPart {
     title: "Bias",
     summary: "Adds one stored number at the end, so the output can move up or down.",
     copies: 1,
-    facts: { shape: "1", weightCount: 1, headline: { value: 1, unit: "number" }, input: "the finished sum", output: "sum plus 1 number", outputDetail: "the sum plus one stored number" },
+    facts: { shape: "1", weightCount: 1, headline: { value: 1, unit: "number", isComputed: true }, input: "the finished sum", output: "sum plus 1 number", outputDetail: "the sum plus one stored number", sources },
     tiny: { part: tinyPart, level: "multiply-add", missing: NO_BIAS },
     lesson: "Lesson 01",
     reverseLesson: "RL-06",
@@ -83,7 +102,7 @@ export function projectionPart(spec: ProjectionSpec): ModelPart {
     title: "One output number",
     summary: "Makes one output number: each input times its own stored number, all added up.",
     copies: outSize,
-    facts: { shape: `${sizeIn} × 1`, weightCount: inSize + (hasBias ? 1 : 0), headline: { value: inSize + (hasBias ? 1 : 0), unit: "numbers" }, input: `${sizeIn} numbers`, output: "1 number" },
+    facts: { shape: `${sizeIn} × 1`, weightCount: inSize + (hasBias ? 1 : 0), headline: { value: inSize + (hasBias ? 1 : 0), unit: "numbers", isComputed: true }, input: `${sizeIn} numbers`, output: "1 number", sources },
     tiny: { part: tinyPart, level: "number", missing },
     lesson: "Lesson 08",
     reverseLesson: "RL-06",
@@ -99,7 +118,7 @@ export function projectionPart(spec: ProjectionSpec): ModelPart {
     title: spec.title,
     summary: spec.summary,
     copies: spec.copies,
-    facts: { shape: `${sizeIn} × ${sizeOut}`, weightCount: inSize * outSize + (hasBias ? outSize : 0), headline: { value: inSize * outSize + (hasBias ? outSize : 0), unit: "numbers" }, input: spec.input, output: spec.output, inputDetail: spec.inputDetail, outputDetail: spec.outputDetail },
+    facts: { shape: `${sizeIn} × ${sizeOut}`, weightCount: inSize * outSize + (hasBias ? outSize : 0), headline: { value: inSize * outSize + (hasBias ? outSize : 0), unit: "numbers", isComputed: true }, input: spec.input, output: spec.output, inputDetail: spec.inputDetail, outputDetail: spec.outputDetail, sources },
     tiny: { part: tinyPart, level: "whole", missing },
     lesson: spec.lesson,
     reverseLesson: spec.reverseLesson,
@@ -112,14 +131,14 @@ export function projectionPart(spec: ProjectionSpec): ModelPart {
 }
 
 export function tablePart(spec: TableSpec): ModelPart {
-  const { id, rows, cols, rowName, tinyPart, missing } = spec;
+  const { id, rows, cols, rowName, tinyPart, missing, sources } = spec;
   const storedNumber: ModelPart = {
     id: `${id}-number`,
     icon: "hash",
     title: "One stored number",
     summary: "One number in the table, set by training, that means nothing on its own.",
     copies: cols,
-    facts: { shape: "1", weightCount: 1, headline: { value: rows * cols, unit: "in the table" }, input: "nothing, only read", output: "1 number", inputDetail: "nothing, it is only read" },
+    facts: { shape: "1", weightCount: 1, headline: { value: rows * cols, unit: "in the table", isComputed: true }, input: "nothing, only read", output: "1 number", inputDetail: "nothing, it is only read", sources },
     tiny: { part: tinyPart, level: "number", missing },
     lesson: "Lessons 03, 10",
     reverseLesson: "RL-06",
@@ -135,12 +154,12 @@ export function tablePart(spec: TableSpec): ModelPart {
     title: `One ${rowName}'s row`,
     summary: `The list of numbers for one ${rowName}, copied out each time that ${rowName} comes up.`,
     copies: rows,
-    facts: { shape: `1 × ${count(cols)}`, weightCount: cols, headline: { value: cols, unit: "numbers" }, input: `the ${rowName}'s id`, output: `${count(cols)} numbers` },
+    facts: { shape: `1 × ${count(cols)}`, weightCount: cols, headline: { value: cols, unit: "numbers", isComputed: true }, input: `the ${rowName}'s id`, output: `${count(cols)} numbers`, sources },
     tiny: { part: tinyPart, level: "row", missing },
     lesson: "Lesson 10",
     reverseLesson: "RL-02",
     explanation: `The ${count(cols)} numbers for one ${rowName}. Looking it up is just copying this row out of the table.`,
-    why: "The row is a point in a space with many directions. Rows that are used in similar places end up close together.",
+    why: "The row is a point in a space with many directions. Training moves it; the row holds no word, only numbers.",
     formula: { lines: [`row = table[id], ${count(cols)} numbers`] },
     code: "const row: number[] = table[id];",
     children: [storedNumber],
@@ -151,7 +170,7 @@ export function tablePart(spec: TableSpec): ModelPart {
     title: spec.title,
     summary: spec.summary,
     copies: spec.copies,
-    facts: { shape: `${count(rows)} × ${count(cols)}`, weightCount: rows * cols, headline: { value: rows * cols, unit: "numbers" }, input: `a ${rowName} id`, output: `${count(cols)} numbers` },
+    facts: { shape: `${count(rows)} × ${count(cols)}`, weightCount: rows * cols, headline: { value: rows * cols, unit: "numbers", isComputed: true }, input: `a ${rowName} id`, output: `${count(cols)} numbers`, sources },
     tiny: { part: tinyPart, level: "whole", missing },
     lesson: spec.lesson,
     reverseLesson: spec.reverseLesson,
@@ -164,14 +183,14 @@ export function tablePart(spec: TableSpec): ModelPart {
 }
 
 export function normPart(spec: NormSpec): ModelPart {
-  const { id, size, hasShift, tinyPart } = spec;
+  const { id, size, hasShift, tinyPart, sources } = spec;
   const number: ModelPart = {
     id: `${id}-number`,
     icon: "hash",
     title: "One output number",
     summary: hasShift ? "Scales one number by its own stored number, then shifts it by another." : "Scales one number by its own stored number.",
     copies: size,
-    facts: { shape: "1", weightCount: hasShift ? 2 : 1, headline: hasShift ? { value: 2, unit: "numbers" } : { value: 1, unit: "number" }, input: "1 rescaled number", output: "1 number" },
+    facts: { shape: "1", weightCount: hasShift ? 2 : 1, headline: hasShift ? { value: 2, unit: "numbers", isComputed: true } : { value: 1, unit: "number", isComputed: true }, input: "1 rescaled number", output: "1 number", sources },
     tiny: { part: tinyPart, level: "number", missing: NO_SCALE },
     lesson: "Lessons 13, 20",
     reverseLesson: "RL-06",
@@ -189,7 +208,7 @@ export function normPart(spec: NormSpec): ModelPart {
     title: spec.title,
     summary: spec.summary,
     copies: spec.copies,
-    facts: { shape: hasShift ? `2 × ${count(size)}` : `1 × ${count(size)}`, weightCount: size * (hasShift ? 2 : 1), headline: { value: size * (hasShift ? 2 : 1), unit: "numbers" }, input: `${count(size)} numbers`, output: `${count(size)} steady numbers`, outputDetail: `${count(size)} numbers, in a steady range` },
+    facts: { shape: hasShift ? `2 × ${count(size)}` : `1 × ${count(size)}`, weightCount: size * (hasShift ? 2 : 1), headline: { value: size * (hasShift ? 2 : 1), unit: "numbers", isComputed: true }, input: `${count(size)} numbers`, output: `${count(size)} steady numbers`, outputDetail: `${count(size)} numbers, in a steady range`, sources },
     tiny: { part: tinyPart, level: "whole", missing: spec.missing },
     lesson: spec.lesson,
     reverseLesson: spec.reverseLesson,

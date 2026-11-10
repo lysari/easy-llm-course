@@ -1,9 +1,10 @@
 import type { ModelPart, RealModel } from "@/features/take-apart/interfaces/model-part.interface";
 import { inferenceRoot } from "./inference-steps";
 import { lifecycleRoot } from "./lifecycle-steps";
+import { LLAMA_3_BUILD } from "./llama-3-build-facts";
 import { llama3Layers } from "./llama-3-layer";
 import { normPart, projectionPart, tablePart } from "./part-builders";
-import { LLAMA_3_BLOG, LLAMA_3_CARD, LLAMA_3_PAPER } from "./sources";
+import { LLAMA_3_SETTINGS } from "./sources";
 
 const WIDTH = 4096;
 const WORD_COUNT = 128_256;
@@ -20,10 +21,11 @@ const wordTable = tablePart({
   cols: WIDTH,
   rowName: "word",
   tinyPart: "word-table",
+  sources: LLAMA_3_SETTINGS,
   lesson: "Lessons 10, 18",
   reverseLesson: "RL-02",
   explanation: "One row of 4,096 numbers for each of the 128,256 words in Llama 3's list. A word's id picks its row.",
-  why: "This is where \"meaning\" lives: a point in a space with 4,096 directions. Words used in similar places end up near each other.",
+  why: "Each word becomes a point in a space with 4,096 directions. Only training decides where each point sits.",
 });
 
 const finalNorm = normPart({
@@ -35,6 +37,7 @@ const finalNorm = normPart({
   size: WIDTH,
   hasShift: false,
   tinyPart: "final-norm",
+  sources: LLAMA_3_SETTINGS,
   missing: "Our tiny model uses a plain LayerNorm with no stored numbers here.",
   lesson: "Lesson 20",
   reverseLesson: "RL-04",
@@ -56,6 +59,7 @@ const outputHead = projectionPart({
   inputDetail: "4,096 numbers for the last word",
   outputDetail: "128,256 scores, one per word",
   tinyPart: "output-table",
+  sources: LLAMA_3_SETTINGS,
   lesson: "Lessons 11, 20",
   reverseLesson: "RL-04",
   explanation: "Turns the last word's 4,096 numbers into one score per word. Llama 3 8B stores its own output table, separate from the word table, so it adds another 525,336,576 numbers.",
@@ -68,7 +72,20 @@ const root: ModelPart = {
   title: "Llama 3 8B",
   summary: "The whole model: word IDs go in, and a score for every word comes out.",
   copies: 1,
-  facts: { shape: "32 layers × 4,096 numbers per word", weightCount: 8_030_261_248, headline: { value: 8_030_261_248, unit: "numbers" }, input: "up to 8,192 word IDs", output: "128,256 scores", outputDetail: "128,256 scores, one per word it knows" },
+  facts: {
+    shape: "32 layers × 4,096 numbers per word",
+    weightCount: 8_030_261_248,
+    headline: { value: 8_030_261_248, unit: "numbers", isComputed: true },
+    input: "up to 8,192 word IDs",
+    output: "128,256 scores",
+    outputDetail: "128,256 scores, one per word it knows",
+    sources: [...LLAMA_3_SETTINGS, "llama-3-weights", "llama-3-card"],
+    notes: [
+      { label: "Size", value: "8,030,261,248, worked out from Meta's settings; Hugging Face lists the same count", source: "llama-3-weights" },
+      { label: "Text length", value: "8,192 words (tokens)", source: "llama-3-card" },
+      { label: "Released", value: "April 18, 2024", source: "llama-3-card" },
+    ],
+  },
   tiny: { part: "model", level: "whole" },
   lesson: "Lessons 25, 30",
   reverseLesson: "RL-00",
@@ -86,7 +103,7 @@ const wordOrder: ModelPart = {
   title: "Word order comes later",
   summary: "Adds nothing here, because Llama marks word order later, inside attention.",
   copies: 1,
-  facts: { shape: "nothing stored here", weightCount: 0, headline: { value: 0, unit: "numbers" }, input: "word vectors", output: "the same vectors" },
+  facts: { shape: "nothing stored here", weightCount: 0, headline: { value: 0, unit: "numbers added here" }, input: "word vectors", output: "the same vectors", sources: LLAMA_3_SETTINGS },
   tiny: { part: "position-table", level: "whole", missing: "Our tiny model adds a learned position table here instead, like GPT-2." },
   lesson: "Lesson 25",
   reverseLesson: "RL-02",
@@ -104,15 +121,28 @@ export const LLAMA_3_8B: RealModel = {
   modes: {
     use: inferenceRoot({
       modelTitle: "Llama 3 8B",
-      tokenizer: "BPE",
+      tokenizer: "tiktoken-based BPE",
       wordCount: WORD_COUNT,
       width: WIDTH,
       context: CONTEXT,
       kvWidth: KV_WIDTH,
+      sources: LLAMA_3_SETTINGS,
+      textSources: ["llama-3-card"],
       tokenizerNotes: [
-        { label: "Word list", value: "128K words: 100K from OpenAI's tiktoken list plus 28K more", source: LLAMA_3_PAPER },
-        { label: "Fewer pieces", value: "3.94 English characters per piece, up from 3.17 with Llama 2's list", source: LLAMA_3_PAPER },
+        { label: "Word list", value: "128K words, 128,256 exactly", source: "llama-3-settings" },
+        { label: "Built on", value: "OpenAI's tiktoken library", source: "llama-3-tokenizer" },
+        { label: "Fewer pieces", value: "up to 15% fewer pieces than Llama 2 for the same text", source: "llama-3-blog" },
       ],
+      merges: { text: "Not published" },
+      mergeNotes: [{ label: "Merge rules", value: "Not published; the rules ship inside the tokenizer file, not in a paper", source: "llama-3-tokenizer" }],
+      stopWord: {
+        id: 128_001,
+        isComputed: true,
+        notes: [
+          { label: "Stop word", value: "<|end_of_text|>, ID 128,001: the 2nd special word after the 128,000 regular ones", source: "llama-3-tokenizer" },
+          { label: "Instruct model", value: "also stops at <|eot_id|>, the end of a turn, ID 128,009", source: "llama-3-tokenizer" },
+        ],
+      },
       embeddingLesson: "Lessons 10, 25",
       embeddingText:
         "Each word ID picks its row of 4,096 numbers from the word table. Llama 3 adds no place numbers here: word order is added later by RoPE, inside attention.",
@@ -121,69 +151,6 @@ export const LLAMA_3_8B: RealModel = {
       finalNorm,
       outputHead,
     }),
-    build: lifecycleRoot({
-      model: root,
-      data: {
-        shape: "over 15 trillion words, public sources",
-        headline: { value: 15_000_000_000_000, unit: "words", isOver: true },
-        notes: [
-          { label: "Size", value: "over 15 trillion words (tokens), seven times Llama 2's", source: LLAMA_3_BLOG },
-          { label: "Mix", value: "four times more code than Llama 2; over 5% in more than 30 other languages", source: LLAMA_3_BLOG },
-          { label: "Cleaning", value: "simple rules, adult-content filters, removing near copies, and text-quality scoring models", source: LLAMA_3_BLOG },
-          { label: "Copies removed", value: "by web address, by whole document (MinHash), and line by line", source: LLAMA_3_PAPER },
-          { label: "Newest text", value: "March 2023", source: LLAMA_3_CARD },
-        ],
-      },
-      tokenizer: {
-        shape: "BPE · 128K words",
-        headline: { value: WORD_COUNT, unit: "words" },
-        notes: [
-          { label: "Word list", value: "128K words: 100K from OpenAI's tiktoken list plus 28K more for other languages", source: LLAMA_3_PAPER },
-          { label: "Fewer pieces", value: "3.94 English characters per piece, up from 3.17 with Llama 2's list", source: LLAMA_3_PAPER },
-        ],
-      },
-      preTraining: {
-        shape: "over 15 trillion words, 8,192 at a time",
-        headline: { value: CONTEXT, unit: "words per text" },
-        notes: [
-          { label: "Words trained on", value: "over 15 trillion", source: LLAMA_3_CARD },
-          { label: "Text length", value: "8,192 words per text", source: LLAMA_3_CARD },
-          { label: "Computer time", value: "1.3 million GPU hours on H100-80GB chips", source: LLAMA_3_CARD },
-        ],
-      },
-      postTraining: {
-        shape: "SFT, rejection sampling, PPO and DPO",
-        headline: { value: 10_000_000, unit: "example answers", isOver: true },
-        notes: [
-          { label: "Methods", value: "SFT, rejection sampling, PPO and DPO, for the Instruct version", source: LLAMA_3_BLOG },
-          { label: "Example answers", value: "public instruction sets and over 10 million examples marked by people", source: LLAMA_3_CARD },
-          { label: "Two versions", value: "a pre-trained base model and an instruction-tuned Instruct model", source: LLAMA_3_CARD },
-        ],
-      },
-      benchmarks: {
-        shape: "MMLU 66.6 (base), 68.4 (Instruct)",
-        headline: { value: 66.6, unit: "% right on MMLU" },
-        notes: [
-          { label: "MMLU, 5 examples", value: "66.6 base, 68.4 Instruct", source: LLAMA_3_CARD },
-          { label: "More tests", value: "ARC-Challenge 78.6, Winogrande 76.1 (base); GSM-8K 79.6, HumanEval 62.2 (Instruct)", source: LLAMA_3_CARD },
-        ],
-      },
-      safety: {
-        shape: "red teaming, Llama Guard 2",
-        headline: { value: 3, unit: "safety tools" },
-        notes: [
-          { label: "Red teaming", value: "people and programs wrote attack prompts to test the Instruct model", source: LLAMA_3_BLOG },
-          { label: "Tools", value: "Llama Guard 2, Code Shield and CyberSec Eval 2", source: LLAMA_3_BLOG },
-        ],
-      },
-      quantization: {
-        shape: "not covered for 8B",
-        headline: { value: 8_030_261_248, unit: "numbers to round" },
-        notes: [
-          { label: "8B", value: "not covered in the model card", source: LLAMA_3_CARD },
-          { label: "Largest model", value: "8-bit (FP8) numbers tested for running the 405B model", source: LLAMA_3_PAPER },
-        ],
-      },
-    }),
+    build: lifecycleRoot(root, LLAMA_3_BUILD),
   },
 };

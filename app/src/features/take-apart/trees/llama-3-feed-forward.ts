@@ -1,5 +1,6 @@
 import type { ModelPart } from "@/features/take-apart/interfaces/model-part.interface";
 import { projectionPart } from "./part-builders";
+import { LLAMA_3_SETTINGS } from "./sources";
 
 const WIDTH = 4096;
 const EXPANDED = 14_336;
@@ -11,12 +12,12 @@ const swiglu: ModelPart = {
   title: "SwiGLU mix",
   summary: "Lets each gate number decide how much of its up number gets through.",
   copies: 1,
-  facts: { shape: "14,336 numbers", weightCount: 0, headline: { value: EXPANDED, unit: "numbers per word" }, input: "gate and up numbers", output: "14,336 numbers", inputDetail: "14,336 gate numbers and 14,336 up numbers" },
+  facts: { shape: "14,336 numbers", weightCount: 0, headline: { value: EXPANDED, unit: "numbers per word", isComputed: true }, input: "gate and up numbers", output: "14,336 numbers", inputDetail: "14,336 gate numbers and 14,336 up numbers", sources: LLAMA_3_SETTINGS },
   tiny: { part: "relu", level: "whole", missing: NO_SWIGLU },
   lesson: "Lessons 15, 30",
   reverseLesson: "RL-05",
   explanation: "Bends each gate number with SiLU, then multiplies it by the matching up number. The gate decides how much of each up number gets through. It stores no numbers.",
-  why: "A gated bend trains a little better than a plain one for the same count of numbers, so most new models use it.",
+  why: "Llama 3's code writes the whole feed-forward as w2(silu(w1(x)) × w3(x)). The gate adds no stored numbers.",
   formula: { lines: ["silu(g) = g × sigmoid(g)", "h = silu(g) × u"] },
   code: "const h = gate.map((g, i) => silu(g) * up[i]);",
   children: [
@@ -26,7 +27,7 @@ const swiglu: ModelPart = {
       title: "One mixed number",
       summary: "Makes one number from one gate number and one up number.",
       copies: EXPANDED,
-      facts: { shape: "1", weightCount: 0, headline: { value: EXPANDED, unit: "per word" }, input: "1 gate, 1 up", output: "1 number", inputDetail: "1 gate number and 1 up number" },
+      facts: { shape: "1", weightCount: 0, headline: { value: EXPANDED, unit: "per word", isComputed: true }, input: "1 gate, 1 up", output: "1 number", inputDetail: "1 gate number and 1 up number", sources: LLAMA_3_SETTINGS },
       tiny: { part: "relu", level: "number", missing: NO_SWIGLU },
       lesson: "Lesson 15",
       reverseLesson: "RL-05",
@@ -41,7 +42,7 @@ const swiglu: ModelPart = {
           title: "SiLU",
           summary: "Multiplies the gate number by a squashed copy of itself, between 0 and 1.",
           copies: 1,
-          facts: { shape: "1 × 1", weightCount: 0, headline: { value: 1, unit: "multiply" }, input: "1 gate, its sigmoid", output: "1 number", inputDetail: "1 gate number and its sigmoid" },
+          facts: { shape: "1 × 1", weightCount: 0, headline: { value: 1, unit: "multiply", isComputed: true }, input: "1 gate, its sigmoid", output: "1 number", inputDetail: "1 gate number and its sigmoid", sources: LLAMA_3_SETTINGS },
           tiny: { part: "relu", level: "number", missing: NO_SWIGLU },
           lesson: "Lesson 05",
           reverseLesson: "RL-06",
@@ -57,7 +58,7 @@ const swiglu: ModelPart = {
           title: "Gate times up",
           summary: "Multiplies the gate number by its up number, so a gate near 0 shuts it out.",
           copies: 1,
-          facts: { shape: "1 × 1", weightCount: 0, headline: { value: 1, unit: "multiply" }, input: "1 SiLU, 1 up", output: "1 number", inputDetail: "1 SiLU number and 1 up number" },
+          facts: { shape: "1 × 1", weightCount: 0, headline: { value: 1, unit: "multiply", isComputed: true }, input: "1 SiLU, 1 up", output: "1 number", inputDetail: "1 SiLU number and 1 up number", sources: LLAMA_3_SETTINGS },
           tiny: { part: "relu", level: "number", missing: NO_SWIGLU },
           lesson: "Lesson 15",
           reverseLesson: "RL-06",
@@ -78,12 +79,12 @@ export const llama3FeedForward: ModelPart = {
   title: "Feed-forward",
   summary: "Works on each word alone, picking out patterns stored in its tables.",
   copies: 1,
-  facts: { shape: "3 tables of 4,096 × 14,336", weightCount: 176_160_768, headline: { value: 176_160_768, unit: "numbers" }, input: "4,096 per word", output: "4,096 per word", inputDetail: "4,096 numbers per word", outputDetail: "4,096 numbers per word" },
+  facts: { shape: "3 tables of 4,096 × 14,336", weightCount: 176_160_768, headline: { value: 176_160_768, unit: "numbers", isComputed: true }, input: "4,096 per word", output: "4,096 per word", inputDetail: "4,096 numbers per word", outputDetail: "4,096 numbers per word", sources: LLAMA_3_SETTINGS },
   tiny: { part: "feed-forward", level: "whole" },
   lesson: "Lesson 15",
   reverseLesson: "RL-05",
   explanation: "Works on each word on its own: two tables expand 4,096 numbers to 14,336 (gate and up), SwiGLU mixes them, and the down table contracts back to 4,096.",
-  why: "Four fifths of each layer's numbers live here. Much of what people call the model's \"knowledge\" is patterns stored in these tables.",
+  why: "About four fifths of each layer's numbers live here: 176,160,768 of its 218,112,000.",
   formula: { lines: ["ffn(x) = (silu(x × Wg) × (x × Wu)) × Wd"] },
   code: "const h = swiglu(project(x, Wg), project(x, Wu));\nconst out = project(h, Wd);",
   children: [
@@ -100,6 +101,7 @@ export const llama3FeedForward: ModelPart = {
       output: "14,336 gate numbers",
       inputDetail: "4,096 numbers for one word",
       tinyPart: "expand",
+      sources: LLAMA_3_SETTINGS,
       missing: "Our tiny model has no gate table. Its one expand table is the nearest part.",
       lesson: "Lessons 15, 30",
       reverseLesson: "RL-05",
@@ -119,6 +121,7 @@ export const llama3FeedForward: ModelPart = {
       output: "14,336 numbers",
       inputDetail: "4,096 numbers for one word",
       tinyPart: "expand",
+      sources: LLAMA_3_SETTINGS,
       lesson: "Lesson 15",
       reverseLesson: "RL-05",
       explanation: "Spreads a word's 4,096 numbers out to 14,336, so there is room to pick out many patterns at once. Our tiny model's expand table does the same job.",
@@ -137,6 +140,7 @@ export const llama3FeedForward: ModelPart = {
       input: "14,336 mixed numbers",
       output: "4,096 numbers",
       tinyPart: "contract",
+      sources: LLAMA_3_SETTINGS,
       lesson: "Lesson 15",
       reverseLesson: "RL-05",
       explanation: "Squeezes the 14,336 numbers back to 4,096, so the result can be added onto the word's numbers.",

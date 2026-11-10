@@ -75,7 +75,6 @@ describe.each(MODELS)("$title", (model) => {
         expect(part.reverseLesson, part.id).toMatch(/^RL-0[0-6]$/);
         expect(Boolean(part.formula || part.code), part.id).toBe(true);
         expect(part.copies, part.id).toBeGreaterThanOrEqual(1);
-        for (const note of part.facts.notes ?? []) expect(note.source.length, part.id).toBeGreaterThan(10);
       }
     });
 
@@ -109,8 +108,11 @@ describe.each(MODELS)("$title", (model) => {
       const tiny = viewTiny(new ModelLab(), readSentence(SENTENCES[0]).words);
       for (const part of parts) {
         const { headline } = part.facts;
-        expect(Number.isFinite(headline.value) && headline.value >= 0, part.id).toBe(true);
-        expect(headline.unit.length, part.id).toBeGreaterThan(0);
+        if ("text" in headline) expect(part.facts.notes?.length, part.id).toBeGreaterThan(0);
+        else {
+          expect(Number.isFinite(headline.value) && headline.value >= 0, part.id).toBe(true);
+          expect(headline.unit.length, part.id).toBeGreaterThan(0);
+        }
         if (part.tiny.missing) {
           expect(part.tiny.missing.length, part.id).toBeGreaterThan(10);
           continue;

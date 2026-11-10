@@ -10,8 +10,9 @@ import { FactRows } from "./fact-rows";
 import { InOut } from "./in-out";
 import { LiveExample } from "./live-example";
 import { DRAWER_ID, NO_LESSON, numbersOf, partsOf, tagOf, titleOf } from "./part-card";
-import { PartNumbers } from "./part-numbers";
+import { NONE_TO_LEARN, PartNumbers } from "./part-numbers";
 import { readTinyPart } from "./tiny-parts";
+import { SOURCES } from "./trees/sources";
 
 const REVERSE_TITLES: Record<string, string> = {
   "RL-00": "The Illusion",
@@ -47,17 +48,17 @@ interface PartDrawerProps {
 export function PartDrawer({ ref, root, modelTitle, part, tiny, sentence, onClose }: PartDrawerProps) {
   const readout = readTinyPart(part.tiny, tiny);
   const notes = part.facts.notes ?? [];
-  const sources = [...new Set(notes.map((note) => note.source))];
+  const sources = [...new Set([...part.facts.sources, ...notes.map((note) => note.source)])];
   const realRows: [string, string][] = [
     ["Shape", part.facts.shape],
-    ["Numbers", numbersOf(part)],
+    ["Numbers", part.facts.weightCount > 0 ? `${numbersOf(part)}, worked out from the sources` : NONE_TO_LEARN],
     ["Inside", part.groundZero ? `Ground zero: ${GROUND_ZERO_TEXT[part.groundZero]}` : partsOf(part.children ?? [])],
     ...notes.map((note): [string, string] => [note.label, note.value]),
   ];
   const tinyRows: [string, string][] = [
     ["Part", readout.title],
     ["Shape", readout.shape],
-    ["Numbers", count(readout.weightCount)],
+    ["Numbers", readout.weightCount > 0 ? count(readout.weightCount) : NONE_TO_LEARN],
     ["Live value", readout.live],
     ["Training", tiny.lab.isTrained ? `done, round ${tiny.lab.round}` : `round ${tiny.lab.round}`],
   ];
@@ -86,7 +87,16 @@ export function PartDrawer({ ref, root, modelTitle, part, tiny, sentence, onClos
       <section className="section">
         <p className="section-title">{`The real part in ${modelTitle}`}</p>
         <FactRows rows={realRows} />
-        {sources.length > 0 && <p className="card-lesson">{`Source: ${sources.join("; ")}`}</p>}
+        <p className="card-lesson">Sources</p>
+        <ul className="source-list card-lesson">
+          {sources.map((id) => (
+            <li key={id}>
+              <a href={SOURCES[id].url} target="_blank" rel="noreferrer">
+                {SOURCES[id].title}
+              </a>
+            </li>
+          ))}
+        </ul>
       </section>
       {part.formula && <FormulaBlock formula={part.formula} />}
       {part.code && <CodeBlock code={part.code} />}

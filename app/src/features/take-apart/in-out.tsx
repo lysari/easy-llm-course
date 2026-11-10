@@ -1,4 +1,4 @@
-import type { RealFacts } from "@/features/take-apart/interfaces/model-part.interface";
+import type { RealFacts } from "@/features/take-apart/interfaces/real-facts.interface";
 
 export function InOut({ facts, isDetailed }: { facts: RealFacts; isDetailed: boolean }) {
   return (

@@ -1,6 +1,7 @@
 import type { ModelLab } from "@/core/model/lab";
 import type { Formula } from "@/shared/interfaces/formula.interface";
 import type { ForwardTrace, RankedToken, TinyGptWeights } from "@/shared/interfaces/model.interface";
+import type { Amount, RealFacts } from "./real-facts.interface";
 
 export type ModelId = "gpt-2-small" | "llama-3-8b";
 
@@ -42,35 +43,6 @@ export type TinyPartId =
   | "evaluation";
 
 export type TinyLevel = "whole" | "row" | "number" | "multiply-add";
-
-export interface RealNote {
-  label: string;
-  value: string;
-  source: string;
-}
-
-export interface Amount {
-  value: number;
-  unit: string;
-  isOver?: boolean;
-}
-
-export interface RealFacts {
-  shape: string;
-  weightCount: number;
-  headline: Amount;
-  input: string;
-  output: string;
-  inputDetail?: string;
-  outputDetail?: string;
-  notes?: RealNote[];
-}
-
-export interface StepFacts {
-  shape: string;
-  headline: Amount;
-  notes: RealNote[];
-}
 
 export interface TinyLink {
   part: TinyPartId;

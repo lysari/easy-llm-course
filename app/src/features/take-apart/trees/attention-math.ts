@@ -1,12 +1,14 @@
 import type { ModelPart } from "@/features/take-apart/interfaces/model-part.interface";
 import { count } from "@/shared/utils/format";
+import type { SourceId } from "./sources";
 
 interface AttentionMathSpec {
   headSize: number;
   context: number;
+  sources: SourceId[];
 }
 
-export function attentionMathParts({ headSize, context }: AttentionMathSpec): ModelPart[] {
+export function attentionMathParts({ headSize, context, sources }: AttentionMathSpec): ModelPart[] {
   const size = count(headSize);
   const words = count(context);
   return [
@@ -16,7 +18,7 @@ export function attentionMathParts({ headSize, context }: AttentionMathSpec): Mo
       title: "Match scores",
       summary: "Checks how well this word matches each earlier word, as shares that add up to 1.",
       copies: 1,
-      facts: { shape: `up to ${words} × ${words}`, weightCount: 0, headline: { value: context, unit: "words at most" }, input: "query and keys", output: "one share per word", inputDetail: "this word's query and every earlier word's key", outputDetail: "one share per earlier word, adding up to 1" },
+      facts: { shape: `up to ${words} × ${words}`, weightCount: 0, headline: { value: context, unit: "words at most" }, input: "query and keys", output: "one share per word", inputDetail: "this word's query and every earlier word's key", outputDetail: "one share per earlier word, adding up to 1", sources },
       tiny: { part: "scores", level: "whole" },
       lesson: "Lessons 11, 12",
       reverseLesson: "RL-03",
@@ -31,7 +33,7 @@ export function attentionMathParts({ headSize, context }: AttentionMathSpec): Mo
           title: "One score",
           summary: "How well this word's question matches one earlier word's label, as one number.",
           copies: context,
-          facts: { shape: "1", weightCount: 0, headline: { value: headSize, unit: "pairs multiplied" }, input: `${size} query, ${size} key`, output: "1 score", inputDetail: `${size} query numbers and ${size} key numbers` },
+          facts: { shape: "1", weightCount: 0, headline: { value: headSize, unit: "pairs multiplied", isComputed: true }, input: `${size} query, ${size} key`, output: "1 score", inputDetail: `${size} query numbers and ${size} key numbers`, sources },
           tiny: { part: "scores", level: "number" },
           lesson: "Lesson 12",
           reverseLesson: "RL-03",
@@ -46,7 +48,7 @@ export function attentionMathParts({ headSize, context }: AttentionMathSpec): Mo
               title: "One multiply-and-add",
               summary: "Multiplies one query number by one key number and adds it to the sum.",
               copies: headSize,
-              facts: { shape: "1 × 1", weightCount: 0, headline: { value: headSize, unit: "per score" }, input: "1 query, 1 key", output: "the running sum", inputDetail: "1 query number and 1 key number" },
+              facts: { shape: "1 × 1", weightCount: 0, headline: { value: headSize, unit: "per score", isComputed: true }, input: "1 query, 1 key", output: "the running sum", inputDetail: "1 query number and 1 key number", sources },
               tiny: { part: "scores", level: "multiply-add" },
               lesson: "Lessons 00, 12",
               reverseLesson: "RL-06",
@@ -66,7 +68,7 @@ export function attentionMathParts({ headSize, context }: AttentionMathSpec): Mo
       title: "Weighted mix",
       summary: "Blends the earlier words' values, giving more weight to the best matches.",
       copies: 1,
-      facts: { shape: `${words} × ${size}`, weightCount: 0, headline: { value: headSize, unit: "numbers per word" }, input: "shares and values", output: `${size} numbers`, inputDetail: "the shares and every earlier word's value" },
+      facts: { shape: `${words} × ${size}`, weightCount: 0, headline: { value: headSize, unit: "numbers per word", isComputed: true }, input: "shares and values", output: `${size} numbers`, inputDetail: "the shares and every earlier word's value", sources },
       tiny: { part: "mix", level: "whole" },
       lesson: "Lesson 12",
       reverseLesson: "RL-03",
@@ -81,7 +83,7 @@ export function attentionMathParts({ headSize, context }: AttentionMathSpec): Mo
           title: "One mixed number",
           summary: "One number of the blend: each earlier word's share times its value, added up.",
           copies: headSize,
-          facts: { shape: "1", weightCount: 0, headline: { value: context, unit: "words at most" }, input: "shares and values", output: "1 number", inputDetail: `up to ${words} shares and ${words} value numbers` },
+          facts: { shape: "1", weightCount: 0, headline: { value: context, unit: "words at most" }, input: "shares and values", output: "1 number", inputDetail: `up to ${words} shares and ${words} value numbers`, sources },
           tiny: { part: "mix", level: "number" },
           lesson: "Lesson 12",
           reverseLesson: "RL-03",
@@ -96,7 +98,7 @@ export function attentionMathParts({ headSize, context }: AttentionMathSpec): Mo
               title: "One multiply-and-add",
               summary: "Multiplies one share by one value number and adds it to the sum.",
               copies: context,
-              facts: { shape: "1 × 1", weightCount: 0, headline: { value: context, unit: "per mixed number" }, input: "1 share, 1 value", output: "the running sum", inputDetail: "1 share and 1 value number" },
+              facts: { shape: "1 × 1", weightCount: 0, headline: { value: context, unit: "per mixed number" }, input: "1 share, 1 value", output: "the running sum", inputDetail: "1 share and 1 value number", sources },
               tiny: { part: "mix", level: "multiply-add" },
               lesson: "Lessons 00, 12",
               reverseLesson: "RL-06",

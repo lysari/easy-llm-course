@@ -327,6 +327,24 @@
   color: var(--ink-faint);
 }
 
+.part-numbers-basis {
+  display: block;
+  color: var(--ink-faint);
+  font-size: var(--text-caption);
+}
+
+.source-list {
+  display: grid;
+  gap: var(--space-edge);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.source-list a {
+  color: var(--link);
+}
+
 .part-card-foot {
   display: flex;
   align-items: center;

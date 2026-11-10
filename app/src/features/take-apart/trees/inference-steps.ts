@@ -1,5 +1,13 @@
-import type { ModelPart, RealNote } from "@/features/take-apart/interfaces/model-part.interface";
+import type { ModelPart } from "@/features/take-apart/interfaces/model-part.interface";
+import type { Headline, RealNote } from "@/features/take-apart/interfaces/real-facts.interface";
 import { count } from "@/shared/utils/format";
+import type { SourceId } from "./sources";
+
+interface StopWord {
+  id: number;
+  isComputed: boolean;
+  notes: RealNote[];
+}
 
 interface InferenceSpec {
   modelTitle: string;
@@ -8,7 +16,12 @@ interface InferenceSpec {
   width: number;
   context: number;
   kvWidth: number;
+  sources: SourceId[];
+  textSources: SourceId[];
   tokenizerNotes: RealNote[];
+  merges: Headline;
+  mergeNotes: RealNote[];
+  stopWord: StopWord;
   embeddingLesson: string;
   embeddingText: string;
   embedding: ModelPart[];
@@ -22,6 +35,8 @@ const NO_CACHE = "Our tiny model keeps no cache. It runs the whole sentence agai
 
 const numbersIn = (parts: ModelPart[]) => parts.reduce((sum, part) => sum + part.facts.weightCount * part.copies, 0);
 
+const sourcesOf = (notes: RealNote[]) => [...new Set(notes.map((note) => note.source))];
+
 function tokenizeStep(spec: InferenceSpec): ModelPart {
   return {
     id: "tokenize",
@@ -29,7 +44,7 @@ function tokenizeStep(spec: InferenceSpec): ModelPart {
     title: "Tokenization",
     summary: "Splits your text into small pieces and gives each piece an ID.",
     copies: 1,
-    facts: { shape: `${spec.tokenizer} · ${count(spec.wordCount)} words`, weightCount: 0, headline: { value: spec.wordCount, unit: "words" }, input: "text", output: "word IDs", notes: spec.tokenizerNotes },
+    facts: { shape: `${spec.tokenizer} · ${count(spec.wordCount)} words`, weightCount: 0, headline: { value: spec.wordCount, unit: "words" }, input: "text", output: "word IDs", sources: [...new Set([...spec.sources, ...sourcesOf(spec.tokenizerNotes)])], notes: spec.tokenizerNotes },
     tiny: { part: "tokens", level: "whole" },
     lesson: "Lessons 09, 18",
     reverseLesson: "RL-01",
@@ -44,7 +59,7 @@ function tokenizeStep(spec: InferenceSpec): ModelPart {
         title: "Split into pieces",
         summary: "Cuts the text into pieces from the word list, joining letters step by step.",
         copies: 1,
-        facts: { shape: "merge rules, in the order learned", weightCount: 0, headline: { value: spec.wordCount, unit: "words" }, input: "text as bytes", output: "pieces" },
+        facts: { shape: "merge rules, in the order learned", weightCount: 0, headline: spec.merges, input: "text as bytes", output: "pieces", sources: sourcesOf(spec.mergeNotes), notes: spec.mergeNotes },
         tiny: { part: "tokens", level: "whole" },
         lesson: "Lesson 18",
         reverseLesson: "RL-01",
@@ -58,7 +73,7 @@ function tokenizeStep(spec: InferenceSpec): ModelPart {
             title: "One merge rule",
             summary: "Joins two side-by-side pieces into one, when a learned rule names them.",
             copies: 1,
-            facts: { shape: "1 rule", weightCount: 0, headline: { value: 1, unit: "rule" }, input: "two pieces", output: "one joined piece", inputDetail: "two neighbouring pieces", outputDetail: "one joined piece, or no change" },
+            facts: { shape: "1 rule", weightCount: 0, headline: spec.merges, input: "two pieces", output: "one joined piece", inputDetail: "two neighbouring pieces", outputDetail: "one joined piece, or no change", sources: sourcesOf(spec.mergeNotes), notes: spec.mergeNotes },
             tiny: { part: "tokens", level: "number", missing: NO_MERGES },
             lesson: "Lesson 18",
             reverseLesson: "RL-01",
@@ -75,7 +90,7 @@ function tokenizeStep(spec: InferenceSpec): ModelPart {
         title: "Look up one piece",
         summary: "Finds one piece in the word list and writes down its place number.",
         copies: 1,
-        facts: { shape: "1 row of the list", weightCount: 0, headline: { value: spec.wordCount, unit: "words in the list" }, input: "one piece", output: "its ID" },
+        facts: { shape: "1 row of the list", weightCount: 0, headline: { value: spec.wordCount, unit: "words in the list" }, input: "one piece", output: "its ID", sources: spec.sources },
         tiny: { part: "lookup", level: "number" },
         lesson: "Lesson 09",
         reverseLesson: "RL-01",
@@ -96,7 +111,7 @@ function embeddingStep(spec: InferenceSpec): ModelPart {
     title: "Embedding",
     summary: "Swaps each word ID for a list of numbers that stands for that word.",
     copies: 1,
-    facts: { shape: `${count(spec.width)} numbers per word`, weightCount: numbersIn(spec.embedding), headline: { value: spec.width, unit: "numbers per word" }, input: "word IDs", output: "vectors" },
+    facts: { shape: `${count(spec.width)} numbers per word`, weightCount: numbersIn(spec.embedding), headline: { value: spec.width, unit: "numbers per word" }, input: "word IDs", output: "vectors", sources: spec.sources },
     tiny: { part: "embedding", level: "whole" },
     lesson: spec.embeddingLesson,
     reverseLesson: "RL-02",
@@ -115,7 +130,7 @@ function outputStep(spec: InferenceSpec): ModelPart {
     title: "Softmax",
     summary: "Turns the scores into chances that add up to 100%.",
     copies: 1,
-    facts: { shape: `${count(spec.wordCount)} chances`, weightCount: 0, headline: { value: spec.wordCount, unit: "chances" }, input: `${count(spec.wordCount)} scores`, output: "chances adding to 1", outputDetail: "chances that add up to 1" },
+    facts: { shape: `${count(spec.wordCount)} chances`, weightCount: 0, headline: { value: spec.wordCount, unit: "chances" }, input: `${count(spec.wordCount)} scores`, output: "chances adding to 1", outputDetail: "chances that add up to 1", sources: spec.sources },
     tiny: { part: "chances", level: "whole" },
     lesson: "Lesson 11",
     reverseLesson: "RL-04",
@@ -129,7 +144,7 @@ function outputStep(spec: InferenceSpec): ModelPart {
         title: "One word's chance",
         summary: "Turns one word's score into its chance, by comparing it with all the others.",
         copies: spec.wordCount,
-        facts: { shape: "1", weightCount: 0, headline: { value: spec.wordCount, unit: "per new word" }, input: "1 score, the total", output: "1 chance", inputDetail: "one score and the total" },
+        facts: { shape: "1", weightCount: 0, headline: { value: spec.wordCount, unit: "per new word" }, input: "1 score, the total", output: "1 chance", inputDetail: "one score and the total", sources: spec.sources },
         tiny: { part: "chances", level: "number" },
         lesson: "Lesson 11",
         reverseLesson: "RL-04",
@@ -148,7 +163,7 @@ function outputStep(spec: InferenceSpec): ModelPart {
     title: "Output head",
     summary: "Scores every word in the list and turns the scores into chances.",
     copies: 1,
-    facts: { shape: "final norm, output table, softmax", weightCount: numbersIn(parts), headline: { value: spec.wordCount, unit: "chances" }, input: "last word's vector", output: "chances", inputDetail: "the last word's vector" },
+    facts: { shape: "final norm, output table, softmax", weightCount: numbersIn(parts), headline: { value: spec.wordCount, unit: "chances" }, input: "last word's vector", output: "chances", inputDetail: "the last word's vector", sources: spec.sources },
     tiny: { part: "chances", level: "whole" },
     lesson: "Lessons 11, 20",
     reverseLesson: "RL-04",
@@ -166,7 +181,7 @@ function generateStep(spec: InferenceSpec): ModelPart {
     title: "Generate",
     summary: "Picks a word, adds it to the end, and runs again until it stops.",
     copies: 1,
-    facts: { shape: `1 word per round, up to ${count(spec.context)} words`, weightCount: 0, headline: { value: spec.context, unit: "words at most" }, input: "chances", output: "new words", outputDetail: "new words, one at a time" },
+    facts: { shape: `1 word per round, up to ${count(spec.context)} words`, weightCount: 0, headline: { value: spec.context, unit: "words at most" }, input: "chances", output: "new words", outputDetail: "new words, one per round", sources: [...spec.sources, ...spec.textSources] },
     tiny: { part: "write", level: "whole" },
     lesson: "Lessons 21, 23",
     reverseLesson: "RL-04",
@@ -180,7 +195,7 @@ function generateStep(spec: InferenceSpec): ModelPart {
         title: "One writing round",
         summary: "One pass of the loop: pick a word, add it, then check whether to stop.",
         copies: 1,
-        facts: { shape: "pick, add, check", weightCount: 0, headline: { value: 1, unit: "word added" }, input: "all words so far", output: "one more word" },
+        facts: { shape: "pick, add, check", weightCount: 0, headline: { value: 1, unit: "word added" }, input: "all words so far", output: "one more word", sources: spec.textSources },
         tiny: { part: "write", level: "row" },
         lesson: "Lessons 14, 23",
         reverseLesson: "RL-04",
@@ -194,7 +209,7 @@ function generateStep(spec: InferenceSpec): ModelPart {
             title: "Pick one word",
             summary: "Rolls a random number and walks down the chances to choose one word.",
             copies: 1,
-            facts: { shape: "1 random roll", weightCount: 0, headline: { value: spec.wordCount, unit: "words to pick from" }, input: "chances", output: "one word" },
+            facts: { shape: "1 random roll", weightCount: 0, headline: { value: spec.wordCount, unit: "words to pick from" }, input: "chances", output: "one word", sources: spec.sources },
             tiny: { part: "pick", level: "number" },
             lesson: "Lesson 23",
             reverseLesson: "RL-04",
@@ -210,7 +225,7 @@ function generateStep(spec: InferenceSpec): ModelPart {
             title: "Add it to the end",
             summary: "Adds the picked word's ID to the end of the text, ready for the next round.",
             copies: 1,
-            facts: { shape: "1 more ID", weightCount: 0, headline: { value: spec.context, unit: "words at most" }, input: "words and the pick", output: "one word longer", inputDetail: "words so far and the picked word" },
+            facts: { shape: "1 more ID", weightCount: 0, headline: { value: spec.context, unit: "words at most" }, input: "words and the pick", output: "one word longer", inputDetail: "words so far and the picked word", sources: spec.sources },
             tiny: { part: "pick", level: "whole" },
             lesson: "Lesson 14",
             reverseLesson: "RL-04",
@@ -226,7 +241,7 @@ function generateStep(spec: InferenceSpec): ModelPart {
             title: "Stop check",
             summary: "Stops when the stop word is picked or the text is full.",
             copies: 1,
-            facts: { shape: "2 checks", weightCount: 0, headline: { value: 2, unit: "checks" }, input: "pick and length", output: "go on, or stop", inputDetail: "the picked word and the length" },
+            facts: { shape: "stop word, or full length", weightCount: 0, headline: { value: spec.stopWord.id, unit: "is the stop word's ID", isComputed: spec.stopWord.isComputed, isId: true }, input: "pick and length", output: "go on, or stop", inputDetail: "the picked word and the length", sources: [...spec.sources, ...sourcesOf(spec.stopWord.notes)], notes: spec.stopWord.notes },
             tiny: { part: "write", level: "number" },
             lesson: "Lesson 14",
             reverseLesson: "RL-04",
@@ -243,7 +258,7 @@ function generateStep(spec: InferenceSpec): ModelPart {
         title: "KV cache",
         summary: "Saves work done for earlier words, so each new word runs faster.",
         copies: 1,
-        facts: { shape: `2 × ${count(spec.kvWidth)} numbers per word, per layer`, weightCount: 0, headline: { value: 2 * spec.kvWidth, unit: "saved per word, per layer" }, input: "new keys and values", output: "saved for reuse", inputDetail: "each new word's keys and values", outputDetail: "earlier keys and values, ready to reuse" },
+        facts: { shape: `2 × ${count(spec.kvWidth)} numbers per word, per layer`, weightCount: 0, headline: { value: 2 * spec.kvWidth, unit: "saved per word, per layer", isComputed: true }, input: "new keys and values", output: "saved for reuse", inputDetail: "each new word's keys and values", outputDetail: "earlier keys and values, ready to reuse", sources: spec.sources },
         tiny: { part: "write", level: "whole", missing: NO_CACHE },
         lesson: "Lesson 21",
         reverseLesson: "RL-03",
@@ -264,7 +279,7 @@ export function inferenceRoot(spec: InferenceSpec): ModelPart {
     title: "Use a model",
     summary: "How a model turns your text into the next word, in 5 steps.",
     copies: 1,
-    facts: { shape: "5 steps", weightCount: numbersIn(steps), headline: { value: numbersIn(steps), unit: "numbers" }, input: "your text", output: "the next words" },
+    facts: { shape: "5 steps", weightCount: numbersIn(steps), headline: { value: numbersIn(steps), unit: "numbers", isComputed: true }, input: "your text", output: "the next words", sources: spec.sources },
     tiny: { part: "model", level: "whole" },
     lesson: "Lessons 14, 20",
     reverseLesson: "RL-00",

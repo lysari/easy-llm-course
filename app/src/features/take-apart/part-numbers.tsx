@@ -1,9 +1,12 @@
-import type { Amount, ModelPart, TinyView } from "@/features/take-apart/interfaces/model-part.interface";
+import type { ModelPart, TinyView } from "@/features/take-apart/interfaces/model-part.interface";
+import type { Amount, Headline } from "@/features/take-apart/interfaces/real-facts.interface";
 import { count } from "@/shared/utils/format";
 import { readTinyPart } from "./tiny-parts";
 
 const COMPACT = new Intl.NumberFormat("en-US", { notation: "compact", maximumSignificantDigits: 3 });
 const COMPACT_FROM = 100_000;
+
+export const NONE_TO_LEARN = "None to learn";
 
 export const showAmount = (value: number, isExact: boolean) => (!isExact && value >= COMPACT_FROM ? COMPACT.format(value) : count(value));
 
@@ -11,9 +14,19 @@ function AmountText({ amount, isExact }: { amount: Amount; isExact: boolean }) {
   const isPercent = amount.unit.startsWith("%");
   return (
     <>
-      <b>{`${showAmount(amount.value, isExact)}${amount.isOver ? "+" : ""}${isPercent ? "%" : ""}`}</b>
+      <b>{`${showAmount(amount.value, isExact || Boolean(amount.isId))}${amount.isOver ? "+" : ""}${isPercent ? "%" : ""}`}</b>
       {isPercent ? amount.unit.slice(1) : ` ${amount.unit}`}
     </>
+  );
+}
+
+function RealHeadline({ headline, isExact }: { headline: Headline; isExact: boolean }) {
+  if ("text" in headline) return <dd className="is-muted">{headline.text}</dd>;
+  return (
+    <dd>
+      <AmountText amount={headline} isExact={isExact} />
+      {isExact && <span className="part-numbers-basis">{headline.isComputed ? "Worked out from the sources" : "As published"}</span>}
+    </dd>
   );
 }
 
@@ -31,9 +44,7 @@ export function PartNumbers({ modelTitle, part, tiny, isExact }: PartNumbersProp
     <dl className="part-numbers">
       <div>
         <dt>{`Real ${modelTitle}`}</dt>
-        <dd>
-          <AmountText amount={part.facts.headline} isExact={isExact} />
-        </dd>
+        <RealHeadline headline={part.facts.headline} isExact={isExact} />
       </div>
       <div>
         <dt>
@@ -44,7 +55,7 @@ export function PartNumbers({ modelTitle, part, tiny, isExact }: PartNumbersProp
           <dd>
             <AmountText amount={amount} isExact={isExact} />
           </dd>
-        ) : <dd className="is-muted">{headline ? "None to learn" : "Not in the tiny model"}</dd>}
+        ) : <dd className="is-muted">{headline ? NONE_TO_LEARN : "Not in the tiny model"}</dd>}
       </div>
     </dl>
   );
