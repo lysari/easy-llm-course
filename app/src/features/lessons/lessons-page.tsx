@@ -17,7 +17,7 @@ interface LessonsPageProps {
 
 export function LessonsPage({ isOpen, stageId, onSelectStage }: LessonsPageProps) {
   const lessons = useLessons(isOpen, stageId);
-  const { session, partsStageId, isLeaving, openStep, partCards } = lessons;
+  const { session, partsStageId, isLeaving, openStep, partCards, activeCardIds } = lessons;
   const width = useWindowWidth();
   const isNarrow = width <= NARROW_WIDTH;
   const flowRef = useRef<HTMLDivElement>(null);
@@ -42,7 +42,7 @@ export function LessonsPage({ isOpen, stageId, onSelectStage }: LessonsPageProps
       session={session}
       index={steps.indexOf(step)}
       isNested={NESTED_STEPS.includes(step.id)}
-      isActive={step.id === lessons.activeStepId}
+      isActive={activeCardIds.includes(step.id)}
       isOpen={step === openStep}
       onToggle={() => lessons.togglePart(step.id)}
       onCommand={lessons.runCommand}
@@ -77,8 +77,8 @@ export function LessonsPage({ isOpen, stageId, onSelectStage }: LessonsPageProps
             <strong>{`Loss ${(session.lab.latestLoss ?? session.startLoss).toFixed(2)}`}</strong>
           </p>
         </header>
-        <div className="flow" id="flow" ref={flowRef}>
-          <FlowLinks id="links" drawing={links} activeIds={lessons.activeStepId ? [stageId, lessons.activeStepId] : [stageId]} />
+        <div className="flow" id="flow" ref={flowRef} style={lessons.glowStyle}>
+          <FlowLinks id="links" drawing={links} activeIds={lessons.activeLinkIds} />
           <div className="column" id="stages">
             {STAGES.map((stage) => (
               <Fragment key={stage.id}>
@@ -90,6 +90,7 @@ export function LessonsPage({ isOpen, stageId, onSelectStage }: LessonsPageProps
                   stage={stage}
                   session={session}
                   isSelected={stage.id === stageId}
+                  isActive={activeCardIds.includes(stage.id)}
                   onSelect={() => onSelectStage(stage.id)}
                   onCommand={lessons.runCommand}
                 />

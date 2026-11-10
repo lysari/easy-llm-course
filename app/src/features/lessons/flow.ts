@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { END_TOKEN, TRAINING_SEQUENCES, VOCABULARY } from "@/core/model/corpus";
 import { TARGET_ROUNDS } from "@/core/model/lab";
 import { countWeights } from "@/core/model/tiny-gpt";
@@ -17,6 +18,18 @@ export const stepsOf = (stage: StageId) => STEPS.filter((step) => step.stage ===
 export const NESTED_STEPS = ["repeat-layer", "train-loop"];
 
 export const TRAINING_PATH = ["embedding", "position", "layernorm", "attention", "ffn", "repeat-layer", "logits", "softmax", "loss", "backprop", "adam", "train-loop"];
+
+export const STEP_ORDER_MS = 450;
+
+export const RUN_GLOW_STYLE = { "--links-glow-duration": `${STEP_ORDER_MS}ms` } as CSSProperties;
+
+export function activeIdsOf(stageId: StageId, openStepId: string | undefined, runningStepId: string | null) {
+  const focusId = openStepId ?? stageId;
+  return {
+    activeCardIds: runningStepId ? [focusId, runningStepId] : [focusId],
+    activeLinkIds: runningStepId ? [stageId, runningStepId] : [focusId],
+  };
+}
 
 const questionTotal = TRAINING_SEQUENCES.reduce((sum, sequence) => sum + sequence.length - 1, 0);
 

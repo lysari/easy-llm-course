@@ -39,7 +39,7 @@
   stroke-opacity: var(--opacity-glow);
   stroke-dasharray: var(--dash-glow) 2px;
   stroke-dashoffset: var(--dash-glow);
-  animation: flow var(--motion-flow) infinite;
+  animation: flow var(--links-glow-duration, var(--motion-flow-duration)) var(--motion-flow-ease) infinite;
 }
 
 .link-dot {

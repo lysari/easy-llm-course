@@ -6,7 +6,7 @@ import { END_TOKEN, START_CHOICES, TEST_ANSWER } from "@/core/model/corpus";
 import { TARGET_ROUNDS } from "@/core/model/lab";
 import { LINE_TOTAL_ROUNDS, SALARIES, YEARS, lineLoss, predictOnLine } from "@/core/model/line-model";
 import { LESSON_ROUNDS, NETWORK_TOTAL_ROUNDS, SmallNetwork } from "@/core/model/small-network";
-import { STAGES, STEPS, TRAINING_PATH, stepsOf } from "@/features/lessons/flow";
+import { RUN_GLOW_STYLE, STAGES, STEPS, STEP_ORDER_MS, TRAINING_PATH, activeIdsOf, stepsOf } from "@/features/lessons/flow";
 import { rollUp } from "@/features/lessons/roll-up";
 import { Session } from "@/features/lessons/session";
 
@@ -109,6 +109,22 @@ describe("the flow", () => {
     expect(rollUp(["done", "lesson"])).toBe("done");
     expect(rollUp(["lesson", "lesson"])).toBe("lesson");
     expect(rollUp(["done", "queued"])).toBe("queued");
+  });
+});
+
+describe("the active card", () => {
+  test("the selected stage is active until a part's drawer opens, then that part is", () => {
+    expect(activeIdsOf("forward", undefined, null)).toEqual({ activeCardIds: ["forward"], activeLinkIds: ["forward"] });
+    expect(activeIdsOf("forward", "attention", null)).toEqual({ activeCardIds: ["attention"], activeLinkIds: ["attention"] });
+  });
+
+  test("during a training run the lines follow the running part, and the open part keeps its band", () => {
+    expect(activeIdsOf("forward", undefined, "ffn")).toEqual({ activeCardIds: ["forward", "ffn"], activeLinkIds: ["forward", "ffn"] });
+    expect(activeIdsOf("forward", "attention", "ffn")).toEqual({ activeCardIds: ["attention", "ffn"], activeLinkIds: ["forward", "ffn"] });
+  });
+
+  test("the glow passes once per training step during a run", () => {
+    expect(Object.entries(RUN_GLOW_STYLE)).toEqual([["--links-glow-duration", `${STEP_ORDER_MS}ms`]]);
   });
 });
 

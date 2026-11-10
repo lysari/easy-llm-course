@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import type { StageId } from "@/features/lessons/interfaces/story.interface";
-import { TRAINING_PATH, stepsOf } from "@/features/lessons/flow";
+import { RUN_GLOW_STYLE, STEP_ORDER_MS, TRAINING_PATH, activeIdsOf, stepsOf } from "@/features/lessons/flow";
 import { useDrawer } from "@/shared/hooks/use-drawer";
 import { useSession } from "./use-session";
 
 const LEAVE_MS = 150;
-const STEP_ORDER_MS = 450;
 
 const prefersReducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -30,14 +29,15 @@ export function useLessons(isOpen: boolean, stageId: StageId) {
   }, [isOpen, stageId, closeDrawer]);
 
   const openStep = drawer.openId && !isLeaving ? stepsOf(partsStageId).find((step) => step.id === drawer.openId) : undefined;
-  const activeStepId = session.isRunning("train") ? TRAINING_PATH[Math.floor(performance.now() / STEP_ORDER_MS) % TRAINING_PATH.length] : null;
+  const runningStepId = session.isRunning("train") ? TRAINING_PATH[Math.floor(performance.now() / STEP_ORDER_MS) % TRAINING_PATH.length] : null;
 
   return {
     session,
     partsStageId,
     isLeaving,
     openStep,
-    activeStepId,
+    ...activeIdsOf(stageId, openStep?.id, runningStepId),
+    glowStyle: runningStepId ? RUN_GLOW_STYLE : undefined,
     partCards,
     drawerRef: drawer.drawerRef,
     runCommand,

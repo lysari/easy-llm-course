@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { MAX_CONTEXT } from "@/core/model/corpus";
 import { ModelLab } from "@/core/model/lab";
 import type { ModeId, ModelPart } from "@/features/inside-real-models/interfaces/model-part.interface";
-import { MODELS, matchingPath, openPath, pathUrl, readPath } from "@/features/inside-real-models/models";
+import { MODELS, activeIdOf, matchingPath, openPath, pathUrl, readPath } from "@/features/inside-real-models/models";
 import { PartCard } from "@/features/inside-real-models/part-card";
 import { PartDrawer } from "@/features/inside-real-models/part-drawer";
 import { RUNS_LABEL, keyFactOf, placeOf, runsOf, shareOf, showAmount } from "@/features/inside-real-models/real-place";
@@ -251,6 +251,15 @@ describe("paths", () => {
     expect(pathUrl(llama.id, matchingPath(llama.modes.build, gelu))).toBe("/inside-real-models/llama-3-8b/build/architecture/model/layers/layer/feed-forward");
     const position = readPath(gpt2, ["use", "embedding", "position-table"]);
     expect(pathUrl(llama.id, matchingPath(llama.modes.use, position))).toBe("/inside-real-models/llama-3-8b/use/embedding");
+  });
+
+  test("the open card is active, else the deepest selected card", () => {
+    const data = readPath(gpt2, ["build", "data"]);
+    const copyIn = data[data.length - 1].children?.find((part) => part.id === "gather");
+    expect(copyIn).toBeDefined();
+    expect(activeIdOf(data, copyIn)).toBe("gather");
+    expect(activeIdOf(data, data[1])).toBe("data");
+    expect(activeIdOf(data, undefined)).toBe("data");
   });
 
   test("openPath still walks the model tree", () => {

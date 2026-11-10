@@ -11,6 +11,7 @@ interface StageCardProps {
   stage: FlowStage;
   session: Session;
   isSelected: boolean;
+  isActive: boolean;
   onSelect: () => void;
   onCommand: (command: string) => void;
 }
@@ -27,12 +28,12 @@ interface PartCardProps {
   onCommand: (command: string) => void;
 }
 
-export function StageCard({ ref, stage, session, isSelected, onSelect, onCommand }: StageCardProps) {
+export function StageCard({ ref, stage, session, isSelected, isActive, onSelect, onCommand }: StageCardProps) {
   const action = stage.action?.(session);
   return (
     <FlowCard
       ref={ref}
-      className={isSelected ? "is-active" : "is-dim"}
+      className={isActive ? "is-active" : isSelected ? "is-selected" : "is-dim"}
       id={`stage-${stage.id}`}
       aria-current={isSelected}
       onClick={onSelect}
@@ -52,7 +53,7 @@ export function PartCard({ ref, step, session, index, isNested, isActive, isOpen
   return (
     <FlowCard
       ref={ref}
-      className={`is-entering${isNested ? " is-nested" : ""}${isActive ? " is-active" : ""}${isOpen ? " is-open" : ""}`}
+      className={`is-entering${isNested ? " is-nested" : ""}${isActive ? " is-active" : ""}`}
       id={`part-${step.id}`}
       aria-expanded={isOpen}
       aria-controls={isOpen ? DRAWER_ID : undefined}

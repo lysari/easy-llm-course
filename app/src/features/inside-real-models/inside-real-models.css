@@ -199,11 +199,6 @@
   transition: background var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast);
 }
 
-.part-card.is-selected {
-  border-color: var(--rule-line);
-  box-shadow: var(--shadow-card-active);
-}
-
 .part-card.is-active .step-badge,
 .part-card.is-active .part-card-head .tile {
   border-color: var(--band-line);

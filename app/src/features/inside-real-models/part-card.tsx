@@ -50,7 +50,7 @@ export function PartCard({ ref, root, modelTitle, part, place, index, isSelected
   return (
     <article
       ref={ref}
-      className={`card part-card is-entering${isActive ? " is-active" : isSelected ? " is-selected" : ""}${isOpen ? " is-open" : ""}`}
+      className={`card part-card is-entering${isActive ? " is-active" : isSelected ? " is-selected" : ""}`}
       id={`inside-real-models-${part.id}`}
       tabIndex={0}
       aria-label={titleOf(part, root)}
