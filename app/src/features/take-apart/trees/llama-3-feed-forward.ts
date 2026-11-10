@@ -5,7 +5,6 @@ import { LLAMA_3_SETTINGS } from "./sources";
 
 const WIDTH = 4096;
 const EXPANDED = 14_336;
-const NO_SWIGLU = "Our tiny model has no gate. It bends its expanded numbers with ReLU, which sets negatives to 0.";
 
 const swiglu: ModelPart = {
   id: "swiglu",
@@ -14,7 +13,7 @@ const swiglu: ModelPart = {
   summary: "Lets each gate number decide how much of its up number gets through.",
   copies: 1,
   facts: { shape: "14,336 numbers", weightCount: 0, headline: { value: EXPANDED, unit: "numbers per word", isComputed: true }, input: "gate and up numbers", output: "14,336 numbers", inputDetail: "14,336 gate numbers and 14,336 up numbers", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_FEED_FORWARD, LLAMA_3_NO_REASON] },
-  tiny: { part: "relu", level: "whole", missing: NO_SWIGLU },
+  tiny: { part: "relu", level: "whole" },
   lesson: "Lessons 15, 30",
   reverseLesson: "RL-05",
   explanation: "Bends each gate number with SiLU, then multiplies it by the matching up number. The gate decides how much of each up number gets through. It stores no numbers.",
@@ -36,7 +35,7 @@ const swiglu: ModelPart = {
       summary: "Makes one number from one gate number and one up number.",
       copies: EXPANDED,
       facts: { shape: "1", weightCount: 0, headline: { value: EXPANDED, unit: "per word", isComputed: true }, input: "1 gate, 1 up", output: "1 number", inputDetail: "1 gate number and 1 up number", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_FEED_FORWARD] },
-      tiny: { part: "relu", level: "number", missing: NO_SWIGLU },
+      tiny: { part: "relu", level: "number" },
       lesson: "Lesson 15",
       reverseLesson: "RL-05",
       explanation: "One of the 14,336 mixed numbers: two multiplies, one for SiLU and one for the gate.",
@@ -58,7 +57,7 @@ const swiglu: ModelPart = {
           summary: "Multiplies the gate number by a squashed copy of itself, between 0 and 1.",
           copies: 1,
           facts: { shape: "1 × 1", weightCount: 0, headline: { value: 1, unit: "multiply", isComputed: true }, input: "1 gate, its sigmoid", output: "1 number", inputDetail: "1 gate number and its sigmoid", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_FEED_FORWARD] },
-          tiny: { part: "relu", level: "number", missing: NO_SWIGLU },
+          tiny: { part: "relu", level: "number" },
           lesson: "Lesson 05",
           reverseLesson: "RL-06",
           explanation: "Ground zero. The gate number times its own sigmoid, a number from 0 to 1. One multiply on two numbers.",
@@ -81,7 +80,7 @@ const swiglu: ModelPart = {
           summary: "Multiplies the gate number by its up number, so a gate near 0 shuts it out.",
           copies: 1,
           facts: { shape: "1 × 1", weightCount: 0, headline: { value: 1, unit: "multiply", isComputed: true }, input: "1 SiLU, 1 up", output: "1 number", inputDetail: "1 SiLU number and 1 up number", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_FEED_FORWARD] },
-          tiny: { part: "relu", level: "number", missing: NO_SWIGLU },
+          tiny: { part: "relu", level: "number" },
           lesson: "Lesson 15",
           reverseLesson: "RL-06",
           explanation: "Ground zero. The SiLU number times the matching up number. One multiply on two numbers.",
@@ -168,7 +167,7 @@ export const llama3FeedForward: ModelPart = {
       sources: LLAMA_3_SETTINGS,
       lesson: "Lesson 15",
       reverseLesson: "RL-05",
-      explanation: "Spreads a word's 4,096 numbers out to 14,336, so there is room to pick out many patterns at once. Our tiny model's expand table does the same job.",
+      explanation: "Spreads a word's 4,096 numbers out to 14,336, so there is room to pick out many patterns at once.",
       why: "Each of the 14,336 numbers is one pattern detector: a dot product that is large when the word's numbers match it.",
       story: {
         problem: "A word's 4,096 numbers leave little room to check many patterns at once. Spreading out to 14,336 gives room for many pattern detectors side by side.",

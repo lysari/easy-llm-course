@@ -7,7 +7,7 @@ import { count, showWord } from "@/shared/utils/format";
 import { type ChatMessage, LLAMA_3_BASE_WORDS, chatPieces } from "./post-training-math";
 
 function BaseModelView({ tiny }: Pick<DemoProps, "tiny">) {
-  const written = tiny.written.map((each) => showWord(each.word));
+  const written = tiny.written.map(showWord);
   return (
     <div className="watch">
       <HonestNote>

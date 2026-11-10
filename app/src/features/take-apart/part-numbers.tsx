@@ -1,31 +1,18 @@
-import type { ModelPart, TinyView } from "@/features/take-apart/interfaces/model-part.interface";
-import type { Amount, Headline } from "@/features/take-apart/interfaces/real-facts.interface";
-import { count } from "@/shared/utils/format";
-import { readTinyPart } from "./tiny-parts";
+import type { ModelPart } from "@/features/take-apart/interfaces/model-part.interface";
+import type { PartPlace } from "@/features/take-apart/interfaces/part-place.interface";
+import type { Headline } from "@/features/take-apart/interfaces/real-facts.interface";
+import { keyFactOf, showAmount } from "./real-place";
 
-const COMPACT = new Intl.NumberFormat("en-US", { notation: "compact", maximumSignificantDigits: 3 });
-const COMPACT_FROM = 100_000;
-
-export const NONE_TO_LEARN = "None to learn";
-
-export const showAmount = (value: number, isExact: boolean) => (!isExact && value >= COMPACT_FROM ? COMPACT.format(value) : count(value));
-
-function AmountText({ amount, isExact }: { amount: Amount; isExact: boolean }) {
-  const isPercent = amount.unit.startsWith("%");
-  return (
-    <>
-      <b>{`${showAmount(amount.value, isExact || Boolean(amount.isId))}${amount.isOver ? "+" : ""}${isPercent ? "%" : ""}`}</b>
-      {isPercent ? amount.unit.slice(1) : ` ${amount.unit}`}
-    </>
-  );
-}
+const COMPUTED = "Worked out from the sources";
 
 function RealHeadline({ headline, isExact }: { headline: Headline; isExact: boolean }) {
   if ("text" in headline) return <dd className="is-muted">{headline.text}</dd>;
+  const isPercent = headline.unit.startsWith("%");
   return (
     <dd>
-      <AmountText amount={headline} isExact={isExact} />
-      {isExact && <span className="part-numbers-basis">{headline.isComputed ? "Worked out from the sources" : "As published"}</span>}
+      <b>{`${showAmount(headline.value, isExact || Boolean(headline.isId))}${headline.isOver ? "+" : ""}${isPercent ? "%" : ""}`}</b>
+      {isPercent ? headline.unit.slice(1) : ` ${headline.unit}`}
+      {isExact && <span className="part-numbers-basis">{headline.isComputed ? COMPUTED : "As published"}</span>}
     </dd>
   );
 }
@@ -33,29 +20,24 @@ function RealHeadline({ headline, isExact }: { headline: Headline; isExact: bool
 interface PartNumbersProps {
   modelTitle: string;
   part: ModelPart;
-  tiny: TinyView;
+  place: PartPlace;
   isExact: boolean;
 }
 
-export function PartNumbers({ modelTitle, part, tiny, isExact }: PartNumbersProps) {
-  const headline = part.tiny.missing ? null : readTinyPart(part.tiny, tiny).headline;
-  const amount = headline && !("reason" in headline) ? headline : null;
+export function PartNumbers({ modelTitle, part, place, isExact }: PartNumbersProps) {
+  const key = keyFactOf(part, place, isExact);
   return (
     <dl className="part-numbers">
       <div>
         <dt>{`Real ${modelTitle}`}</dt>
         <RealHeadline headline={part.facts.headline} isExact={isExact} />
       </div>
-      <div>
-        <dt>
-          Tiny model
-          {amount && !tiny.lab.isTrained && <span className="live-tag">live</span>}
-        </dt>
-        {amount ? (
-          <dd>
-            <AmountText amount={amount} isExact={isExact} />
-          </dd>
-        ) : <dd className="is-muted">{headline ? NONE_TO_LEARN : "Not in the tiny model"}</dd>}
+      <div className="part-numbers-key">
+        <dt>{key.label}</dt>
+        <dd>
+          {key.value}
+          {isExact && key.isComputed && <span className="part-numbers-basis">{COMPUTED}</span>}
+        </dd>
       </div>
     </dl>
   );

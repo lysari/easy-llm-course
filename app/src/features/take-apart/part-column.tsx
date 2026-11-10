@@ -1,25 +1,25 @@
 import { type RefObject, useMemo, useRef } from "react";
-import type { ModelPart, TinyView } from "@/features/take-apart/interfaces/model-part.interface";
+import type { ModelPart, RealModel } from "@/features/take-apart/interfaces/model-part.interface";
 import { FlowLinks } from "@/shared/components/flow-links";
 import { useFlowLinks } from "@/shared/hooks/use-flow-links";
 import { PartCard, titleOf } from "./part-card";
+import { placeOf } from "./real-place";
 
 interface PartColumnProps {
+  model: RealModel;
   root: ModelPart;
-  modelTitle: string;
   parent: ModelPart;
   parts: ModelPart[];
   selectedId: string | undefined;
   openId: string | null;
   cards: RefObject<Map<string, HTMLElement>>;
-  tiny: TinyView;
   hasLinks: boolean;
   width: number;
   onSelect: (part: ModelPart) => void;
   onDetails: (id: string) => void;
 }
 
-export function PartColumn({ root, modelTitle, parent, parts, selectedId, openId, cards, tiny, hasLinks, width, onSelect, onDetails }: PartColumnProps) {
+export function PartColumn({ model, root, parent, parts, selectedId, openId, cards, hasLinks, width, onSelect, onDetails }: PartColumnProps) {
   const columnRef = useRef<HTMLElement>(null);
   const partIds = useMemo(() => parts.map((part) => part.id), [parts]);
   const isSteps = parent === root;
@@ -41,9 +41,9 @@ export function PartColumn({ root, modelTitle, parent, parts, selectedId, openId
             else cards.current.delete(part.id);
           }}
           root={root}
-          modelTitle={modelTitle}
+          modelTitle={model.title}
           part={part}
-          tiny={tiny}
+          place={placeOf(model, root, part)}
           index={i}
           isSelected={part.id === selectedId}
           isOpen={part.id === openId}

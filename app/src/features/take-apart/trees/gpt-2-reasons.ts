@@ -1,3 +1,4 @@
+import type { WritingNotes } from "@/features/take-apart/interfaces/inference-spec.interface";
 import type { RealNote, UseReasons } from "@/features/take-apart/interfaces/real-facts.interface";
 
 export const GPT_2_TRANSFORMER: RealNote = { label: "Built on", value: "\"We use a Transformer (Vaswani et al., 2017) based architecture for our LMs\"", source: "gpt-2-paper" };
@@ -87,4 +88,13 @@ export const GPT_2_USE_REASONS: UseReasons = {
     { label: "In GPT-2's code", value: "\"present = tf.stack([k, v], axis=1)\" saves each layer's keys and values, and \"k = tf.concat([pk, k], axis=-2)\" puts the saved ones first", source: "gpt-2-code" },
     { label: "Its size", value: "\"[batch_size, hparams.n_layer, 2, hparams.n_head, sequence, hparams.n_embd // hparams.n_head]\": 12 layers × 2 × 12 heads × 64 numbers per word", source: "gpt-2-code" },
   ],
+};
+
+export const GPT_2_WRITING_NOTES: WritingNotes = {
+  softmax: { label: "Default temperature", value: "1, so the scores are used as they are", source: "gpt-2-interactive" },
+  chance: { label: "Whose scores", value: "only the last word's; the other words' scores are not used", source: "gpt-2-sample" },
+  generate: { label: "OpenAI's examples", value: "top-k 40, so each pick comes from the 40 likeliest words", source: "gpt-2-paper" },
+  "write-round": { label: "Words run each round", value: "only the newest one, with the saved keys and values", source: "gpt-2-sample" },
+  pick: { label: "Default settings", value: "temperature 1, top-k 0 (off) and top-p 1 (off)", source: "gpt-2-interactive" },
+  append: { label: "Its place", value: "the next place number, after the words already read", source: "gpt-2-code" },
 };

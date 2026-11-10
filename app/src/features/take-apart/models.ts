@@ -19,7 +19,7 @@ export function openPath(root: ModelPart, ids: string[]): ModelPart[] {
   return path;
 }
 
-function pathTo(part: ModelPart, id: string): ModelPart[] | null {
+export function pathTo(part: ModelPart, id: string): ModelPart[] | null {
   if (part.id === id) return [part];
   for (const child of part.children ?? []) {
     const found = pathTo(child, id);

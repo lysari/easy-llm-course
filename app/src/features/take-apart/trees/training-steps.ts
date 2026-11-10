@@ -1,10 +1,6 @@
-import { TRAINING_SEQUENCES } from "@/core/model/corpus";
-import { TARGET_ROUNDS } from "@/core/model/lab";
 import type { ModelPart } from "@/features/take-apart/interfaces/model-part.interface";
 import type { BuildFacts } from "@/features/take-apart/interfaces/real-facts.interface";
 import { stepFacts } from "./part-builders";
-
-const NO_POST_TRAINING = "Our tiny model is only pre-trained. It never sees example answers or preferences, so this stage is in the lessons only.";
 
 export function preTrainingStep(facts: BuildFacts): ModelPart {
   return {
@@ -14,7 +10,6 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
     summary: "Trains the model to guess the next word, over and over, on all the text.",
     copies: 1,
     facts: stepFacts(facts["pre-training"], "a random model", "a base model", { inputDetail: "word IDs and random numbers" }),
-    tiny: { part: "training", level: "whole" },
     lesson: "Lessons 02, 03, 17, 22",
     reverseLesson: "RL-05",
     explanation: "The model reads huge amounts of text and keeps guessing the next word. After each guess it is scored, and every stored number is nudged so the right word gets a higher chance next time.",
@@ -35,11 +30,10 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
         summary: "Guess, score the guess, find what caused the error, and nudge every number.",
         copies: 1,
         facts: stepFacts(facts["training-round"], "a batch of text", "every number nudged", { outputDetail: "every number nudged a little" }),
-        tiny: { part: "training", level: "row" },
         lesson: "Lessons 03, 14",
         reverseLesson: "RL-05",
-        explanation: "One round: run the model on a batch of text, score its guesses with the loss, work out each number's slope, and let Adam nudge each number.",
-        why: `Our tiny model runs ${TARGET_ROUNDS} of these rounds, each on all ${TRAINING_SEQUENCES.length} of its sentences.`,
+        explanation: "One round: run the model on a batch of text, score its guesses with the loss, work out each number's slope, and nudge each number a small step against it.",
+        why: "Each round fixes only a little, so training runs the same round over and over.",
         story: {
           problem: "Numbers can't be set in one go, because each one affects all the others. A round makes one small fix to every number, and many rounds add up.",
           demo: "training",
@@ -56,7 +50,6 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
             summary: "Reads the chance the model gives the word that really comes next.",
             copies: 1,
             facts: stepFacts(facts.guess, "words before", "right word's chance", { inputDetail: "the words before", outputDetail: "the chance of the right next word" }),
-            tiny: { part: "loss", level: "row" },
             lesson: "Lesson 14",
             reverseLesson: "RL-04",
             explanation: "Ground zero. Run the model on the words before, and read the chance it gives the word that really comes next. Use a model shows every step inside.",
@@ -78,7 +71,6 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
             summary: "Turns that chance into one number saying how wrong the guess was.",
             copies: 1,
             facts: stepFacts(facts["loss-term"], "right word's chance", "how wrong it was", { inputDetail: "the chance of the right word", outputDetail: "how wrong the guess was" }),
-            tiny: { part: "loss", level: "number" },
             lesson: "Lessons 02, 11",
             reverseLesson: "RL-04",
             explanation: "Ground zero. One loss term for one word: minus the log of the chance the model gave the right word. A chance of 100% gives 0. A chance of 1% gives 4.6.",
@@ -101,7 +93,6 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
             summary: "Works out which way to move one number to make the guess less wrong.",
             copies: 1,
             facts: stepFacts(facts.slope, "slope from above", "this number's slope", { inputDetail: "the slope from the part above" }),
-            tiny: { part: "slope", level: "number" },
             lesson: "Lessons 07, 16",
             reverseLesson: "RL-05",
             explanation: "Ground zero. One step of the chain rule: the slope from the part above times one local number, added to this number's slope. It says which way to move the number to lower the loss.",
@@ -124,10 +115,9 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
             summary: "Moves one stored number a small step the right way.",
             copies: 1,
             facts: stepFacts(facts["adam-update"], "number and slope", "nudged number", { inputDetail: "one number and its slope", outputDetail: "the number, nudged" }),
-            tiny: { part: "adam", level: "number" },
             lesson: "Lesson 17",
             reverseLesson: "RL-05",
-            explanation: "Ground zero. Move one stored number a small step against its slope. Our tiny model does it with Adam: it keeps a running average of the slope and of the slope squared, then steps.",
+            explanation: "Ground zero. Move one stored number a small step against its slope. Adam, a common way to do it, keeps a running average of the slope and of the slope squared, then steps.",
             why: "This is all \"learning\" is: one number moved a tiny bit, round after round.",
             story: {
               problem: "Knowing the direction is not enough: steps that are too big overshoot, too small learn nothing. The update decides how far to move each number.",
@@ -153,7 +143,6 @@ export function postTrainingStep(facts: BuildFacts): ModelPart {
     summary: "Teaches a model that only continues text to answer questions instead.",
     copies: 1,
     facts: stepFacts(facts["post-training"], "a base model", "a chat model"),
-    tiny: { part: "training", level: "whole", missing: NO_POST_TRAINING },
     lesson: "Lessons 26–28",
     reverseLesson: "RL-00",
     explanation: "A base model only continues text. Post-training teaches it to answer: first from example answers (SFT), then from people's choices between two answers (preference tuning, such as RLHF with PPO, or DPO).",
@@ -174,7 +163,6 @@ export function postTrainingStep(facts: BuildFacts): ModelPart {
         summary: "Trains on questions paired with good answers written by people.",
         copies: 1,
         facts: stepFacts(facts.sft, "example answers", "answers like them", { inputDetail: "a base model and example answers", outputDetail: "a model that answers in that style" }),
-        tiny: { part: "training", level: "row", missing: NO_POST_TRAINING },
         lesson: "Lesson 26",
         reverseLesson: "RL-04",
         explanation: "The same training as before, on a much smaller set of prompts paired with good answers written by people.",
@@ -195,7 +183,6 @@ export function postTrainingStep(facts: BuildFacts): ModelPart {
             summary: "Scores one word of a written answer, the same way as in pre-training.",
             copies: 1,
             facts: stepFacts(facts["sft-term"], "1 answer word", "how wrong it was", { inputDetail: "the chance of one answer word" }),
-            tiny: { part: "loss", level: "number", missing: NO_POST_TRAINING },
             lesson: "Lesson 26",
             reverseLesson: "RL-04",
             explanation: "Ground zero. The same loss term as pre-training, minus the log of the chance, but counted only for one word of a written answer.",
@@ -219,7 +206,6 @@ export function postTrainingStep(facts: BuildFacts): ModelPart {
         summary: "Nudges the model toward the answers people picked as better.",
         copies: 1,
         facts: stepFacts(facts.preference, "ranked answers", "leans to better ones", { inputDetail: "answers people compared", outputDetail: "a model that leans toward preferred answers" }),
-        tiny: { part: "training", level: "row", missing: NO_POST_TRAINING },
         lesson: "Lessons 27, 28",
         reverseLesson: "RL-04",
         explanation: "People pick the better of two answers. RLHF trains a reward model on those picks and pushes the model toward high reward with PPO. DPO skips the reward model and learns from the pairs directly.",
@@ -240,7 +226,6 @@ export function postTrainingStep(facts: BuildFacts): ModelPart {
             summary: "Makes the better of two answers more likely than the worse one.",
             copies: 1,
             facts: stepFacts(facts["preference-pair"], "better, worse answer", "one gap to grow", { inputDetail: "one prompt, a better and a worse answer" }),
-            tiny: { part: "loss", level: "number", missing: NO_POST_TRAINING },
             lesson: "Lesson 28",
             reverseLesson: "RL-04",
             explanation: "Ground zero. Compare the chance the model gives the better answer with the chance it gives the worse one, and nudge the numbers so the gap grows.",

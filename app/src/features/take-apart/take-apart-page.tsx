@@ -6,6 +6,7 @@ import { Breadcrumb } from "./breadcrumb";
 import { useTakeApart } from "./hooks/use-take-apart";
 import { PartColumn } from "./part-column";
 import { PartDrawer } from "./part-drawer";
+import { placeOf } from "./real-place";
 import { START_TEXTS, readSentence } from "./sentence";
 import { SentenceBar } from "./sentence-bar";
 import { TakeApartHeader } from "./take-apart-header";
@@ -36,14 +37,13 @@ export function TakeApartPage({ isOpen }: { isOpen: boolean }) {
           {columns.map(({ parent, parts }, level) => (
             <PartColumn
               key={`${model.id}-${root.id}-${parent.id}`}
+              model={model}
               root={root}
-              modelTitle={model.title}
               parent={parent}
               parts={parts}
               selectedId={path[level + 1]?.id}
               openId={openId}
               cards={takeApart.cards}
-              tiny={tiny}
               hasLinks={isOpen && !isNarrow}
               width={width}
               onSelect={(part) => takeApart.select(part, level)}
@@ -52,7 +52,7 @@ export function TakeApartPage({ isOpen }: { isOpen: boolean }) {
           ))}
         </div>
       </div>
-      {openPart && <PartDrawer ref={takeApart.drawerRef} root={root} modelId={model.id} modelTitle={model.title} part={openPart} tiny={tiny} sentence={sentence} nextPart={nextPart} onOpen={takeApart.showDetails} onClose={takeApart.closeDrawer} />}
+      {openPart && <PartDrawer ref={takeApart.drawerRef} root={root} modelId={model.id} modelTitle={model.title} part={openPart} place={placeOf(model, root, openPart)} tiny={tiny} nextPart={nextPart} onOpen={takeApart.showDetails} onClose={takeApart.closeDrawer} />}
     </main>
   );
 }

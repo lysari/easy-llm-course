@@ -3,7 +3,7 @@ import { inferenceRoot } from "./inference-steps";
 import { lifecycleRoot } from "./lifecycle-steps";
 import { LLAMA_3_BUILD } from "./llama-3-build-facts";
 import { llama3Layers } from "./llama-3-layer";
-import { LLAMA_3_AUTOREGRESSIVE, LLAMA_3_FINAL_NORM, LLAMA_3_NO_REASON, LLAMA_3_OUTPUT, LLAMA_3_RMS_NORM, LLAMA_3_ROPE, LLAMA_3_TRANSFORMER, LLAMA_3_USE_REASONS, LLAMA_3_WORD_TABLE } from "./llama-3-reasons";
+import { LLAMA_3_AUTOREGRESSIVE, LLAMA_3_FINAL_NORM, LLAMA_3_NO_REASON, LLAMA_3_OUTPUT, LLAMA_3_RMS_NORM, LLAMA_3_ROPE, LLAMA_3_TRANSFORMER, LLAMA_3_USE_REASONS, LLAMA_3_WORD_TABLE, LLAMA_3_WRITING_NOTES } from "./llama-3-reasons";
 import { normPart, projectionPart, tablePart } from "./part-builders";
 import { LLAMA_3_SETTINGS } from "./sources";
 
@@ -48,7 +48,6 @@ const finalNorm = normPart({
   hasShift: false,
   tinyPart: "final-norm",
   sources: LLAMA_3_SETTINGS,
-  missing: "Our tiny model uses a plain LayerNorm with no stored numbers here.",
   lesson: "Lesson 20",
   reverseLesson: "RL-04",
   explanation: "One last RMSNorm on the last word's 4,096 numbers, with its own 4,096 scale numbers, before they are scored.",
@@ -109,13 +108,12 @@ const root: ModelPart = {
     outputDetail: "128,256 scores, one per word it knows",
     sources: [...LLAMA_3_SETTINGS, "llama-3-weights", "llama-3-card"],
     notes: [
+      { label: "Released", value: "April 18, 2024", source: "llama-3-card" },
       { label: "Size", value: "8,030,261,248, worked out from Meta's settings; Hugging Face lists the same count", source: "llama-3-weights" },
       { label: "Text length", value: "8,192 words (tokens)", source: "llama-3-card" },
-      { label: "Released", value: "April 18, 2024", source: "llama-3-card" },
     ],
     reasons: [LLAMA_3_TRANSFORMER, LLAMA_3_AUTOREGRESSIVE],
   },
-  tiny: { part: "model", level: "whole" },
   lesson: "Lessons 25, 30",
   reverseLesson: "RL-00",
   explanation:
@@ -139,8 +137,8 @@ const wordOrder: ModelPart = {
   title: "Word order comes later",
   summary: "Adds nothing here, because Llama marks word order later, inside attention.",
   copies: 1,
-  facts: { shape: "nothing stored here", weightCount: 0, headline: { value: 0, unit: "numbers added here" }, input: "word vectors", output: "the same vectors", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_ROPE, LLAMA_3_NO_REASON] },
-  tiny: { part: "position-table", level: "whole", missing: "Our tiny model adds a learned position table here instead, like GPT-2." },
+  facts: { shape: "nothing stored here", weightCount: 0, headline: { value: 0, unit: "numbers added here" }, input: "word vectors", output: "the same vectors", sources: LLAMA_3_SETTINGS, notes: [{ label: "Order comes in", value: "inside attention, by RoPE with θ 500,000", source: "llama-3-settings" }], reasons: [LLAMA_3_ROPE, LLAMA_3_NO_REASON] },
+  tiny: { part: "position-table", level: "whole" },
   lesson: "Lesson 25",
   reverseLesson: "RL-02",
   explanation:
@@ -172,19 +170,20 @@ export const LLAMA_3_8B: RealModel = {
       sources: LLAMA_3_SETTINGS,
       textSources: ["llama-3-card"],
       tokenizerNotes: [
+        { label: "Fewer pieces", value: "up to 15% fewer pieces than Llama 2 for the same text", source: "llama-3-blog" },
         { label: "Word list", value: "128K words, 128,256 exactly", source: "llama-3-settings" },
         { label: "Built on", value: "OpenAI's tiktoken library", source: "llama-3-tokenizer" },
-        { label: "Fewer pieces", value: "up to 15% fewer pieces than Llama 2 for the same text", source: "llama-3-blog" },
       ],
       merges: { text: "Not published" },
       reasons: LLAMA_3_USE_REASONS,
+      writingNotes: LLAMA_3_WRITING_NOTES,
       mergeNotes: [{ label: "Merge rules", value: "Not published; the rules ship inside the tokenizer file, not in a paper", source: "llama-3-tokenizer" }],
       stopWord: {
         id: 128_001,
         isComputed: true,
         notes: [
-          { label: "Stop word", value: "<|end_of_text|>, ID 128,001: the 2nd special word after the 128,000 regular ones", source: "llama-3-tokenizer" },
           { label: "Instruct model", value: "also stops at <|eot_id|>, the end of a turn, ID 128,009", source: "llama-3-tokenizer" },
+          { label: "Stop word", value: "<|end_of_text|>, ID 128,001: the 2nd special word after the 128,000 regular ones", source: "llama-3-tokenizer" },
         ],
       },
       embeddingLesson: "Lessons 10, 25",

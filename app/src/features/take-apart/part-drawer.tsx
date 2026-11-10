@@ -1,18 +1,15 @@
 import type { Ref } from "react";
-import { TEST_ANSWER, TEST_WORDS, joinTokens } from "@/core/model/corpus";
-import type { ModelId, ModelPart, TinyPartId, TinyView } from "@/features/take-apart/interfaces/model-part.interface";
-import type { Sentence } from "@/features/take-apart/interfaces/sentence.interface";
+import type { ModelId, ModelPart, TinyView } from "@/features/take-apart/interfaces/model-part.interface";
+import type { PartPlace } from "@/features/take-apart/interfaces/part-place.interface";
 import { CodeBlock } from "@/shared/components/code-block";
 import { Drawer } from "@/shared/components/drawer";
 import { FormulaBlock } from "@/shared/components/formula-block";
-import { count } from "@/shared/utils/format";
 import { FactRows } from "./fact-rows";
 import { InOut } from "./in-out";
-import { LiveExample } from "./live-example";
 import { DRAWER_ID, NO_LESSON, numbersOf, partsOf, tagOf, titleOf } from "./part-card";
-import { NONE_TO_LEARN, PartNumbers } from "./part-numbers";
+import { PartNumbers } from "./part-numbers";
+import { RUNS_LABEL, SHARE_LABEL, runsOf, shareOf } from "./real-place";
 import { StoryDemo, StoryInfo } from "./story/story-sections";
-import { readTinyPart } from "./tiny-parts";
 import { SOURCES } from "./trees/sources";
 
 const REVERSE_TITLES: Record<string, string> = {
@@ -27,14 +24,9 @@ const REVERSE_TITLES: Record<string, string> = {
 
 const GROUND_ZERO_TEXT = { "multiply-add": "one multiply on two numbers, added to a sum", "stored-number": "one stored number", action: "one small step that uses no stored numbers" };
 
-const TEST_PARTS: TinyPartId[] = ["loss", "evaluation"];
-const WHOLE_RUN_PARTS: TinyPartId[] = ["corpus", "training", "slope", "adam"];
+const NONE_TO_LEARN = "None to learn";
 
-function liveCaption(part: TinyPartId, sentence: Sentence) {
-  if (TEST_PARTS.includes(part)) return `Live on the test sentence "${joinTokens(TEST_WORDS)}", where the right next word is "${TEST_ANSWER}".`;
-  if (WHOLE_RUN_PARTS.includes(part)) return "Live from the tiny model's own training.";
-  return `Live on "${joinTokens(sentence.words)}", for its last word.`;
-}
+const WORKED_OUT = "worked out from the sources";
 
 interface PartDrawerProps {
   ref: Ref<HTMLElement>;
@@ -42,29 +34,28 @@ interface PartDrawerProps {
   modelId: ModelId;
   modelTitle: string;
   part: ModelPart;
+  place: PartPlace;
   tiny: TinyView;
-  sentence: Sentence;
   nextPart: ModelPart | undefined;
   onOpen: (id: string) => void;
   onClose: () => void;
 }
 
-export function PartDrawer({ ref, root, modelId, modelTitle, part, tiny, sentence, nextPart, onOpen, onClose }: PartDrawerProps) {
-  const readout = readTinyPart(part.tiny, tiny);
+export function PartDrawer({ ref, root, modelId, modelTitle, part, place, tiny, nextPart, onOpen, onClose }: PartDrawerProps) {
   const notes = part.facts.notes ?? [];
   const sources = [...new Set([...part.facts.sources, ...notes.map((note) => note.source)])];
+  const share = shareOf(part, place, true);
+  const runs = runsOf(part, place, true);
+  const shareRows: [string, string][] = share ? [[SHARE_LABEL, `${share}, ${WORKED_OUT}`]] : [];
+  const runsRows: [string, string][] = runs ? [[RUNS_LABEL, `${runs}, ${WORKED_OUT}`]] : [];
   const realRows: [string, string][] = [
+    ["Where", place.path.map((each) => titleOf(each, root)).join(" › ")],
     ["Shape", part.facts.shape],
-    ["Numbers", part.facts.weightCount > 0 ? `${numbersOf(part)}, worked out from the sources` : NONE_TO_LEARN],
+    ["Numbers", part.facts.weightCount > 0 ? `${numbersOf(part)}, ${WORKED_OUT}` : NONE_TO_LEARN],
+    ...shareRows,
+    ...runsRows,
     ["Inside", part.groundZero ? `Ground zero: ${GROUND_ZERO_TEXT[part.groundZero]}` : partsOf(part.children ?? [])],
     ...notes.map((note): [string, string] => [note.label, note.value]),
-  ];
-  const tinyRows: [string, string][] = [
-    ["Part", readout.title],
-    ["Shape", readout.shape],
-    ["Numbers", readout.weightCount > 0 ? count(readout.weightCount) : NONE_TO_LEARN],
-    ["Live value", readout.live],
-    ["Training", tiny.lab.isTrained ? `done, round ${tiny.lab.round}` : `round ${tiny.lab.round}`],
   ];
 
   return (
@@ -79,15 +70,7 @@ export function PartDrawer({ ref, root, modelId, modelTitle, part, tiny, sentenc
       <section className="section">
         <p className="section-title">What goes in and out</p>
         <InOut facts={part.facts} isDetailed />
-        <PartNumbers modelTitle={modelTitle} part={part} tiny={tiny} isExact />
-      </section>
-      <section className="section">
-        <p className="section-title">{part.tiny.missing ? "Nearest part in our tiny model" : "Live in our tiny model"}</p>
-        {part.tiny.missing && <p className="note">{part.tiny.missing}</p>}
-        {!part.tiny.missing && "reason" in readout.headline && <p className="note">{readout.headline.reason}</p>}
-        {!part.tiny.missing && <LiveExample link={part.tiny} tiny={tiny} />}
-        <FactRows rows={tinyRows} />
-        <p className="card-lesson">{liveCaption(part.tiny.part, sentence)}</p>
+        <PartNumbers modelTitle={modelTitle} part={part} place={place} isExact />
       </section>
       <section className="section">
         <p className="section-title">{`The real part in ${modelTitle}`}</p>

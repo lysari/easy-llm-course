@@ -6,6 +6,10 @@ export interface RealNote {
   source: SourceId;
 }
 
+export interface KeyFact extends RealNote {
+  isComputed: boolean;
+}
+
 export interface Amount {
   value: number;
   unit: string;
@@ -31,6 +35,7 @@ export interface RealFacts {
   sources: SourceId[];
   notes?: RealNote[];
   reasons?: RealNote[];
+  isPerEarlierWord?: boolean;
 }
 
 export interface StepFacts {

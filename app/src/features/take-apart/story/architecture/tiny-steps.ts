@@ -116,10 +116,12 @@ export function tinyStep(part: ModelPart, modelId: ModelId, view: TinyView, { wo
   const w = Math.min(word, view.ids.length - 1);
   const layer = weights.layers[0];
   const { first, ffIn, pre, finalIn, finalOut } = readLayer(view, w);
-  const level = part.tiny.level;
+  const link = part.tiny;
+  if (!link) throw new Error(`${part.id} has no tiny part to show`);
+  const level = link.level;
   const isRms = modelId === "llama-3-8b";
   const base = part.id.replace(/-(number|multiply-add|bias)$/, "");
-  const nearest = part.tiny.missing ?? TINY;
+  const nearest = link.missing ?? TINY;
   const tableOf: Partial<Record<string, [string, number[], Tensor]>> = {
     query: ["Wq", first.normalized[w], layer.query],
     key: ["Wk", first.normalized[w], layer.key],
@@ -164,16 +166,16 @@ export function tinyStep(part: ModelPart, modelId: ModelId, view: TinyView, { wo
     const after = level === "whole" ? first.afterAttention[w] : [first.afterAttention[w][j]];
     return step([{ label: "the word's numbers", values: values[0] }, { label: "what the head mixed in", values: values[1] }], [{ label: "added back", values: after }], "out = x + mix", nearest, { pick: level === "whole" ? null : { label: "Number", count: VECTOR_SIZE } });
   }
-  switch (part.tiny.part) {
+  switch (link.part) {
     case "word-table":
     case "position-table": {
-      const table = part.tiny.part === "word-table" ? weights.tokenTable : weights.positionTable;
-      const start = part.tiny.part === "word-table" ? lab.untrained.tokenTable : lab.untrained.positionTable;
-      const row = part.tiny.part === "word-table" ? view.ids[w] : w;
-      const name = part.tiny.part === "word-table" ? `ID ${row}, "${showWord(VOCABULARY[row])}"` : `place ${w + 1}`;
+      const table = link.part === "word-table" ? weights.tokenTable : weights.positionTable;
+      const start = link.part === "word-table" ? lab.untrained.tokenTable : lab.untrained.positionTable;
+      const row = link.part === "word-table" ? view.ids[w] : w;
+      const name = link.part === "word-table" ? `ID ${row}, "${showWord(VOCABULARY[row])}"` : `place ${w + 1}`;
       const j = out % table.cols;
       if (level === "number") return step([{ label: `number ${j + 1} of ${name}, before training`, values: [start.data[row * table.cols + j]] }], [{ label: `now, after ${lab.round} rounds`, values: [table.data[row * table.cols + j]] }], "w = w − step size × slope, every round", TINY, { pick: { label: "Number", count: table.cols } });
-      return step([{ label: part.tiny.part === "word-table" ? "word IDs" : "places", values: part.tiny.part === "word-table" ? view.ids : view.ids.map((_, i) => i + 1) }], [{ label: `row for ${name}`, values: table.row(row) }], `row = table[${row}]`, TINY);
+      return step([{ label: link.part === "word-table" ? "word IDs" : "places", values: link.part === "word-table" ? view.ids : view.ids.map((_, i) => i + 1) }], [{ label: `row for ${name}`, values: table.row(row) }], `row = table[${row}]`, TINY);
     }
     case "layers":
       return step([{ label: "the word's numbers in", values: trace.combined[w] }], trace.layers.map((each, i) => ({ label: `after layer ${i + 1}`, values: each.afterFeedForward[w] })), `${LAYER_COUNT} layers, one after the other`, TINY);

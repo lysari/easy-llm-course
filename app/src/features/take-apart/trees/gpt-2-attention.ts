@@ -1,5 +1,4 @@
 import type { ModelPart } from "@/features/take-apart/interfaces/model-part.interface";
-import { VECTOR_SIZE as TINY_WIDTH } from "@/core/model/tiny-gpt";
 import { attentionMathParts } from "./attention-math";
 import { GPT_2_BIAS, GPT_2_HEADS, GPT_2_JOIN_HEADS, GPT_2_MASK, GPT_2_MATMUL, GPT_2_MIX, GPT_2_NO_REASON, GPT_2_QKV, GPT_2_SCORES, GPT_2_TRANSFORMER } from "./gpt-2-reasons";
 import { projectionPart } from "./part-builders";
@@ -23,7 +22,7 @@ const head: ModelPart = {
   reverseLesson: "RL-03",
   explanation:
     "One of 12 heads working side by side. From its own slice of the big 768 × 2,304 table it makes a query, a key and a value of 64 numbers for each word, then mixes the earlier words' values by how well they match.",
-  why: `Each head has its own tables, so each can match words in its own way. Our tiny model has one head of ${TINY_WIDTH} numbers.`,
+  why: "Each head has its own tables, so each can match words in its own way.",
   story: {
     problem: "One way of matching can't follow everything at once. Each head has its own tables, so it can match words its own way; with a single head the model could only look back one way at a time.",
     demo: "tiny-part",

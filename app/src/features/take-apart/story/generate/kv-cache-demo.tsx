@@ -20,7 +20,7 @@ export function KvCacheDemo({ modelId, tiny }: DemoProps) {
   const answerId = useId();
   const picked = Math.min(word, last);
   const cache = cacheFor(tiny.ids, tiny.weights);
-  const nextWord = tiny.written[0]?.word ?? END_TOKEN;
+  const nextWord = tiny.written[0] ?? END_TOKEN;
   const gap = reuseGap(tiny.ids, VOCABULARY.indexOf(nextWord), tiny.weights);
   const most = MAX_CONTEXT - tiny.ids.length;
   const passes = wordPasses(tiny.ids.length, Math.min(answer, most));

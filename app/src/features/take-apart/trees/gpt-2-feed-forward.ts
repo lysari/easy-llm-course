@@ -5,7 +5,6 @@ import { GPT_2_SETTINGS } from "./sources";
 
 const WIDTH = 768;
 const EXPANDED = 3072;
-const NO_GELU = "Our tiny model uses ReLU, which sets every negative number to 0. GELU is a smooth version of it.";
 const GPT_2_TABLE_CODE = [GPT_2_MATMUL, GPT_2_BIAS];
 
 const gelu: ModelPart = {
@@ -15,7 +14,7 @@ const gelu: ModelPart = {
   summary: "Bends each number: big positives pass, negatives shrink to near 0.",
   copies: 1,
   facts: { shape: "3,072 numbers", weightCount: 0, headline: { value: EXPANDED, unit: "numbers per word", isComputed: true }, input: "3,072 numbers", output: "3,072 bent numbers", outputDetail: "3,072 numbers, negatives pushed to near 0", sources: GPT_2_SETTINGS, reasons: [GPT_2_GELU, GPT_2_NO_REASON] },
-  tiny: { part: "relu", level: "whole", missing: NO_GELU },
+  tiny: { part: "relu", level: "whole" },
   lesson: "Lessons 05, 15",
   reverseLesson: "RL-06",
   explanation: "Bends each of the 3,072 numbers: big positive numbers pass, negative numbers shrink to near 0. It stores no numbers. GPT-2's code works out Φ(x) with a close tanh formula.",
@@ -37,7 +36,7 @@ const gelu: ModelPart = {
       summary: "Bends one number by multiplying it by a value from a fixed curve.",
       copies: EXPANDED,
       facts: { shape: "1", weightCount: 0, headline: { value: EXPANDED, unit: "per word", isComputed: true }, input: "1 number", output: "1 number", sources: GPT_2_SETTINGS, reasons: [GPT_2_GELU] },
-      tiny: { part: "relu", level: "number", missing: NO_GELU },
+      tiny: { part: "relu", level: "number" },
       lesson: "Lesson 05",
       reverseLesson: "RL-06",
       explanation: "Ground zero. The number times its own chance Φ(x): one multiply on two numbers.",

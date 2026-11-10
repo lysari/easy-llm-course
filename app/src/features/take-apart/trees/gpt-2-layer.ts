@@ -1,5 +1,4 @@
 import type { ModelPart } from "@/features/take-apart/interfaces/model-part.interface";
-import { LAYER_COUNT as TINY_LAYER_COUNT, VECTOR_SIZE as TINY_WIDTH } from "@/core/model/tiny-gpt";
 import { gpt2Attention } from "./gpt-2-attention";
 import { gpt2FeedForward } from "./gpt-2-feed-forward";
 import { GPT_2_ADD_BACK, GPT_2_DEPTH, GPT_2_LAYER_LOOP, GPT_2_NORM_CODE, GPT_2_NORM_PLACE, GPT_2_SIZE_HELPS } from "./gpt-2-reasons";
@@ -96,7 +95,7 @@ export const gpt2Layers: ModelPart = {
   lesson: "Lessons 13, 20",
   reverseLesson: "RL-03",
   explanation: "12 layers of the same shape, one after another. Each one reads every word's 768 numbers and adds a little more onto them.",
-  why: `The same small recipe, stacked. Our tiny model has ${TINY_LAYER_COUNT} layers of ${TINY_WIDTH} numbers.`,
+  why: `The same small recipe, stacked. Each of the ${LAYER_COUNT} layers has its own numbers, so each can learn something different.`,
   story: {
     problem: "A single layer can only look back and work on each word once. Stacking 12 lets each layer build on what the ones before it found.",
     demo: "tiny-part",

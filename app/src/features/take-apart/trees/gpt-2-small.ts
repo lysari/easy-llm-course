@@ -1,6 +1,6 @@
 import type { ModelPart, RealModel } from "@/features/take-apart/interfaces/model-part.interface";
 import { GPT_2_BUILD } from "./gpt-2-build-facts";
-import { GPT_2_CONTEXT, GPT_2_FINAL_NORM, GPT_2_MERGES, GPT_2_NORM_CODE, GPT_2_NORM_PLACE, GPT_2_NO_REASON, GPT_2_OUTPUT, GPT_2_POSITION_TABLE, GPT_2_RANDOM_START, GPT_2_SIZE_HELPS, GPT_2_TRANSFORMER, GPT_2_USE_REASONS, GPT_2_WORD_TABLE } from "./gpt-2-reasons";
+import { GPT_2_CONTEXT, GPT_2_FINAL_NORM, GPT_2_MERGES, GPT_2_NORM_CODE, GPT_2_NORM_PLACE, GPT_2_NO_REASON, GPT_2_OUTPUT, GPT_2_POSITION_TABLE, GPT_2_RANDOM_START, GPT_2_SIZE_HELPS, GPT_2_TRANSFORMER, GPT_2_USE_REASONS, GPT_2_WORD_TABLE, GPT_2_WRITING_NOTES } from "./gpt-2-reasons";
 import { gpt2Layers } from "./gpt-2-layer";
 import { inferenceRoot } from "./inference-steps";
 import { lifecycleRoot } from "./lifecycle-steps";
@@ -100,7 +100,7 @@ const outputHead: ModelPart = {
   lesson: "Lessons 11, 20",
   reverseLesson: "RL-04",
   explanation:
-    "Turns the last word's 768 numbers into one score per word. GPT-2 reuses the word table here instead of storing a second table, so it adds 0 numbers. Our tiny model keeps its own output table.",
+    "Turns the last word's 768 numbers into one score per word. GPT-2 reuses the word table here instead of storing a second table, so it adds 0 numbers.",
   why: "Softmax turns the scores into chances, and one word is picked. The top chance is not knowledge, only the best guess the numbers give.",
   story: {
     problem: "The layers end with 768 numbers, but the model has to say something about each of its 50,257 words. Without the output table there would be no score to turn into a chance.",
@@ -176,13 +176,12 @@ const root: ModelPart = {
     outputDetail: "50,257 scores, one per word it knows",
     sources: [...GPT_2_SETTINGS, "gpt-2-card"],
     notes: [
+      { label: "Released", value: "February 2019", source: "gpt-2-card" },
       { label: "Size", value: "124,439,808, worked out from config.json; the model card says 124 million", source: "gpt-2-card" },
       { label: "In the paper", value: "listed as 117M for the smallest size", source: "gpt-2-paper" },
-      { label: "Released", value: "February 2019", source: "gpt-2-card" },
     ],
     reasons: [GPT_2_TRANSFORMER, GPT_2_SIZE_HELPS, GPT_2_RANDOM_START],
   },
-  tiny: { part: "model", level: "whole" },
   lesson: "Lessons 14, 20",
   reverseLesson: "RL-00",
   explanation:
@@ -219,8 +218,16 @@ export const GPT_2_SMALL: RealModel = {
         { label: "Word list", value: "50,257 words", source: "gpt-2-paper" },
       ],
       merges: { value: 50_000, unit: "merge rules", isComputed: true },
-      mergeNotes: [GPT_2_MERGES, { label: "Start", value: "256 single bytes, so any text can be split", source: "gpt-2-paper" }],
-      stopWord: { id: 50_256, isComputed: false, notes: [{ label: "Stop word", value: "<|endoftext|>, ID 50,256 (config eos_token_id)", source: "gpt-2-config" }] },
+      mergeNotes: [{ label: "Start", value: "256 single bytes, so any text can be split", source: "gpt-2-paper" }, GPT_2_MERGES],
+      stopWord: {
+        id: 50_256,
+        isComputed: false,
+        notes: [
+          { label: "Released code", value: "never stops at <|endoftext|>; it writes the full length", source: "gpt-2-sample" },
+          { label: "Stop word", value: "<|endoftext|>, ID 50,256 (config eos_token_id)", source: "gpt-2-config" },
+        ],
+      },
+      writingNotes: GPT_2_WRITING_NOTES,
       reasons: GPT_2_USE_REASONS,
       embeddingLesson: "Lessons 10, 14",
       embeddingText:

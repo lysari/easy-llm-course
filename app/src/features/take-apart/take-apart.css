@@ -111,27 +111,6 @@
   color: var(--ink-soft);
 }
 
-.word-ids {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-tight);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  font-size: var(--text-small);
-}
-
-.word-ids li {
-  padding: var(--space-edge) var(--space-item);
-  border-radius: var(--radius-pill);
-  background: var(--group);
-}
-
-.word-ids b {
-  color: var(--ink-soft);
-  font-weight: var(--weight-regular);
-}
-
 .breadcrumb ol {
   display: flex;
   flex-wrap: wrap;
@@ -277,7 +256,7 @@
 
 .part-numbers {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-block);
   margin: 0;
   padding-top: var(--space-block);
   border-top: var(--border-thin) solid var(--card-line);
@@ -285,29 +264,13 @@
 
 .part-numbers > div {
   display: grid;
-  align-content: start;
   gap: var(--space-edge);
   min-width: 0;
-  padding-right: var(--space-block);
-}
-
-.part-numbers > div + div {
-  padding-right: 0;
-  padding-left: var(--space-block);
-  border-left: var(--border-thin) solid var(--card-line);
 }
 
 .part-numbers dt {
   color: var(--ink-soft);
   font-size: var(--text-caption);
-}
-
-.live-tag {
-  margin-left: var(--space-control);
-  padding: 0 var(--space-stack);
-  border-radius: var(--radius-pill);
-  background: var(--running-bg);
-  color: var(--running-ink);
 }
 
 .part-numbers dd {
@@ -321,6 +284,10 @@
   color: var(--ink);
   font-size: var(--text-title);
   font-weight: var(--weight-medium);
+}
+
+.part-numbers-key dd {
+  color: var(--ink);
 }
 
 .part-numbers .is-muted {

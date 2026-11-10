@@ -2,9 +2,8 @@ import type { InferenceSpec } from "@/features/take-apart/interfaces/inference-s
 import type { ModelPart } from "@/features/take-apart/interfaces/model-part.interface";
 import { count } from "@/shared/utils/format";
 
-const NO_CACHE = "Our tiny model keeps no cache. It runs the whole sentence again each round, which gives the same answer, only slower.";
-
 export function generateStep(spec: InferenceSpec): ModelPart {
+  const layerCount = spec.layers.children?.[0].copies ?? 1;
   const stopSources = [...new Set([...spec.sources, ...spec.stopWord.notes.map((note) => note.source)])];
   return {
     id: "generate",
@@ -12,8 +11,7 @@ export function generateStep(spec: InferenceSpec): ModelPart {
     title: "Generate",
     summary: "Picks a word, adds it to the end, and runs again until it stops.",
     copies: 1,
-    facts: { shape: `1 word per round, up to ${count(spec.context)} words`, weightCount: 0, headline: { value: spec.context, unit: "words at most" }, input: "chances", output: "new words", outputDetail: "new words, one per round", sources: [...spec.sources, ...spec.textSources], reasons: spec.reasons.generate },
-    tiny: { part: "write", level: "whole" },
+    facts: { shape: `1 word per round, up to ${count(spec.context)} words`, weightCount: 0, headline: { value: spec.context, unit: "words at most" }, input: "chances", output: "new words", outputDetail: "new words, one per round", sources: [...spec.sources, ...spec.textSources], notes: [spec.writingNotes.generate], reasons: spec.reasons.generate },
     lesson: "Lessons 21, 23",
     reverseLesson: "RL-04",
     explanation: "Pick one word from the chances, add it to the end, and run steps 1 to 4 again. Repeat until the stop word comes up or the text is too long.",
@@ -33,8 +31,7 @@ export function generateStep(spec: InferenceSpec): ModelPart {
         title: "One writing round",
         summary: "One pass of the loop: pick a word, add it, then check whether to stop.",
         copies: 1,
-        facts: { shape: "pick, add, check", weightCount: 0, headline: { value: 1, unit: "word added" }, input: "all words so far", output: "one more word", sources: spec.textSources, reasons: spec.reasons["write-round"] },
-        tiny: { part: "write", level: "row" },
+        facts: { shape: "pick, add, check", weightCount: 0, headline: { value: 1, unit: "word added" }, input: "all words so far", output: "one more word", sources: spec.textSources, notes: [spec.writingNotes["write-round"]], reasons: spec.reasons["write-round"] },
         lesson: "Lessons 14, 23",
         reverseLesson: "RL-04",
         explanation: "One pass of the loop: pick a word from the chances, add it to the end, then check whether to stop.",
@@ -54,8 +51,7 @@ export function generateStep(spec: InferenceSpec): ModelPart {
             title: "Pick one word",
             summary: "Rolls a random number and walks down the chances to choose one word.",
             copies: 1,
-            facts: { shape: "1 random roll", weightCount: 0, headline: { value: spec.wordCount, unit: "words to pick from" }, input: "chances", output: "one word", sources: spec.sources, reasons: spec.reasons.pick },
-            tiny: { part: "pick", level: "number" },
+            facts: { shape: "1 random roll", weightCount: 0, headline: { value: spec.wordCount, unit: "words to pick from" }, input: "chances", output: "one word", sources: spec.sources, notes: [spec.writingNotes.pick], reasons: spec.reasons.pick },
             lesson: "Lesson 23",
             reverseLesson: "RL-04",
             explanation: "Ground zero. Roll a random number from 0 to 1, then walk down the chances, taking each away, until the roll runs out. That word is picked.",
@@ -77,8 +73,7 @@ export function generateStep(spec: InferenceSpec): ModelPart {
             title: "Add it to the end",
             summary: "Adds the picked word's ID to the end of the text, ready for the next round.",
             copies: 1,
-            facts: { shape: "1 more ID", weightCount: 0, headline: { value: spec.context, unit: "words at most" }, input: "words and the pick", output: "one word longer", inputDetail: "words so far and the picked word", sources: spec.sources, reasons: spec.reasons.append },
-            tiny: { part: "pick", level: "whole" },
+            facts: { shape: "1 more ID", weightCount: 0, headline: { value: spec.context, unit: "words at most" }, input: "words and the pick", output: "one word longer", inputDetail: "words so far and the picked word", sources: spec.sources, notes: [spec.writingNotes.append], reasons: spec.reasons.append },
             lesson: "Lesson 14",
             reverseLesson: "RL-04",
             explanation: "Ground zero. Append the picked word's ID to the input, ready for the next round.",
@@ -101,7 +96,6 @@ export function generateStep(spec: InferenceSpec): ModelPart {
             summary: "Stops when the stop word is picked or the text is full.",
             copies: 1,
             facts: { shape: "stop word, or full length", weightCount: 0, headline: { value: spec.stopWord.id, unit: "is the stop word's ID", isComputed: spec.stopWord.isComputed, isId: true }, input: "pick and length", output: "go on, or stop", inputDetail: "the picked word and the length", sources: stopSources, notes: spec.stopWord.notes, reasons: spec.reasons["stop-check"] },
-            tiny: { part: "write", level: "number" },
             lesson: "Lesson 14",
             reverseLesson: "RL-04",
             explanation: `Ground zero. Compare the picked word with the stop word, and the length with ${count(spec.context)} words. Stop if either matches.`,
@@ -124,8 +118,7 @@ export function generateStep(spec: InferenceSpec): ModelPart {
         title: "KV cache",
         summary: "Saves work done for earlier words, so each new word runs faster.",
         copies: 1,
-        facts: { shape: `2 × ${count(spec.kvWidth)} numbers per word, per layer`, weightCount: 0, headline: { value: 2 * spec.kvWidth, unit: "saved per word, per layer", isComputed: true }, input: "new keys and values", output: "saved for reuse", inputDetail: "each new word's keys and values", outputDetail: "earlier keys and values, ready to reuse", sources: spec.sources, reasons: spec.reasons["kv-cache"] },
-        tiny: { part: "write", level: "whole", missing: NO_CACHE },
+        facts: { shape: `2 × ${count(spec.kvWidth)} numbers per word, per layer`, weightCount: 0, headline: { value: 2 * spec.kvWidth, unit: "saved per word, per layer", isComputed: true }, input: "new keys and values", output: "saved for reuse", inputDetail: "each new word's keys and values", outputDetail: "earlier keys and values, ready to reuse", sources: spec.sources, notes: [{ label: "A full text", value: `${count(2 * spec.kvWidth * layerCount * spec.context)} numbers for ${count(spec.context)} words in all ${layerCount} layers, worked out`, source: spec.sources[0] }], reasons: spec.reasons["kv-cache"] },
         lesson: "Lesson 21",
         reverseLesson: "RL-03",
         explanation: "Ground zero. Save one word's key and value from one layer, so the next round reads them back instead of working them out again. Only the new word is run through the layers.",

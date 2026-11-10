@@ -1,5 +1,4 @@
 import type { ModelPart } from "@/features/take-apart/interfaces/model-part.interface";
-import { LAYER_COUNT as TINY_LAYER_COUNT, VECTOR_SIZE as TINY_WIDTH } from "@/core/model/tiny-gpt";
 import { llama3Attention } from "./llama-3-attention";
 import { llama3FeedForward } from "./llama-3-feed-forward";
 import { LLAMA_3_ADD_BACK, LLAMA_3_LAYER_LOOP, LLAMA_3_NO_REASON, LLAMA_3_RMS_NORM } from "./llama-3-reasons";
@@ -8,7 +7,6 @@ import { LLAMA_3_SETTINGS } from "./sources";
 
 const WIDTH = 4096;
 const LAYER_COUNT = 32;
-const NO_RMS_NORM = "Our tiny model uses a plain LayerNorm that also subtracts the average, and has no stored scale numbers.";
 
 const layer: ModelPart = {
   id: "layer",
@@ -42,7 +40,6 @@ const layer: ModelPart = {
       hasShift: false,
       tinyPart: "norm",
       sources: LLAMA_3_SETTINGS,
-      missing: NO_RMS_NORM,
       lesson: "Lessons 13, 20",
       reverseLesson: "RL-06",
       explanation: "RMSNorm. Divides a word's 4,096 numbers by their root mean square, so their size is about 1, then scales each one by its own stored number. It does not subtract the average and has no shift.",
@@ -68,7 +65,6 @@ const layer: ModelPart = {
       hasShift: false,
       tinyPart: "norm",
       sources: LLAMA_3_SETTINGS,
-      missing: NO_RMS_NORM,
       lesson: "Lessons 13, 20",
       reverseLesson: "RL-06",
       explanation: "The same kind of RMSNorm with its own 4,096 scale numbers, run before the feed-forward.",
@@ -98,7 +94,7 @@ export const llama3Layers: ModelPart = {
   lesson: "Lessons 13, 20",
   reverseLesson: "RL-03",
   explanation: "32 layers of the same shape, one after another. Each one reads every word's 4,096 numbers and adds a little more onto them.",
-  why: `The same small recipe, stacked. Our tiny model has ${TINY_LAYER_COUNT} layers of ${TINY_WIDTH} numbers.`,
+  why: `The same small recipe, stacked. Each of the ${LAYER_COUNT} layers has its own numbers, so each can learn something different.`,
   story: {
     problem: "A single layer can only look back and work on each word once. Stacking 32 lets each layer build on what the ones before it found.",
     demo: "tiny-part",

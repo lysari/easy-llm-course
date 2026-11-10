@@ -4,6 +4,7 @@ import { ModelLab } from "@/core/model/lab";
 import type { ModelPart } from "@/features/take-apart/interfaces/model-part.interface";
 import { MODELS } from "@/features/take-apart/models";
 import { PartDrawer } from "@/features/take-apart/part-drawer";
+import { placeOf } from "@/features/take-apart/real-place";
 import { readSentence } from "@/features/take-apart/sentence";
 import { viewTiny } from "@/features/take-apart/tiny-parts";
 import { SOURCES } from "@/features/take-apart/trees/sources";
@@ -50,7 +51,7 @@ describe.each(MODELS)("$title why, watch and when", (model) => {
     const root = model.modes[mode];
     for (const part of allParts(root).filter((each) => each.story)) {
       const nextPart = parts.find((each) => each.id === part.story?.nextId);
-      const html = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelId={model.id} modelTitle={model.title} part={part} tiny={tiny} sentence={readSentence("")} nextPart={nextPart} onOpen={() => {}} onClose={() => {}} />);
+      const html = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelId={model.id} modelTitle={model.title} part={part} place={placeOf(model, root, part)} tiny={tiny} nextPart={nextPart} onOpen={() => {}} onClose={() => {}} />);
       const places = INFO_TITLES.map((title) => html.indexOf(`<p class="section-title">${title}</p>`));
       const panel = html.indexOf('<div class="drawer-panel">');
       expect(html, part.id).toContain('class="drawer drawer--wide"');
@@ -63,7 +64,7 @@ describe.each(MODELS)("$title why, watch and when", (model) => {
 
   test("a part with no story keeps the narrow drawer", () => {
     const part: ModelPart = { ...(model.modes.use.children?.[0] ?? model.modes.use), story: undefined };
-    const html = renderToStaticMarkup(<PartDrawer ref={null} root={model.modes.use} modelId={model.id} modelTitle={model.title} part={part} tiny={tiny} sentence={readSentence("")} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
+    const html = renderToStaticMarkup(<PartDrawer ref={null} root={model.modes.use} modelId={model.id} modelTitle={model.title} part={part} place={placeOf(model, model.modes.use, part)} tiny={tiny} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
     expect(html).toContain('class="drawer"');
     expect(html).not.toContain("drawer-panel");
   });

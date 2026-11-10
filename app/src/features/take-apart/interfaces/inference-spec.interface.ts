@@ -8,6 +8,8 @@ export interface StopWord {
   notes: RealNote[];
 }
 
+export type WritingNotes = Record<"softmax" | "chance" | "generate" | "write-round" | "pick" | "append", RealNote>;
+
 export interface InferenceSpec {
   modelTitle: string;
   tokenizer: string;
@@ -21,6 +23,7 @@ export interface InferenceSpec {
   merges: Headline;
   mergeNotes: RealNote[];
   stopWord: StopWord;
+  writingNotes: WritingNotes;
   reasons: UseReasons;
   embeddingLesson: string;
   embeddingText: string;

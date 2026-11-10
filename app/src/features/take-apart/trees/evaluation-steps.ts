@@ -1,10 +1,6 @@
-import { TRAINING_LINES } from "@/core/model/corpus";
 import type { ModelPart } from "@/features/take-apart/interfaces/model-part.interface";
 import type { BuildFacts } from "@/features/take-apart/interfaces/real-facts.interface";
 import { stepFacts } from "./part-builders";
-
-const NO_SAFETY = `Our tiny model only knows ${TRAINING_LINES.length} hand-written sentences about pets, so it has no safety checks.`;
-const NO_QUANTIZATION = "Our tiny model keeps every number as a full 64-bit number. It is never rounded down.";
 
 export function evaluationStep(facts: BuildFacts): ModelPart {
   return {
@@ -14,7 +10,6 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
     summary: "Tests the finished model, checks it for harm, and makes it smaller.",
     copies: 1,
     facts: stepFacts(facts.evaluation, "a trained model", "ready to ship", { outputDetail: "a model ready to ship" }),
-    tiny: { part: "evaluation", level: "whole" },
     lesson: "Lesson 30",
     reverseLesson: "RL-00",
     explanation: "Before release the model is tested on question sets it never trained on, checked for harmful answers, and often made smaller and faster by storing its numbers with fewer bits.",
@@ -35,7 +30,6 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
         summary: "Asks sets of test questions with known answers and counts the right ones.",
         copies: 1,
         facts: stepFacts(facts.benchmarks, "test questions", "a score", { inputDetail: "test questions with known answers" }),
-        tiny: { part: "evaluation", level: "row" },
         lesson: "Lessons 22, 30",
         reverseLesson: "RL-04",
         explanation: "Sets of questions with known answers. The model answers each one, and the score is how many it got right.",
@@ -56,7 +50,6 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
             summary: "Asks one question and marks the model's top answer right or wrong.",
             copies: 1,
             facts: stepFacts(facts["test-question"], "one question", "right or wrong"),
-            tiny: { part: "evaluation", level: "number" },
             lesson: "Lesson 30",
             reverseLesson: "RL-04",
             explanation: "Ground zero. Ask one question, take the model's most likely answer, and compare it with the right one: 1 if it matches, 0 if not.",
@@ -81,7 +74,6 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
         summary: "Tries risky questions on the model and checks its answers against rules.",
         copies: 1,
         facts: stepFacts(facts.safety, "risky prompts", "checked answers", { outputDetail: "answers checked against rules" }),
-        tiny: { part: "evaluation", level: "whole", missing: NO_SAFETY },
         lesson: "Lesson 30",
         reverseLesson: "RL-00",
         explanation: "People and programs try to make the model give harmful answers (red teaming), and the answers are checked. Extra filter models can also check prompts and answers while it runs.",
@@ -102,7 +94,6 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
             summary: "Sends one risky question and checks the answer against one rule.",
             copies: 1,
             facts: stepFacts(facts["safety-check"], "one risky prompt", "pass or fail"),
-            tiny: { part: "evaluation", level: "whole", missing: NO_SAFETY },
             lesson: "Lesson 30",
             reverseLesson: "RL-00",
             explanation: "Ground zero. Send one risky prompt and check the answer against one safety rule: pass or fail.",
@@ -126,7 +117,6 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
         summary: "Stores every number with fewer digits, so the model is smaller and faster.",
         copies: 1,
         facts: stepFacts(facts.quantization, "full-size numbers", "fewer bits each", { inputDetail: "stored numbers at full size", outputDetail: "the same numbers in fewer bits" }),
-        tiny: { part: "word-table", level: "number", missing: NO_QUANTIZATION },
         lesson: "No lesson yet",
         reverseLesson: "RL-05",
         explanation: "Store each number with fewer bits, for example 8 instead of 16. The model gets smaller, and tests show how much its answers change.",
@@ -147,7 +137,6 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
             summary: "Rounds one stored number so it fits in less space.",
             copies: 1,
             facts: stepFacts(facts["round-number"], "1 full-size number", "1 smaller number", { inputDetail: "one number, full size", outputDetail: "the nearest smaller-size number" }),
-            tiny: { part: "word-table", level: "number", missing: NO_QUANTIZATION },
             lesson: "No lesson yet",
             reverseLesson: "RL-05",
             explanation: "Ground zero. Divide one stored number by a scale, round it to the nearest whole number that fits in the smaller size, and keep that instead.",

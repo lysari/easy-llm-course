@@ -6,9 +6,10 @@ import type { ModeId, ModelPart } from "@/features/take-apart/interfaces/model-p
 import { MODELS, matchingPath, openPath, pathUrl, readPath } from "@/features/take-apart/models";
 import { PartCard } from "@/features/take-apart/part-card";
 import { PartDrawer } from "@/features/take-apart/part-drawer";
-import { showAmount } from "@/features/take-apart/part-numbers";
+import { RUNS_LABEL, keyFactOf, placeOf, runsOf, shareOf, showAmount } from "@/features/take-apart/real-place";
 import { readSentence } from "@/features/take-apart/sentence";
-import { readTinyPart, viewTiny } from "@/features/take-apart/tiny-parts";
+import { viewTiny } from "@/features/take-apart/tiny-parts";
+import { SOURCES } from "@/features/take-apart/trees/sources";
 
 const TOTALS = { "gpt-2-small": 124_439_808, "llama-3-8b": 8_030_261_248 };
 const STEP_IDS: Record<ModeId, string[]> = {
@@ -18,6 +19,8 @@ const STEP_IDS: Record<ModeId, string[]> = {
 const SUMMARY_LIMIT = 90;
 const CHIP_LIMIT = 21;
 const IN_OUT_LIMIT = 35;
+const KEY_FACT_LIMIT = 100;
+const TINY_COMPARISON = /tiny model|our tiny|tiny corpus|lesson model/i;
 const SENTENCES = ["my dog is hungry , so i give it a", "My ELEPHANT is hungry, so", ""];
 
 const allParts = (part: ModelPart): ModelPart[] => [part, ...(part.children ?? []).flatMap(allParts)];
@@ -104,8 +107,7 @@ describe.each(MODELS)("$title", (model) => {
       }
     });
 
-    test("every part has one real headline number, and a tiny one or says the tiny model lacks it", () => {
-      const tiny = viewTiny(new ModelLab(), readSentence(SENTENCES[0]).words);
+    test("every part has one real headline and one more real fact with its source", () => {
       for (const part of parts) {
         const { headline } = part.facts;
         if ("text" in headline) expect(part.facts.notes?.length, part.id).toBeGreaterThan(0);
@@ -113,19 +115,19 @@ describe.each(MODELS)("$title", (model) => {
           expect(Number.isFinite(headline.value) && headline.value >= 0, part.id).toBe(true);
           expect(headline.unit.length, part.id).toBeGreaterThan(0);
         }
-        if (part.tiny.missing) {
-          expect(part.tiny.missing.length, part.id).toBeGreaterThan(10);
-          continue;
+        const place = placeOf(model, root, part);
+        for (const isExact of [false, true]) {
+          const key = keyFactOf(part, place, isExact);
+          expect(key.label.length, part.id).toBeGreaterThan(2);
+          expect(key.value.trim().length, part.id).toBeGreaterThan(0);
+          expect(SOURCES, `${part.id}: ${key.source}`).toHaveProperty(key.source);
         }
-        const tinyHeadline = readTinyPart(part.tiny, tiny).headline;
-        if ("reason" in tinyHeadline) {
-          expect(tinyHeadline.reason, part.id).toMatch(/^[A-Z].*\.$/);
-          continue;
-        }
-        expect(Number.isFinite(tinyHeadline.value) && tinyHeadline.value >= 0, part.id).toBe(true);
-        expect(tinyHeadline.unit.length, part.id).toBeGreaterThan(0);
-        if (/^numbers?$/.test(tinyHeadline.unit)) expect(tinyHeadline.value, part.id).toBeGreaterThan(0);
+        expect(keyFactOf(part, place, false).value.length, part.id).toBeLessThanOrEqual(KEY_FACT_LIMIT);
       }
+    });
+
+    test("a part links to the tiny model only when its demo runs on that part", () => {
+      for (const part of parts) expect(Boolean(part.tiny), part.id).toBe(part.story?.demo === "tiny-part");
     });
 
     test.each([
@@ -137,18 +139,18 @@ describe.each(MODELS)("$title", (model) => {
         const sentence = readSentence(text);
         const tiny = viewTiny(lab, sentence.words);
         for (const part of parts) {
-          const html = renderToStaticMarkup(
-            <>
-              <PartCard ref={null} root={root} modelTitle={model.title} part={part} tiny={tiny} index={0} isSelected={false} isOpen={false} onSelect={() => {}} onDetails={() => {}} />
-              <PartDrawer ref={null} root={root} modelId={model.id} modelTitle={model.title} part={part} tiny={tiny} sentence={sentence} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />
-            </>,
-          );
-          expect(html, `${part.id} on "${text}"`).not.toMatch(/undefined|NaN|Infinity|\[object|\$\{/);
-          expect(html, part.id).toContain(part.summary.replaceAll("'", "&#x27;").replaceAll('"', "&quot;"));
-          expect(html, part.id).toContain(part.tiny.missing ? "Not in the tiny model" : `Real ${model.title}`);
-          for (const tinyNumbers of html.split("<dt>Tiny model").slice(1)) {
-            expect(tinyNumbers.slice(0, tinyNumbers.indexOf("</dl>")), part.id).not.toMatch(/<b>0<\/b> numbers?</);
+          const place = placeOf(model, root, part);
+          const card = renderToStaticMarkup(<PartCard ref={null} root={root} modelTitle={model.title} part={part} place={place} index={0} isSelected={false} isOpen={false} onSelect={() => {}} onDetails={() => {}} />);
+          const drawer = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelId={model.id} modelTitle={model.title} part={part} place={place} tiny={tiny} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
+          const info = drawer.split('<div class="drawer-panel">')[0];
+          for (const html of [card, drawer]) {
+            expect(html, `${part.id} on "${text}"`).not.toMatch(/undefined|NaN|Infinity|\[object|\$\{/);
+            expect(html, part.id).toContain(part.summary.replaceAll("'", "&#x27;").replaceAll('"', "&quot;"));
+            expect(html, part.id).toContain(`<dt>Real ${model.title}</dt>`);
           }
+          expect(card, part.id).not.toMatch(/tiny/i);
+          expect(info, part.id).not.toMatch(TINY_COMPARISON);
+          expect(info, part.id).toContain("<span>Where</span>");
         }
       }
     });
@@ -158,6 +160,47 @@ describe.each(MODELS)("$title", (model) => {
     const steps = model.modes.use.children ?? [];
     expect(steps.find((step) => step.id === "tokenize")?.facts.weightCount).toBe(0);
     expect(steps.find((step) => step.id === "generate")?.facts.weightCount).toBe(0);
+  });
+});
+
+describe("where a part sits in the real model", () => {
+  const [gpt2, llama] = MODELS;
+  const placeIn = (model: (typeof MODELS)[number], mode: ModeId, id: string) => {
+    const root = model.modes[mode];
+    const part = allParts(root).find((each) => each.id === id);
+    if (!part) throw new Error(id);
+    return { part, place: placeOf(model, root, part) };
+  };
+
+  test("the path and copies come from the tree", () => {
+    const { place } = placeIn(gpt2, "use", "query-multiply-add");
+    expect(place.path.map((part) => part.id)).toEqual(["use", "layers", "layer", "attention", "head", "query", "query-number", "query-multiply-add"]);
+    expect(place.copies).toBe(12 * 12 * 64 * 768);
+    expect(place.isInModel).toBe(true);
+    expect(placeIn(gpt2, "use", "softmax").place.isInModel).toBe(false);
+  });
+
+  test("a multiply-and-add says how many times it runs per word", () => {
+    const query = placeIn(gpt2, "build", "query-multiply-add");
+    expect(keyFactOf(query.part, query.place, true)).toEqual({ label: RUNS_LABEL, value: "7,077,888 times", source: "gpt-2-config", isComputed: true });
+    expect(keyFactOf(query.part, query.place, false).value).toBe("7.08M times");
+    const score = placeIn(llama, "use", "score-multiply-add");
+    expect(runsOf(score.part, score.place, true)).toBe("up to 1,073,741,824 times");
+  });
+
+  test("a part with stored numbers gives its share of the model", () => {
+    const table = placeIn(gpt2, "use", "word-table");
+    expect(shareOf(table.part, table.place, true)).toBe("38,597,376 of 124,439,808 (31%)");
+    const layer = placeIn(gpt2, "use", "layer");
+    expect(keyFactOf(layer.part, layer.place, false).value).toBe("68.3% for all 12");
+    expect(shareOf(layer.part, layer.place, true)).toBe("85,054,464 of 124,439,808 (68.3%), all 12 together");
+    const architecture = placeIn(llama, "build", "architecture");
+    expect(shareOf(architecture.part, architecture.place, true)).toBeNull();
+  });
+
+  test("a step outside the model shows its first published note", () => {
+    const stop = placeIn(llama, "use", "stop-check");
+    expect(keyFactOf(stop.part, stop.place, false)).toMatchObject({ label: "Instruct model", source: "llama-3-tokenizer", isComputed: false });
   });
 });
 

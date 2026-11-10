@@ -1,3 +1,4 @@
+import type { WritingNotes } from "@/features/take-apart/interfaces/inference-spec.interface";
 import type { RealNote, UseReasons } from "@/features/take-apart/interfaces/real-facts.interface";
 
 export const LLAMA_3_TRANSFORMER: RealNote = { label: "Built on", value: "\"we opted for a relatively standard decoder-only transformer architecture in Llama 3\"", source: "llama-3-blog" };
@@ -76,4 +77,13 @@ export const LLAMA_3_USE_REASONS: UseReasons = {
     { label: "In Llama 3's code", value: "\"self.cache_k[:bsz, start_pos : start_pos + seqlen] = xk\" saves the new keys, and \"keys = self.cache_k[:bsz, : start_pos + seqlen]\" reads them all back", source: "llama-3-code" },
     LLAMA_3_GQA,
   ],
+};
+
+export const LLAMA_3_WRITING_NOTES: WritingNotes = {
+  softmax: { label: "Default temperature", value: "0.6; the scores are divided by it first", source: "llama-3-generation" },
+  chance: { label: "Whose scores", value: "only the last word's, logits[:, -1]", source: "llama-3-generation" },
+  generate: { label: "Meta's defaults", value: "temperature 0.6 and top-p 0.9", source: "llama-3-generation" },
+  "write-round": { label: "Words run each round", value: "only the ones not read yet", source: "llama-3-generation" },
+  pick: { label: "Temperature 0", value: "always takes the top word, with no roll", source: "llama-3-generation" },
+  append: { label: "Written into", value: "the next place, by tokens[:, cur_pos] = next_token", source: "llama-3-generation" },
 };

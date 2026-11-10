@@ -12,8 +12,8 @@ const notPublished = (label: string, shape: string, reasons: RealNote[]): StepFa
 });
 
 const WORD_LIST: RealNote[] = [
-  { label: "Word list", value: "128K words, 128,256 exactly", source: "llama-3-settings" },
   { label: "Special words", value: "256 kept for markers such as end of text, so 128,000 regular words (worked out)", source: "llama-3-tokenizer" },
+  { label: "Word list", value: "128K words, 128,256 exactly", source: "llama-3-settings" },
 ];
 
 const METHODS: RealNote = { label: "Methods", value: "SFT, rejection sampling, PPO and DPO, for the Instruct version", source: "llama-3-blog" };
@@ -32,8 +32,8 @@ export const LLAMA_3_BUILD: BuildFacts = {
     headline: { value: 15_000_000_000_000, unit: "words", isOver: true },
     sources: ["llama-3-card", "llama-3-blog"],
     notes: [
-      { label: "Size", value: "over 15 trillion words (tokens), all from publicly available sources", source: "llama-3-blog" },
       { label: "Compared with Llama 2", value: "seven times more data, and four times more code", source: "llama-3-blog" },
+      { label: "Size", value: "over 15 trillion words (tokens), all from publicly available sources", source: "llama-3-blog" },
       { label: "Languages", value: "over 5% is non-English, covering over 30 languages", source: "llama-3-blog" },
       { label: "Newest text", value: "March 2023, for the 8B model", source: "llama-3-card" },
       { label: "Meta user data", value: "none", source: "llama-3-card" },
@@ -79,9 +79,9 @@ export const LLAMA_3_BUILD: BuildFacts = {
     headline: { value: 128_256, unit: "words" },
     sources: ["llama-3-card", "llama-3-blog", "llama-3-settings", "llama-3-tokenizer"],
     notes: [
-      ...WORD_LIST,
-      { label: "Built on", value: "OpenAI's tiktoken library", source: "llama-3-tokenizer" },
       { label: "Fewer pieces", value: "up to 15% fewer pieces than Llama 2 for the same text", source: "llama-3-blog" },
+      { label: "Built on", value: "OpenAI's tiktoken library", source: "llama-3-tokenizer" },
+      ...WORD_LIST,
     ],
     reasons: [LLAMA_3_TOKENIZER, LLAMA_3_FEWER_PIECES],
   },
@@ -100,10 +100,10 @@ export const LLAMA_3_BUILD: BuildFacts = {
     headline: { value: 15_000_000_000_000, unit: "words trained on", isOver: true },
     sources: ["llama-3-card", "llama-3-blog"],
     notes: [
+      { label: "Computer time", value: "1.3 million GPU hours on H100-80GB chips", source: "llama-3-card" },
       { label: "Words trained on", value: "over 15 trillion (tokens)", source: "llama-3-card" },
       { label: "Text length", value: "8,192 words (tokens)", source: "llama-3-card" },
       { label: "Documents kept apart", value: "a mask stops attention crossing from one document to the next", source: "llama-3-blog" },
-      { label: "Computer time", value: "1.3 million GPU hours on H100-80GB chips", source: "llama-3-card" },
       { label: "Carbon", value: "390 tonnes CO2eq, offset by Meta", source: "llama-3-card" },
     ],
     reasons: [{ label: "Meta's reason", value: "\"Both our 8B and 70B parameter models continued to improve log-linearly after we trained them on up to 15T tokens\"", source: "llama-3-blog" }, { label: "Far past the usual", value: "\"while the Chinchilla-optimal amount of training compute for an 8B parameter model corresponds to ~200B tokens, we found that model performance continues to improve even after the model is trained on two orders of magnitude more data\"", source: "llama-3-blog" }],
@@ -113,7 +113,7 @@ export const LLAMA_3_BUILD: BuildFacts = {
     shape: "1 chance out of 128,256",
     headline: { value: 128_256, unit: "words to choose from" },
     sources: ["llama-3-settings"],
-    notes: [{ label: "Word list", value: "128,256 words (vocab_size)", source: "llama-3-settings" }],
+    notes: [{ label: "Looks back on", value: "up to 8,192 earlier words (tokens)", source: "llama-3-card" }, { label: "Word list", value: "128,256 words (vocab_size)", source: "llama-3-settings" }],
     reasons: [{ label: "What it is", value: "\"Llama 3 is an auto-regressive language model\"", source: "llama-3-card" }],
   },
   "loss-term": notPublished("Training loss", "loss values not published", [{ label: "Planning ahead", value: "\"scaling laws allow us to predict the performance of our largest models on key tasks\"", source: "llama-3-blog" }, { label: "Loss values", value: "Not published", source: "llama-3-card" }]),
@@ -121,7 +121,7 @@ export const LLAMA_3_BUILD: BuildFacts = {
     shape: "one slope per stored number",
     headline: { value: 8_030_261_248, unit: "slopes per round", isComputed: true },
     sources: ["llama-3-settings", "llama-3-weights"],
-    notes: [{ label: "Slopes", value: "one for each of the 8,030,261,248 stored numbers", source: "llama-3-weights" }],
+    notes: [{ label: "Training code", value: "Not published; Meta's released code only runs the model to write text", source: "llama-3-code" }, { label: "Slopes", value: "one for each of the 8,030,261,248 stored numbers", source: "llama-3-weights" }],
     reasons: [{ label: "Training code", value: "Not published. Meta's model code, llama/model.py, runs under torch.inference_mode() to write text, not to train.", source: "llama-3-code" }],
   },
   "adam-update": notPublished("Optimizer", "optimizer not published", [{ label: "Optimizer", value: "Not published for Llama 3 8B in the model card or Meta's blog", source: "llama-3-card" }]),
@@ -167,8 +167,8 @@ export const LLAMA_3_BUILD: BuildFacts = {
     headline: { value: 66.6, unit: "% right on MMLU" },
     sources: ["llama-3-card"],
     notes: [
-      MMLU,
       { label: "Base model", value: "ARC-Challenge 78.6, Winogrande 76.1", source: "llama-3-card" },
+      MMLU,
       { label: "Instruct model", value: "GSM-8K 79.6, HumanEval 62.2", source: "llama-3-card" },
     ],
     reasons: [{ label: "Keeping tests apart", value: "\"To prevent accidental overfitting of our models on this evaluation set, even our own modeling teams do not have access to it\"", source: "llama-3-blog" }],

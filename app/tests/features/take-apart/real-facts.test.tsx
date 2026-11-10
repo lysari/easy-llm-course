@@ -5,8 +5,9 @@ import type { ModelPart } from "@/features/take-apart/interfaces/model-part.inte
 import { MODELS } from "@/features/take-apart/models";
 import { PartCard } from "@/features/take-apart/part-card";
 import { PartDrawer } from "@/features/take-apart/part-drawer";
+import { placeOf } from "@/features/take-apart/real-place";
 import { readSentence } from "@/features/take-apart/sentence";
-import { readTinyPart, viewTiny } from "@/features/take-apart/tiny-parts";
+import { viewTiny } from "@/features/take-apart/tiny-parts";
 import { SOURCES } from "@/features/take-apart/trees/sources";
 
 const PLACEHOLDERS = /at a time|not covered|not given|sample/i;
@@ -74,19 +75,13 @@ describe.each(MODELS)("$title real facts", (model) => {
     }
   });
 
-  test("the tiny model's sentences are labelled as written by hand", () => {
-    const tiny = viewTiny(new ModelLab(), readSentence("").words);
-    expect(readTinyPart({ part: "corpus", level: "whole" }, tiny).title).toContain("written by hand");
-    expect(partIn(model.modes.build, "gather")?.tiny.missing).toContain("written by hand");
-  });
-
   test("a part with no stored numbers says None to learn, never 0", () => {
     const tiny = viewTiny(new ModelLab(), readSentence("").words);
     const root = model.modes.build;
     for (const id of ["gather", "tokenizer", "pre-training"]) {
       const part = partIn(root, id);
       if (!part) throw new Error(id);
-      const html = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelId={model.id} modelTitle={model.title} part={part} tiny={tiny} sentence={readSentence("")} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
+      const html = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelId={model.id} modelTitle={model.title} part={part} place={placeOf(model, root, part)} tiny={tiny} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
       expect(html, id).toContain("<span>Numbers</span><span>None to learn</span>");
       expect(html, id).not.toContain("<span>Numbers</span><span>0</span>");
     }
@@ -130,8 +125,7 @@ describe("published numbers", () => {
   test("a word ID is never shortened on the card", () => {
     const part = partIn(llama.modes.use, "stop-check");
     if (!part) throw new Error("stop-check");
-    const tiny = viewTiny(new ModelLab(), readSentence("").words);
-    const html = renderToStaticMarkup(<PartCard ref={null} root={llama.modes.use} modelTitle={llama.title} part={part} tiny={tiny} index={0} isSelected={false} isOpen={false} onSelect={() => {}} onDetails={() => {}} />);
+    const html = renderToStaticMarkup(<PartCard ref={null} root={llama.modes.use} modelTitle={llama.title} part={part} place={placeOf(llama, llama.modes.use, part)} index={0} isSelected={false} isOpen={false} onSelect={() => {}} onDetails={() => {}} />);
     expect(html).toContain("<b>128,001</b>");
   });
 });

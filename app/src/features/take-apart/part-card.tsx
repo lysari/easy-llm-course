@@ -1,5 +1,6 @@
 import type { Ref } from "react";
-import type { ModelPart, TinyView } from "@/features/take-apart/interfaces/model-part.interface";
+import type { ModelPart } from "@/features/take-apart/interfaces/model-part.interface";
+import type { PartPlace } from "@/features/take-apart/interfaces/part-place.interface";
 import { STAGGER_MS } from "@/shared/components/flow-links";
 import { Icon } from "@/shared/components/icon";
 import { StatusPill } from "@/shared/components/status-pill";
@@ -18,7 +19,7 @@ interface PartCardProps {
   root: ModelPart;
   modelTitle: string;
   part: ModelPart;
-  tiny: TinyView;
+  place: PartPlace;
   index: number;
   isSelected: boolean;
   isOpen: boolean;
@@ -26,10 +27,7 @@ interface PartCardProps {
   onDetails: () => void;
 }
 
-export function tagOf(part: ModelPart): Status | undefined {
-  if (part.groundZero) return "ground-zero";
-  return part.tiny.missing ? "lesson" : undefined;
-}
+export const tagOf = (part: ModelPart): Status | undefined => (part.groundZero ? "ground-zero" : undefined);
 
 const nameOf = (part: ModelPart) => (part.copies > 1 ? `${part.title} × ${count(part.copies)}` : part.title);
 
@@ -45,7 +43,7 @@ export const partsOf = (children: ModelPart[]) => `${children.length} ${children
 export const numbersOf = (part: ModelPart) =>
   part.copies > 1 && part.facts.weightCount > 0 ? `${count(part.facts.weightCount)} each · ${count(part.facts.weightCount * part.copies)} in all` : count(part.facts.weightCount);
 
-export function PartCard({ ref, root, modelTitle, part, tiny, index, isSelected, isOpen, onSelect, onDetails }: PartCardProps) {
+export function PartCard({ ref, root, modelTitle, part, place, index, isSelected, isOpen, onSelect, onDetails }: PartCardProps) {
   const step = stepOf(part, root);
   const tag = tagOf(part);
   return (
@@ -73,7 +71,7 @@ export function PartCard({ ref, root, modelTitle, part, tiny, index, isSelected,
       </div>
       <p className="part-summary">{part.summary}</p>
       <InOut facts={part.facts} isDetailed={false} />
-      <PartNumbers modelTitle={modelTitle} part={part} tiny={tiny} isExact={false} />
+      <PartNumbers modelTitle={modelTitle} part={part} place={place} isExact={false} />
       <div className="part-card-foot">
         {part.children && <span>{partsOf(part.children)} <span aria-hidden="true">›</span></span>}
         <button

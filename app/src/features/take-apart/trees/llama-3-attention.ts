@@ -7,7 +7,6 @@ import { LLAMA_3_SETTINGS } from "./sources";
 const WIDTH = 4096;
 const HEAD_SIZE = 128;
 const CONTEXT = 8192;
-const NO_ROPE = "Our tiny model has no RoPE. It adds a learned position table to the words instead.";
 
 const rope: ModelPart = {
   id: "rope",
@@ -16,7 +15,7 @@ const rope: ModelPart = {
   summary: "Turns the query numbers by an angle that grows with the word's place.",
   copies: 1,
   facts: { shape: "64 turned pairs", weightCount: 0, headline: { value: HEAD_SIZE / 2, unit: "pairs turned", isComputed: true }, input: "query and place", output: "128 turned numbers", inputDetail: "128 query numbers and the word's place", outputDetail: "128 turned query numbers", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_ROPE, LLAMA_3_NO_REASON] },
-  tiny: { part: "position-table", level: "whole", missing: NO_ROPE },
+  tiny: { part: "position-table", level: "whole" },
   lesson: "Lesson 25",
   reverseLesson: "RL-02",
   explanation:
@@ -39,7 +38,7 @@ const rope: ModelPart = {
       summary: "Turns one number of a pair, using the cos and sin of its angle.",
       copies: HEAD_SIZE,
       facts: { shape: "1", weightCount: 0, headline: { value: HEAD_SIZE, unit: "per query", isComputed: true }, input: "2 numbers, 1 angle", output: "1 number", inputDetail: "a pair of numbers and an angle", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_ROPE] },
-      tiny: { part: "position-table", level: "number", missing: NO_ROPE },
+      tiny: { part: "position-table", level: "number" },
       lesson: "Lesson 25",
       reverseLesson: "RL-02",
       explanation: "One number of the turned pair: two multiply-and-adds, with cos and sin of the angle as the second numbers.",
@@ -61,7 +60,7 @@ const rope: ModelPart = {
           summary: "Multiplies one number by the cos or sin of its angle and adds it to the sum.",
           copies: 2,
           facts: { shape: "1 × 1", weightCount: 0, headline: { value: 2, unit: "per turned number", isComputed: true }, input: "1 number, cos or sin", output: "the running sum", inputDetail: "1 number and its cos or sin", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_ROPE] },
-          tiny: { part: "position-table", level: "number", missing: NO_ROPE },
+          tiny: { part: "position-table", level: "number" },
           lesson: "Lessons 00, 25",
           reverseLesson: "RL-06",
           explanation: "Ground zero. One query number times the cos (or minus sin) of its angle, added to the running sum.",
