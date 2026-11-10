@@ -39,6 +39,10 @@ export const LLAMA_3_BUILD: BuildFacts = {
       { label: "From", value: "\"a new mix of publicly available online data\"", source: "llama-3-card" },
       { label: "Documents and how text was copied", value: "Not published", source: "llama-3-card" },
     ],
+    reasons: [
+      { label: "Meta's reason", value: "\"the curation of a large, high-quality training dataset is paramount\"", source: "llama-3-blog" },
+      { label: "How text was copied out of pages", value: "Not published. The model card and Meta's blog do not say.", source: "llama-3-card" },
+    ],
   },
   filter: {
     shape: "filter rules not published",

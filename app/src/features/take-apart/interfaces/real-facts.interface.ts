@@ -30,6 +30,7 @@ export interface RealFacts {
   outputDetail?: string;
   sources: SourceId[];
   notes?: RealNote[];
+  reasons?: RealNote[];
 }
 
 export interface StepFacts {
@@ -37,6 +38,7 @@ export interface StepFacts {
   headline: Headline;
   sources: SourceId[];
   notes: RealNote[];
+  reasons?: RealNote[];
 }
 
 export type BuildStepId =

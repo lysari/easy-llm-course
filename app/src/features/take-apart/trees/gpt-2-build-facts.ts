@@ -39,6 +39,11 @@ export const GPT_2_BUILD: BuildFacts = {
       { label: "Links", value: "45 million outbound links from Reddit posts with at least 3 karma", source: "gpt-2-paper" },
       { label: "Text pulled out with", value: "the Dragnet and Newspaper content extractors", source: "gpt-2-paper" },
     ],
+    reasons: [
+      { label: "Raw web scrapes", value: "web scrapes such as Common Crawl \"have significant data quality issues\"", source: "gpt-2-paper" },
+      { label: "Common Crawl pages", value: "many documents \"whose content are mostly unintelligible\" (Trinh & Le, 2018, quoted in the paper)", source: "gpt-2-paper" },
+      { label: "What OpenAI did", value: "\"To extract the text from HTML responses we use a combination of the Dragnet … and Newspaper content extractors\"", source: "gpt-2-paper" },
+    ],
   },
   filter: {
     shape: "Reddit karma of at least 3",

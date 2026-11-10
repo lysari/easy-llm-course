@@ -81,6 +81,10 @@
   --chip: var(--white);
   --chip-hover: var(--gray-75);
   --rule-line: var(--gray-300);
+  --kept: var(--green-700);
+  --dropped-text: var(--orange-600);
+  --dropped-code: var(--purple-700);
+  --dropped-markup: var(--gray-400);
   --toggle: var(--teal-500);
   --toggle-knob: var(--white);
   --code-identifier: var(--gray-950);
@@ -128,6 +132,10 @@
     --chip: var(--slate-650);
     --chip-hover: var(--slate-625);
     --rule-line: var(--slate-600);
+    --kept: var(--green-300);
+    --dropped-text: var(--orange-400);
+    --dropped-code: var(--purple-300);
+    --dropped-markup: var(--slate-400);
     --code-identifier: var(--gray-125);
     --code-keyword: var(--purple-300);
     --code-string: var(--green-300);

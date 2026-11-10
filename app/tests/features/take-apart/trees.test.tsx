@@ -140,7 +140,7 @@ describe.each(MODELS)("$title", (model) => {
           const html = renderToStaticMarkup(
             <>
               <PartCard ref={null} root={root} modelTitle={model.title} part={part} tiny={tiny} index={0} isSelected={false} isOpen={false} onSelect={() => {}} onDetails={() => {}} />
-              <PartDrawer ref={null} root={root} modelTitle={model.title} part={part} tiny={tiny} sentence={sentence} onClose={() => {}} />
+              <PartDrawer ref={null} root={root} modelTitle={model.title} part={part} tiny={tiny} sentence={sentence} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />
             </>,
           );
           expect(html, `${part.id} on "${text}"`).not.toMatch(/undefined|NaN|Infinity|\[object|\$\{/);

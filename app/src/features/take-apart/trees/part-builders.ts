@@ -55,6 +55,7 @@ export const stepFacts = (facts: StepFacts, input: string, output: string, detai
   ...detail,
   sources: facts.sources,
   notes: facts.notes,
+  reasons: facts.reasons,
 });
 
 const NO_BIAS = "Our tiny model has no biases. Its numbers come from the multiply-and-adds alone.";

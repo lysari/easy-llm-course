@@ -5,6 +5,7 @@
 - Package Manager: bun (`bun.lock`). Never add a second lockfile.
 - Tests: `bun:test`
 - Code colours: `sugar-high` (token API only). Prettier is a dev dependency used only by the lesson snippet test.
+- Page text extraction: `@mozilla/readability` (pinned, Apache-2.0), used only by Take apart's "Copy one document in" demo. `happy-dom` is a dev dependency used only by that demo's test, to parse HTML in `bun:test`.
 - Runs entirely in the browser. There is no server, database or auth.
 - Pages are path routes: `/` is Lessons, `/playground` is Playground and `/take-apart/:model/:mode/*` is Take apart (`/take-apart` alone goes to `/take-apart/gpt-2-small/use`), through React Router. Any host must rewrite every path to `index.html`, and `dist/` can no longer be opened straight from the file system.
 
@@ -25,8 +26,9 @@ src/
 │   │   └── interfaces/         # types private to Playground
 │   └── take-apart/             # Take apart page: take-apart-page, take-apart-header (mode switch, model select), sentence-bar, breadcrumb, part-column, part-card (its own card, not `FlowCard`), part-numbers (the Real | Tiny numbers strip), in-out (the in → out chips), part-drawer, fact-rows, live-example (.tsx), models.ts (routes and paths), sentence.ts (reads the user's sentence), tiny-parts.ts (live tiny model readouts) and take-apart.css
 │       ├── trees/              # one tree of real parts per model (gpt-2-*, llama-3-*), each model's Build facts (gpt-2-build-facts, llama-3-build-facts), the step builders for both modes (inference-steps, lifecycle-steps, training-steps, evaluation-steps), sources (every real fact's source, with its URL), part-builders and attention-math
-│       ├── hooks/              # use-take-apart (selected path, model, drawer, column scrolling), use-tiny-lab (the page's own ModelLab and its frame loop)
-│       └── interfaces/         # model-part (ModelPart, RealModel, TinyLink, TinyReadout), real-facts (RealFacts, RealNote, Amount, Headline, Unstated, StepFacts, BuildFacts), sentence (Sentence)
+│       ├── story/              # the drawer's "Why it exists", "Watch it happen" and "When you'd do this" (story-sections), the demos (copy-document-demo, page-extract-result), extract-page (Readability, counts), saved-page with its saved HTML (weather-gov-lightning.json) and story.css
+│       ├── hooks/              # use-take-apart (selected path, model, drawer, column scrolling), use-tiny-lab (the page's own ModelLab and its frame loop), use-page-extract (the page demo's state)
+│       └── interfaces/         # model-part (ModelPart, PartStory, DemoId, RealModel, TinyLink, TinyReadout), real-facts (RealFacts, RealNote, Amount, Headline, Unstated, StepFacts, BuildFacts), sentence (Sentence), page-extract (PageExtract)
 └── shared/
     ├── components/             # React components used by 2 or more modules: Icon, SparkleIcon, ChanceBars, LossPlot, FlowCard, StatusPill, FlowLinks, Drawer, FormulaBlock, CodeBlock, CopyButton, each with its own stylesheet beside it
     ├── hooks/                  # React hooks used by 2 or more modules: use-drawer, use-flow-links, use-window-width
@@ -80,7 +82,7 @@ docs/                           # one doc per page, kept out of git by docs/.git
 - Narrow width: `useWindowWidth()` and `NARROW_WIDTH` (960px, matching the stylesheets' `max-width: 960px`) in `src/shared/hooks/use-window-width.ts`.
 - Snippets: `FormulaBlock` (`{ formula: Formula }`), `CodeBlock` (`{ code: string }`) and `CopyButton` (`{ text, label }`) in `src/shared/components/` (`formula-block.tsx`, `code-block.tsx`, `copy-button.tsx`, styled by `snippet-blocks.css`). `Formula` and `FormulaTerm` live in `src/shared/interfaces/formula.interface.ts`. Code colours come from `sugar-high` tokens rendered as JSX spans, never its HTML string.
 - Frame loops: `use-session.ts` (Lessons), `use-training-loop.ts` (Playground) and `use-tiny-lab.ts` (Take apart) stay in their features; they drive different objects in different ways, so there is no shared loop hook.
-- Network, auth and notifications: none exist, and none are needed.
+- Network, auth and notifications: none exist, and none are needed. A saved web page is stored in the app, never fetched.
 
 ## UI & Styling Conventions
 - Rendering: React components with JSX, under `StrictMode`. No `dangerouslySetInnerHTML` and no `innerHTML`. Every effect cleans up its listeners, timers and frames.
@@ -135,3 +137,5 @@ docs/                           # one doc per page, kept out of git by docs/.git
 - Take apart page: top-down tour of a real LLM (GPT-2 small or Llama 3 8B from a dropdown), Fleet look in left → right columns that keep the whole selected path visible; the breadcrumb only shows the path and scrolls to a card; real sizes plus the tiny model live, down to a single multiply-and-add; chosen by the user 2026-11-09. The user chose this row of columns for this page even though a single long row was rejected for Lessons
 - Take apart steps: two modes, Use a model (5 steps) and Build a model (6 stages), as numbered step cards in the first column that open into the parts tree; live tiny example from the user's own sentence; chosen by the user 2026-11-09
 - Real-model facts: every fact about GPT-2 small and Llama 3 8B on Take apart (headlines, shapes, number counts, in/out labels, drawer rows, numbers in text) is stated in a published source or worked out exactly from published settings (marked `isComputed`), and links to an entry in `features/take-apart/trees/sources.ts`; a fact the makers never gave says "Not published", a step that does not apply says "None: …"; nothing is estimated, and the tiny model's values come only from the running tiny model and its hand-written corpus; chosen by the user 2026-11-10
+- Why, watch and when: each Take apart step gets "Why it exists" (what goes wrong without it, with the real model's reasons sourced or "Not published"), "Watch it happen" (a real, interactive before → after of exactly that step) and "When you'd do this" (when and what for, and the step it feeds), right after "What it does" in the drawer, as `ModelPart.story` plus `StepFacts.reasons`; a test lists the steps still missing one as todo; asked for by the user 2026-11-10 ("show a real cow eating grass"), "Copy one document in" first
+- Demo honesty: a "Watch it happen" demo runs a real tool on real data live in the browser (a real public-domain page saved whole, with its URL and fetch date, and Mozilla Readability) and never shows a made-up output; when the tool differs from what the model's makers used it says so and names theirs, or "Not published"; chosen 2026-11-10

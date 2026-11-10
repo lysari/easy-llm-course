@@ -50,6 +50,16 @@ export interface TinyLink {
   missing?: string;
 }
 
+export type DemoId = "copy-document";
+
+export interface PartStory {
+  problem: string;
+  demo: DemoId;
+  when: string;
+  feeds: string;
+  nextId?: string;
+}
+
 export interface ModelPart {
   id: string;
   icon: string;
@@ -62,6 +72,7 @@ export interface ModelPart {
   reverseLesson: string;
   explanation: string;
   why: string;
+  story?: PartStory;
   formula?: Formula;
   code?: string;
   groundZero?: GroundZero;

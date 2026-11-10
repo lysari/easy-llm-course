@@ -19,7 +19,7 @@ const partIn = (part: ModelPart, id: string) => allParts(part).find((each) => ea
 function factTexts(part: ModelPart) {
   const { facts } = part;
   const headline = "text" in facts.headline ? [facts.headline.text] : [facts.headline.unit];
-  return [facts.shape, facts.input, facts.output, facts.inputDetail ?? "", facts.outputDetail ?? "", ...headline, ...(facts.notes ?? []).flatMap((note) => [note.label, note.value])];
+  return [facts.shape, facts.input, facts.output, facts.inputDetail ?? "", facts.outputDetail ?? "", ...headline, ...[...(facts.notes ?? []), ...(facts.reasons ?? [])].flatMap((note) => [note.label, note.value])];
 }
 
 function gpt2Count(vocab: number, context: number, width: number, layers: number) {
@@ -52,7 +52,7 @@ describe.each(MODELS)("$title real facts", (model) => {
     for (const part of parts) {
       expect(part.facts.sources.length, part.id).toBeGreaterThan(0);
       for (const id of part.facts.sources) expect(SOURCES, `${part.id}: ${id}`).toHaveProperty(id);
-      for (const note of part.facts.notes ?? []) {
+      for (const note of [...(part.facts.notes ?? []), ...(part.facts.reasons ?? [])]) {
         expect(SOURCES, `${part.id}: ${note.source}`).toHaveProperty(note.source);
         expect(note.value.length, part.id).toBeGreaterThan(2);
       }
@@ -86,7 +86,7 @@ describe.each(MODELS)("$title real facts", (model) => {
     for (const id of ["gather", "tokenizer", "pre-training"]) {
       const part = partIn(root, id);
       if (!part) throw new Error(id);
-      const html = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelTitle={model.title} part={part} tiny={tiny} sentence={readSentence("")} onClose={() => {}} />);
+      const html = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelTitle={model.title} part={part} tiny={tiny} sentence={readSentence("")} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
       expect(html, id).toContain("<span>Numbers</span><span>None to learn</span>");
       expect(html, id).not.toContain("<span>Numbers</span><span>0</span>");
     }

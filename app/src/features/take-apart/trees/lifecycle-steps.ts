@@ -38,6 +38,13 @@ function dataStep(facts: BuildFacts): ModelPart {
         reverseLesson: "RL-04",
         explanation: "Ground zero. Take one web page, strip out the menus and code, and keep its plain text as one document.",
         why: "Nobody reads it first. It goes in as a long run of characters.",
+        story: {
+          problem: "A web page is mostly not writing: it is HTML tags, menus, links, scripts and a footer wrapped around a few paragraphs. A model only learns to echo what it reads, so trained on raw pages it would learn to write menus and code. This step keeps just the words someone wrote.",
+          demo: "copy-document",
+          when: "When you build your own training text from the web. You run it once on every page you download, before any other check, so every later step works on words, not code.",
+          feeds: "What comes out, one plain-text document, goes next to the quality check, which keeps it or drops it.",
+          nextId: "filter",
+        },
         formula: { lines: ["document = text(page)"] },
         groundZero: "action",
       },

@@ -21,7 +21,9 @@ export function TakeApartPage({ isOpen }: { isOpen: boolean }) {
   const tiny = viewTiny(lab, sentence.words);
   const root = path[0];
   const columns = useMemo(() => path.map((part) => ({ parent: part, parts: part.children ?? [] })), [path]);
-  const openPart = columns.flatMap((column) => column.parts).find((part) => part.id === openId);
+  const shownParts = columns.flatMap((column) => column.parts);
+  const openPart = shownParts.find((part) => part.id === openId);
+  const nextPart = shownParts.find((part) => part.id === openPart?.story?.nextId);
 
   return (
     <main className="page" id="take-apart" hidden={!isOpen}>
@@ -50,7 +52,7 @@ export function TakeApartPage({ isOpen }: { isOpen: boolean }) {
           ))}
         </div>
       </div>
-      {openPart && <PartDrawer ref={takeApart.drawerRef} root={root} modelTitle={model.title} part={openPart} tiny={tiny} sentence={sentence} onClose={takeApart.closeDrawer} />}
+      {openPart && <PartDrawer ref={takeApart.drawerRef} root={root} modelTitle={model.title} part={openPart} tiny={tiny} sentence={sentence} nextPart={nextPart} onOpen={takeApart.showDetails} onClose={takeApart.closeDrawer} />}
     </main>
   );
 }

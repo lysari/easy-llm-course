@@ -11,6 +11,7 @@ import { InOut } from "./in-out";
 import { LiveExample } from "./live-example";
 import { DRAWER_ID, NO_LESSON, numbersOf, partsOf, tagOf, titleOf } from "./part-card";
 import { NONE_TO_LEARN, PartNumbers } from "./part-numbers";
+import { StorySections } from "./story/story-sections";
 import { readTinyPart } from "./tiny-parts";
 import { SOURCES } from "./trees/sources";
 
@@ -42,10 +43,12 @@ interface PartDrawerProps {
   part: ModelPart;
   tiny: TinyView;
   sentence: Sentence;
+  nextPart: ModelPart | undefined;
+  onOpen: (id: string) => void;
   onClose: () => void;
 }
 
-export function PartDrawer({ ref, root, modelTitle, part, tiny, sentence, onClose }: PartDrawerProps) {
+export function PartDrawer({ ref, root, modelTitle, part, tiny, sentence, nextPart, onOpen, onClose }: PartDrawerProps) {
   const readout = readTinyPart(part.tiny, tiny);
   const notes = part.facts.notes ?? [];
   const sources = [...new Set([...part.facts.sources, ...notes.map((note) => note.source)])];
@@ -71,6 +74,7 @@ export function PartDrawer({ ref, root, modelTitle, part, tiny, sentence, onClos
         <p className="note">{part.explanation}</p>
         <p className="why">{part.why}</p>
       </section>
+      {part.story && <StorySections story={part.story} reasons={part.facts.reasons ?? []} nextPart={nextPart} onOpen={onOpen} />}
       <section className="section">
         <p className="section-title">What goes in and out</p>
         <InOut facts={part.facts} isDetailed />
