@@ -3,7 +3,7 @@ import { inferenceRoot } from "./inference-steps";
 import { lifecycleRoot } from "./lifecycle-steps";
 import { LLAMA_3_BUILD } from "./llama-3-build-facts";
 import { llama3Layers } from "./llama-3-layer";
-import { LLAMA_3_AUTOREGRESSIVE, LLAMA_3_FINAL_NORM, LLAMA_3_NO_REASON, LLAMA_3_OUTPUT, LLAMA_3_RMS_NORM, LLAMA_3_TRANSFORMER, LLAMA_3_WORD_TABLE } from "./llama-3-reasons";
+import { LLAMA_3_AUTOREGRESSIVE, LLAMA_3_FINAL_NORM, LLAMA_3_NO_REASON, LLAMA_3_OUTPUT, LLAMA_3_RMS_NORM, LLAMA_3_ROPE, LLAMA_3_TRANSFORMER, LLAMA_3_USE_REASONS, LLAMA_3_WORD_TABLE } from "./llama-3-reasons";
 import { normPart, projectionPart, tablePart } from "./part-builders";
 import { LLAMA_3_SETTINGS } from "./sources";
 
@@ -139,13 +139,20 @@ const wordOrder: ModelPart = {
   title: "Word order comes later",
   summary: "Adds nothing here, because Llama marks word order later, inside attention.",
   copies: 1,
-  facts: { shape: "nothing stored here", weightCount: 0, headline: { value: 0, unit: "numbers added here" }, input: "word vectors", output: "the same vectors", sources: LLAMA_3_SETTINGS },
+  facts: { shape: "nothing stored here", weightCount: 0, headline: { value: 0, unit: "numbers added here" }, input: "word vectors", output: "the same vectors", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_ROPE, LLAMA_3_NO_REASON] },
   tiny: { part: "position-table", level: "whole", missing: "Our tiny model adds a learned position table here instead, like GPT-2." },
   lesson: "Lesson 25",
   reverseLesson: "RL-02",
   explanation:
     "Ground zero. Nothing is added here: Llama 3 has no position table. Word order comes in later through RoPE, inside each attention head of step 3, which turns every query and key pair by an angle that grows with the word's place.",
   why: "Turning queries and keys makes their match depend on how far apart two words are, and adds no stored numbers.",
+  story: {
+    problem: "Attention looks at all the words at once, so without some sign of order \"dog bites man\" and \"man bites dog\" would look the same. Llama 3 gives that sign later, by turning queries and keys, so nothing is added here.",
+    demo: "tiny-part",
+    when: "Every time a message is read. Nothing happens here; the turning happens in every attention head, for every word.",
+    feeds: "The word rows go into layer 1 unchanged, and RoPE turns their queries and keys inside attention.",
+    nextId: "layers",
+  },
   formula: { lines: ["vector = word table[id]", "place: added later by RoPE"] },
   groundZero: "action",
 };
@@ -170,6 +177,7 @@ export const LLAMA_3_8B: RealModel = {
         { label: "Fewer pieces", value: "up to 15% fewer pieces than Llama 2 for the same text", source: "llama-3-blog" },
       ],
       merges: { text: "Not published" },
+      reasons: LLAMA_3_USE_REASONS,
       mergeNotes: [{ label: "Merge rules", value: "Not published; the rules ship inside the tokenizer file, not in a paper", source: "llama-3-tokenizer" }],
       stopWord: {
         id: 128_001,

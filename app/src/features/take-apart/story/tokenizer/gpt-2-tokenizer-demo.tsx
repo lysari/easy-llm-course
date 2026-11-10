@@ -1,13 +1,16 @@
 import { useId, useState } from "react";
+import { joinTokens } from "@/core/model/corpus";
 import { useGpt2Vocab } from "@/features/take-apart/hooks/use-gpt-2-vocab";
 import type { DemoProps } from "@/features/take-apart/interfaces/model-part.interface";
 import { BeforeAfter, HonestNote } from "@/features/take-apart/story/watch-parts";
 import { SOURCES } from "@/features/take-apart/trees/sources";
 import { count } from "@/shared/utils/format";
-import { BASE_PIECES, type Gpt2Vocab, MAX_TOKENIZE_LENGTH, type Token, encodeText } from "./gpt-2-bpe";
+import { BASE_PIECES, type EncodedWord, type Gpt2Vocab, MAX_TOKENIZE_LENGTH, type Token, encodeText } from "./gpt-2-bpe";
 import { GptTwoNote, PieceChips } from "./tokenizer-parts";
 
 const START_TEXT = "Lightning is a giant spark of electricity.";
+const USE_PARTS = new Set(["tokenize", "split", "apply-merge", "lookup"]);
+const LOOKUP_PARTS = new Set(["assign-id", "lookup"]);
 
 function IdLookup({ token, vocab }: { token: Token; vocab: Gpt2Vocab }) {
   const near = [token.id - 2, token.id - 1, token.id, token.id + 1, token.id + 2].filter((id) => id >= 0 && id < vocab.pieces.length);
@@ -29,10 +32,39 @@ function IdLookup({ token, vocab }: { token: Token; vocab: Gpt2Vocab }) {
   );
 }
 
-export function Gpt2TokenizerDemo({ part, modelId }: DemoProps) {
+function OneMerge({ word, vocab, index, onIndex }: { word: EncodedWord; vocab: Gpt2Vocab; index: number; onIndex: (index: number) => void }) {
+  const rounds = word.steps.length - 1;
+  if (rounds === 0) return <p className="note">{`"${word.text.replace(/ /g, "Ġ")}" is already one piece of the list after its bytes, so no rule is needed.`}</p>;
+  const i = Math.min(Math.max(index, 1), rounds);
+  const { rule, rank, pieces } = word.steps[i];
+  const toChips = (list: string[]) => list.map((piece) => ({ piece, id: vocab.ids.get(piece) ?? -1 }));
+  return (
+    <div className="watch-box">
+      <div className="watch-controls">
+        <button type="button" className="action" onClick={() => onIndex(i - 1)} disabled={i === 1}>
+          Back
+        </button>
+        <button type="button" className="action action--strong" onClick={() => onIndex(i + 1)} disabled={i === rounds}>
+          Next rule
+        </button>
+        <span className="card-lesson">{`Join ${i} of ${rounds}`}</span>
+      </div>
+      <BeforeAfter
+        beforeLabel={rule ? `Rule ${count((rank ?? 0) + 1)} of ${count(vocab.merges.length)}: "${rule[0]}" + "${rule[1]}"` : "Bytes"}
+        before={<PieceChips tokens={toChips(word.steps[i - 1].pieces)} />}
+        afterLabel="Those two side by side are joined"
+        after={<PieceChips tokens={toChips(pieces)} />}
+      />
+      <p className="card-lesson">Of all the pairs side by side, the one whose rule was learned first is joined first. It stops when no pair has a rule.</p>
+    </div>
+  );
+}
+
+export function Gpt2TokenizerDemo({ part, modelId, tiny }: DemoProps) {
   const { vocab, problem } = useGpt2Vocab();
-  const [text, setText] = useState(START_TEXT);
+  const [text, setText] = useState(() => (USE_PARTS.has(part.id) ? joinTokens(tiny.words) : START_TEXT));
   const [picked, setPicked] = useState(0);
+  const [mergeIndex, setMergeIndex] = useState(1);
   const inputId = useId();
   if (problem) return <p className="watch-problem" role="alert">{problem}</p>;
   if (!vocab) return <p className="note">Loading GPT-2's 50,000 merge rules…</p>;
@@ -61,17 +93,18 @@ export function Gpt2TokenizerDemo({ part, modelId }: DemoProps) {
         afterLabel={`${count(tokens.length)} pieces, each with its real GPT-2 ID`}
         after={<PieceChips tokens={tokens} />}
       />
-      {part.id === "assign-id" && word && <IdLookup token={word.tokens[word.tokens.length - 1]} vocab={vocab} />}
+      {LOOKUP_PARTS.has(part.id) && word && <IdLookup token={word.tokens[word.tokens.length - 1]} vocab={vocab} />}
       {word && (
         <div className="watch-box">
           <p className="section-title">Pick a word to watch its merges</p>
           <div className="word-picker">
             {words.map((each, i) => (
-              <button key={i} type="button" className={`word-chip${each === word ? " is-picked" : ""}`} aria-pressed={each === word} onClick={() => setPicked(i)}>
+              <button key={i} type="button" className={`word-chip${each === word ? " is-picked" : ""}`} aria-pressed={each === word} onClick={() => { setPicked(i); setMergeIndex(1); }}>
                 {each.text.replace(/ /g, "Ġ")}
               </button>
             ))}
           </div>
+          {part.id === "apply-merge" && <OneMerge word={word} vocab={vocab} index={mergeIndex} onIndex={setMergeIndex} />}
           <ol className="merge-steps">
             {word.steps.map((each, i) => (
               <li key={i}>
@@ -80,6 +113,13 @@ export function Gpt2TokenizerDemo({ part, modelId }: DemoProps) {
               </li>
             ))}
           </ol>
+        </div>
+      )}
+      {part.id === "tokenize" && (
+        <div className="watch-box">
+          <p className="section-title">{`Our tiny model's own split of "${joinTokens(tiny.words)}"`}</p>
+          <PieceChips tokens={tiny.words.map((each, i) => ({ piece: each, id: tiny.ids[i] }))} />
+          <p className="card-lesson">It has no merge rules: it splits on spaces and looks each word up in its own list. These are the IDs the next steps use.</p>
         </div>
       )}
       <GptTwoNote />

@@ -1,0 +1,49 @@
+.score-scroll {
+  width: 100%;
+  max-height: var(--watch-pane-height);
+  overflow: auto;
+  border: var(--border-thin) solid var(--card-line);
+  border-radius: var(--radius-group);
+  background: var(--card);
+}
+
+.score-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: var(--text-caption);
+}
+
+.score-table th,
+.score-table td {
+  padding: var(--space-tight) var(--space-item);
+  border-bottom: var(--border-thin) solid var(--card-line);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.score-table th:first-child {
+  font-family: var(--font);
+  font-weight: var(--weight-regular);
+  text-align: left;
+}
+
+.score-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--card);
+  color: var(--ink-soft);
+  font-family: var(--font);
+  font-weight: var(--weight-medium);
+}
+
+.score-table tfoot th,
+.score-table tfoot td {
+  border-bottom: 0;
+  font-weight: var(--weight-medium);
+}
+
+.score-table tr.is-picked {
+  background: var(--selected-bg);
+  color: var(--selected-ink);
+}

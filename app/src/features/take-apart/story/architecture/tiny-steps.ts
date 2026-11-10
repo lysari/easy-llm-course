@@ -85,6 +85,19 @@ function normStep(isRms: boolean, input: number[], level: string, out: number, i
   return step([{ label: `number ${j + 1}`, values: [input[j]] }], [{ label: "× g + b, with g = 1, b = 0", values: [normed[j]] }], `(${fixed(input[j])} − ${fixed(mean)}) / ${fixed(spread)} × 1 + 0 = ${fixed(normed[j])}`, note, { terms: termsOf("rescaled", "g", [[normed[j], 1]]), pick: { label: "Number", count: input.length } });
 }
 
+function embeddingStep(view: TinyView, w: number, isRms: boolean): TinyStep {
+  const { trace } = view;
+  const row = `the word row for ID ${view.ids[w]}, "${showWord(VOCABULARY[view.ids[w]])}"`;
+  if (isRms) return step([{ label: row, values: trace.tokenVectors[w] }], [{ label: "into layer 1 in Llama 3: the same row, nothing added", values: trace.tokenVectors[w] }, { label: `our tiny model adds its row for place ${w + 1} instead, like GPT-2`, values: trace.combined[w] }], "x = word table[id]", "Llama 3's step run on our tiny model's real word row: the row goes in as it is. Our tiny model itself adds a learned place row, like GPT-2, shown below it.");
+  return step([{ label: row, values: trace.tokenVectors[w] }, { label: `the place row for place ${w + 1}`, values: trace.positionVectors[w] }], [{ label: "added together: what goes into layer 1", values: trace.combined[w] }], "x = word row + place row", TINY);
+}
+
+function wordOrderStep(view: TinyView, w: number): TinyStep {
+  const query = view.trace.layers[0].queries[w];
+  const note = `Nothing is added here. To show where order comes in, Llama 3's RoPE formula from its code (θ = 500,000) turns our tiny model's real query for word ${w + 1}; that query already holds our tiny model's own place row, since it has no RoPE.`;
+  return step([{ label: `the word row for "${showWord(VOCABULARY[view.ids[w]])}", the same at every place`, values: view.trace.tokenVectors[w] }], [{ label: "after this step: unchanged", values: view.trace.tokenVectors[w] }, { label: `later, inside attention: its query turned for place ${w + 1}`, values: rope(query, w) }], "x = word table[id]; order: q′ = rope(q, place)", note);
+}
+
 function ropeStep(query: number[], place: number, level: string, out: number): TinyStep {
   const turned = rope(query, place);
   const note = `Llama 3's RoPE formula from its code (θ = 500,000), run on our tiny model's real query numbers for word ${place + 1}. Our tiny query has ${VECTOR_SIZE} numbers, Llama 3's has 128, so the angles differ from Llama's own.`;
@@ -129,6 +142,8 @@ export function tinyStep(part: ModelPart, modelId: ModelId, view: TinyView, { wo
   if (base === "norm-1") return normStep(isRms, trace.combined[w], level, out, "the word's numbers, entering layer 1");
   if (base === "norm-2") return normStep(isRms, first.afterAttention[w], level, out, "the word's numbers after attention");
   if (base === "final-norm") return normStep(isRms, finalIn, level, out, "the last layer's numbers");
+  if (part.id === "embedding") return embeddingStep(view, w, isRms);
+  if (part.id === "word-order") return wordOrderStep(view, w);
   if (base.startsWith("rope")) return ropeStep(first.queries[w], w, part.id === "rope" ? "whole" : "number", out);
   if (base === "gelu") {
     const j = out % pre.length;

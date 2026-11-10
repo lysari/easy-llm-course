@@ -65,7 +65,10 @@ export type DemoId =
   | "preference"
   | "tiny-test"
   | "safety"
-  | "quantize";
+  | "quantize"
+  | "next-word"
+  | "generate"
+  | "kv-cache";
 
 export interface PartStory {
   problem: string;

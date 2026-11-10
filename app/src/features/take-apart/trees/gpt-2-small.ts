@@ -1,6 +1,6 @@
 import type { ModelPart, RealModel } from "@/features/take-apart/interfaces/model-part.interface";
-import { GPT_2_BUILD, GPT_2_MERGES } from "./gpt-2-build-facts";
-import { GPT_2_CONTEXT, GPT_2_FINAL_NORM, GPT_2_NORM_CODE, GPT_2_NORM_PLACE, GPT_2_NO_REASON, GPT_2_OUTPUT, GPT_2_POSITION_TABLE, GPT_2_RANDOM_START, GPT_2_SIZE_HELPS, GPT_2_TRANSFORMER, GPT_2_WORD_TABLE } from "./gpt-2-reasons";
+import { GPT_2_BUILD } from "./gpt-2-build-facts";
+import { GPT_2_CONTEXT, GPT_2_FINAL_NORM, GPT_2_MERGES, GPT_2_NORM_CODE, GPT_2_NORM_PLACE, GPT_2_NO_REASON, GPT_2_OUTPUT, GPT_2_POSITION_TABLE, GPT_2_RANDOM_START, GPT_2_SIZE_HELPS, GPT_2_TRANSFORMER, GPT_2_USE_REASONS, GPT_2_WORD_TABLE } from "./gpt-2-reasons";
 import { gpt2Layers } from "./gpt-2-layer";
 import { inferenceRoot } from "./inference-steps";
 import { lifecycleRoot } from "./lifecycle-steps";
@@ -221,6 +221,7 @@ export const GPT_2_SMALL: RealModel = {
       merges: { value: 50_000, unit: "merge rules", isComputed: true },
       mergeNotes: [GPT_2_MERGES, { label: "Start", value: "256 single bytes, so any text can be split", source: "gpt-2-paper" }],
       stopWord: { id: 50_256, isComputed: false, notes: [{ label: "Stop word", value: "<|endoftext|>, ID 50,256 (config eos_token_id)", source: "gpt-2-config" }] },
+      reasons: GPT_2_USE_REASONS,
       embeddingLesson: "Lessons 10, 14",
       embeddingText:
         "Each word ID picks its row of 768 numbers from the word table. GPT-2 then adds a learned row for the word's place, 1 to 1,024, from the position table, so the same word at a different place gets different numbers.",

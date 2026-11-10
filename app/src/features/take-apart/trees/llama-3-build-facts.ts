@@ -1,4 +1,5 @@
 import type { BuildFacts, RealNote, StepFacts } from "@/features/take-apart/interfaces/real-facts.interface";
+import { LLAMA_3_FEWER_PIECES, LLAMA_3_RANKS_IN_FILE, LLAMA_3_SPECIAL_IDS, LLAMA_3_TOKENIZER } from "./llama-3-reasons";
 
 const NOT_PUBLISHED = { text: "Not published" };
 
@@ -18,8 +19,6 @@ const WORD_LIST: RealNote[] = [
 const METHODS: RealNote = { label: "Methods", value: "SFT, rejection sampling, PPO and DPO, for the Instruct version", source: "llama-3-blog" };
 
 const MMLU: RealNote = { label: "MMLU, 5 examples first", value: "66.6 base, 68.4 Instruct", source: "llama-3-card" };
-
-const RANKS_IN_FILE: RealNote = { label: "Where the rules are", value: "\"mergeable_ranks = load_tiktoken_bpe(model_path)\": the ranked merge rules ship inside the tokenizer file", source: "llama-3-tokenizer" };
 
 const MERGES_NOT_PUBLISHED: RealNote = { label: "How they were learned", value: "Not published", source: "llama-3-card" };
 
@@ -84,17 +83,17 @@ export const LLAMA_3_BUILD: BuildFacts = {
       { label: "Built on", value: "OpenAI's tiktoken library", source: "llama-3-tokenizer" },
       { label: "Fewer pieces", value: "up to 15% fewer pieces than Llama 2 for the same text", source: "llama-3-blog" },
     ],
-    reasons: [{ label: "Meta's reason", value: "\"Llama 3 uses a tokenizer with a vocabulary of 128K tokens that encodes language much more efficiently, which leads to substantially improved model performance\"", source: "llama-3-blog" }, { label: "Fewer pieces", value: "\"yielding up to 15% fewer tokens compared to Llama 2\"", source: "llama-3-blog" }],
+    reasons: [LLAMA_3_TOKENIZER, LLAMA_3_FEWER_PIECES],
   },
-  "merge-round": notPublished("Merge rounds", "merge rounds not published", [RANKS_IN_FILE, MERGES_NOT_PUBLISHED]),
-  "count-pair": notPublished("Pair counts", "pair counts not published", [RANKS_IN_FILE, MERGES_NOT_PUBLISHED]),
-  "learn-merge": notPublished("Merge rules", "merge rules not published", [RANKS_IN_FILE, MERGES_NOT_PUBLISHED]),
+  "merge-round": notPublished("Merge rounds", "merge rounds not published", [LLAMA_3_RANKS_IN_FILE, MERGES_NOT_PUBLISHED]),
+  "count-pair": notPublished("Pair counts", "pair counts not published", [LLAMA_3_RANKS_IN_FILE, MERGES_NOT_PUBLISHED]),
+  "learn-merge": notPublished("Merge rules", "merge rules not published", [LLAMA_3_RANKS_IN_FILE, MERGES_NOT_PUBLISHED]),
   "assign-id": {
     shape: "IDs 0 to 128,255",
     headline: { value: 128_256, unit: "IDs given" },
     sources: ["llama-3-settings", "llama-3-tokenizer"],
     notes: WORD_LIST,
-    reasons: [{ label: "In Llama 3's code", value: "\"token: num_base_tokens + i for i, token in enumerate(special_tokens)\": the 256 special words get the IDs after the regular ones", source: "llama-3-tokenizer" }],
+    reasons: [LLAMA_3_SPECIAL_IDS],
   },
   "pre-training": {
     shape: "over 15 trillion words, texts of 8,192",

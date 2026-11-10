@@ -1,4 +1,5 @@
 import type { BuildFacts, RealNote, StepFacts } from "@/features/take-apart/interfaces/real-facts.interface";
+import { GPT_2_ANY_STRING, GPT_2_BYTES, GPT_2_LIST_SIZE, GPT_2_LOOKUP, GPT_2_MERGES, GPT_2_NEXT_WORD } from "./gpt-2-reasons";
 
 const NOT_PUBLISHED = { text: "Not published" };
 const BASE_MODEL_ONLY = { text: "None: base model only" };
@@ -32,8 +33,6 @@ const OVER_REPORTING: RealNote = { label: "Why copies matter", value: "near-dupl
 const BIAS_ADVICE: RealNote = { label: "OpenAI's advice", value: "\"we do not recommend that they be deployed into systems that interact with humans unless the deployers first carry out a study of biases relevant to the intended use-case\"", source: "gpt-2-card" };
 
 const NO_QUANTIZATION: RealNote = { label: "Quantization", value: "Not published in the paper or the model card.", source: "gpt-2-paper" };
-
-export const GPT_2_MERGES = { label: "Merge rules", value: "50,000, counted line by line in OpenAI's vocab.bpe file", source: "gpt-2-merges" } as const;
 
 export const GPT_2_BUILD: BuildFacts = {
   data: {
@@ -90,7 +89,7 @@ export const GPT_2_BUILD: BuildFacts = {
       GPT_2_MERGES,
       { label: "Word list", value: "50,257 words", source: "gpt-2-paper" },
     ],
-    reasons: [{ label: "OpenAI's reason", value: "BPE \"is a practical middle ground between character and word level language modeling\"", source: "gpt-2-paper" }, { label: "Why bytes", value: "\"a byte-level version of BPE only requires a base vocabulary of size 256\"", source: "gpt-2-paper" }, { label: "What it gives", value: "\"our approach can assign a probability to any Unicode string\"", source: "gpt-2-paper" }],
+    reasons: [{ label: "OpenAI's reason", value: "BPE \"is a practical middle ground between character and word level language modeling\"", source: "gpt-2-paper" }, GPT_2_BYTES, GPT_2_ANY_STRING],
   },
   "merge-round": {
     shape: "50,000 rounds, one new piece each",
@@ -112,7 +111,7 @@ export const GPT_2_BUILD: BuildFacts = {
     headline: { value: 50_257, unit: "IDs given" },
     sources: ["gpt-2-config"],
     notes: [{ label: "Last ID", value: "50,256, the end-of-text word (config eos_token_id)", source: "gpt-2-config" }],
-    reasons: [{ label: "In GPT-2's code", value: "\"self.encoder[bpe_token] for bpe_token in self.bpe(token).split(' ')\": each piece is looked up for its ID", source: "gpt-2-encoder" }, { label: "List size", value: "\"The vocabulary is expanded to 50,257\"", source: "gpt-2-paper" }],
+    reasons: [GPT_2_LOOKUP, GPT_2_LIST_SIZE],
   },
   "pre-training": {
     shape: "WebText, batches of 512 texts × 1,024 words",
@@ -142,7 +141,7 @@ export const GPT_2_BUILD: BuildFacts = {
     headline: { value: 50_257, unit: "words to choose from" },
     sources: ["gpt-2-config"],
     notes: [{ label: "Word list", value: "50,257 words (config vocab_size)", source: "gpt-2-config" }],
-    reasons: [{ label: "Next-word guessing", value: "\"it is common to factorize the joint probabilities over symbols as the product of conditional probabilities\"", source: "gpt-2-paper" }],
+    reasons: [GPT_2_NEXT_WORD],
   },
   "loss-term": notPublished("Training loss", "loss values not published", [STEP_SIZE, { label: "Loss values", value: "Not published", source: "gpt-2-paper" }]),
   slope: {

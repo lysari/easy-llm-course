@@ -26,6 +26,8 @@ function finishedSession() {
   return session;
 }
 
+const FINISHED = finishedSession();
+
 const states = [
   ["fresh", () => new Session()],
   ["mid-training", () => {
@@ -34,7 +36,7 @@ const states = [
     session.tick(2);
     return session;
   }],
-  ["finished", finishedSession],
+  ["finished", () => FINISHED],
   ["with sampling settings", () => {
     const session = finishedSession();
     session.runCommand("temperature:0.5");
@@ -72,7 +74,7 @@ describe("the flow", () => {
   });
 
   test("every step has real detail, not only a label", () => {
-    const session = finishedSession();
+    const session = FINISHED;
     for (const step of STEPS) {
       const details = [step.rows?.(session).length, step.visual, step.formula, step.code, step.note].filter(Boolean).length;
       expect(details, step.id).toBeGreaterThanOrEqual(MIN_DETAILS);
@@ -96,7 +98,7 @@ describe("the flow", () => {
   });
 
   test("every stage has parts, and a status taken from them", () => {
-    const session = finishedSession();
+    const session = FINISHED;
     for (const stage of STAGES) {
       expect(stepsOf(stage.id).length, stage.id).toBeGreaterThan(0);
       const text = [stage.title, stage.lesson, stage.task, stage.value(session), stage.detail(session)].join(" ");
@@ -210,6 +212,6 @@ describe("the worked numbers on the cards are real", () => {
   });
 
   test("writing a reply always finishes", () => {
-    expect(finishedSession().isWritingDone).toBe(true);
+    expect(FINISHED.isWritingDone).toBe(true);
   });
 });

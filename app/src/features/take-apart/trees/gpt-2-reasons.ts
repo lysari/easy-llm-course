@@ -1,4 +1,4 @@
-import type { RealNote } from "@/features/take-apart/interfaces/real-facts.interface";
+import type { RealNote, UseReasons } from "@/features/take-apart/interfaces/real-facts.interface";
 
 export const GPT_2_TRANSFORMER: RealNote = { label: "Built on", value: "\"We use a Transformer (Vaswani et al., 2017) based architecture for our LMs\"", source: "gpt-2-paper" };
 
@@ -47,3 +47,44 @@ export const GPT_2_OUTPUT: RealNote = { label: "In GPT-2's code", value: "\"logi
 export const GPT_2_FINAL_NORM: RealNote = { label: "In GPT-2's code", value: "\"h = norm(h, 'ln_f')\" runs after the last layer, before the scores", source: "gpt-2-code" };
 
 export const GPT_2_LAYER_LOOP: RealNote = { label: "In GPT-2's code", value: "\"for layer, past in enumerate(pasts):\" runs \"block\" once per layer, and config.json sets n_layer to 12", source: "gpt-2-code" };
+
+export const GPT_2_MERGES: RealNote = { label: "Merge rules", value: "50,000, counted line by line in OpenAI's vocab.bpe file", source: "gpt-2-merges" };
+
+export const GPT_2_BYTES: RealNote = { label: "Why bytes", value: "\"a byte-level version of BPE only requires a base vocabulary of size 256\"", source: "gpt-2-paper" };
+
+export const GPT_2_ANY_STRING: RealNote = { label: "What it gives", value: "\"our approach can assign a probability to any Unicode string\"", source: "gpt-2-paper" };
+
+export const GPT_2_LOOKUP: RealNote = { label: "In GPT-2's code", value: "\"self.encoder[bpe_token] for bpe_token in self.bpe(token).split(' ')\": each piece is looked up for its ID", source: "gpt-2-encoder" };
+
+export const GPT_2_LIST_SIZE: RealNote = { label: "List size", value: "\"The vocabulary is expanded to 50,257\"", source: "gpt-2-paper" };
+
+export const GPT_2_NEXT_WORD: RealNote = { label: "Next-word guessing", value: "\"it is common to factorize the joint probabilities over symbols as the product of conditional probabilities\"", source: "gpt-2-paper" };
+
+const GPT_2_LAST_WORD: RealNote = { label: "Only the last word", value: "\"logits = next_outputs['logits'][:, -1, :]\": only the last word's scores are used to pick the next word", source: "gpt-2-sample" };
+
+export const GPT_2_USE_REASONS: UseReasons = {
+  tokenize: [GPT_2_ANY_STRING, { label: "In GPT-2's code", value: "\"for token in re.findall(self.pat, text):\" cuts your text into words, and each word is then split into pieces", source: "gpt-2-encoder" }],
+  split: [{ label: "In GPT-2's code", value: "\"token = ''.join(self.byte_encoder[b] for b in token.encode('utf-8'))\": each word starts as its bytes", source: "gpt-2-encoder" }, GPT_2_BYTES],
+  "apply-merge": [{ label: "In GPT-2's code", value: "\"bigram = min(pairs, key = lambda pair: self.bpe_ranks.get(pair, float('inf')))\": of the pairs side by side, the rule learned first is used first", source: "gpt-2-encoder" }, GPT_2_MERGES],
+  lookup: [GPT_2_LOOKUP, GPT_2_LIST_SIZE],
+  embedding: [GPT_2_WORD_TABLE, GPT_2_NO_REASON],
+  output: [GPT_2_FINAL_NORM, GPT_2_OUTPUT, GPT_2_LAST_WORD],
+  softmax: [GPT_2_NEXT_WORD, { label: "In GPT-2's code", value: "the scores go straight into \"tf.multinomial(logits\", TensorFlow's random draw, which turns them into chances itself", source: "gpt-2-sample" }],
+  chance: [GPT_2_NEXT_WORD, GPT_2_LAST_WORD],
+  generate: [{ label: "OpenAI's examples", value: "\"Top-k random sampling with k = 40 was used for generation.\"", source: "gpt-2-paper" }, { label: "In GPT-2's code", value: "\"tf.while_loop\" runs one round per new word, up to \"maximum_iterations=length - 1\"", source: "gpt-2-sample" }],
+  "write-round": [{ label: "In GPT-2's code", value: "\"next_outputs = step(hparams, prev, past=past)\" runs the model once per round, on the newest word, with the saved keys and values", source: "gpt-2-sample" }, GPT_2_NEXT_WORD],
+  pick: [
+    { label: "In GPT-2's code", value: "\"logits = top_k_logits(logits, k=top_k)\" and \"logits = top_p_logits(logits, p=top_p)\" cut the list, then \"tf.multinomial(logits\" rolls for one word", source: "gpt-2-sample" },
+    { label: "OpenAI's advice on top-k", value: "\"0 (default) is a special setting meaning no restrictions. 40 generally is a good value.\"", source: "gpt-2-interactive" },
+    { label: "Temperature", value: "\"As the temperature approaches zero, the model will become deterministic and repetitive.\"", source: "gpt-2-interactive" },
+  ],
+  append: [GPT_2_NEXT_WORD, { label: "Its place", value: "\"positions_for(X, past_length)\": the added word gets the next place number, after the words already read", source: "gpt-2-code" }],
+  "stop-check": [
+    { label: "In GPT-2's code", value: "the loop's check, \"def cond(*args):\", always does \"return True\"; it stops only after \"maximum_iterations=length - 1\", so the released code never stops at <|endoftext|>", source: "gpt-2-sample" },
+    { label: "Length when none is given", value: "\"length = hparams.n_ctx // 2\": 512 words", source: "gpt-2-interactive" },
+  ],
+  "kv-cache": [
+    { label: "In GPT-2's code", value: "\"present = tf.stack([k, v], axis=1)\" saves each layer's keys and values, and \"k = tf.concat([pk, k], axis=-2)\" puts the saved ones first", source: "gpt-2-code" },
+    { label: "Its size", value: "\"[batch_size, hparams.n_layer, 2, hparams.n_head, sequence, hparams.n_embd // hparams.n_head]\": 12 layers × 2 × 12 heads × 64 numbers per word", source: "gpt-2-code" },
+  ],
+};

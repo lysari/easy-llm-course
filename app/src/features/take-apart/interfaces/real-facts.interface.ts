@@ -71,3 +71,21 @@ export type BuildStepId =
   | "round-number";
 
 export type BuildFacts = Record<BuildStepId, StepFacts>;
+
+export type UseStepId =
+  | "tokenize"
+  | "split"
+  | "apply-merge"
+  | "lookup"
+  | "embedding"
+  | "output"
+  | "softmax"
+  | "chance"
+  | "generate"
+  | "write-round"
+  | "pick"
+  | "append"
+  | "stop-check"
+  | "kv-cache";
+
+export type UseReasons = Record<UseStepId, RealNote[]>;

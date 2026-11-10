@@ -43,7 +43,7 @@ describe("the exact formulas", () => {
 });
 
 describe.each(MODELS)("$title model parts in the tiny-part demo", (model) => {
-  const parts = allParts(model.modes.build).filter((part) => part.story?.demo === "tiny-part");
+  const parts = [...new Set([model.modes.use, model.modes.build].flatMap(allParts))].filter((part) => part.story?.demo === "tiny-part");
 
   test("every one shows finite numbers before and after, for every word", () => {
     expect(parts.length).toBeGreaterThan(30);
@@ -64,6 +64,14 @@ describe.each(MODELS)("$title model parts in the tiny-part demo", (model) => {
     const shown = tinyStep(query, model.id, tiny, { word: 3, out: 2, extra: 0 });
     expect(shown.terms?.total).toBeCloseTo(tiny.trace.layers[0].queries[3][2], 10);
     expect(shown.terms?.pairs.length).toBe(tiny.trace.layers[0].normalized[3].length);
+  });
+
+  test("the embedding shows what goes into layer 1: word row plus place row in GPT-2, the word row alone in Llama 3", () => {
+    const embedding = parts.find((part) => part.id === "embedding");
+    if (!embedding) throw new Error("embedding");
+    const shown = tinyStep(embedding, model.id, tiny, { word: 2, out: 0, extra: 0 });
+    const into = model.id === "gpt-2-small" ? tiny.trace.combined[2] : tiny.trace.tokenVectors[2];
+    expect(shown.after[0].values).toEqual(into);
   });
 
   test("a score is the query times the key, scaled, as the tiny model computed it", () => {

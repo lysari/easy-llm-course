@@ -20,7 +20,7 @@ export function StoryInfo({ story, reasons, nextPart, onOpen }: StoryInfoProps) 
         <p className="note">{story.problem}</p>
         <ul className="reason-list">
           {reasons.map((reason) => (
-            <li key={reason.label}>
+            <li key={reason.value}>
               <b>{reason.label}:</b> {reason.value}{" "}
               <a className="card-lesson" href={SOURCES[reason.source].url} target="_blank" rel="noreferrer">
                 {SOURCES[reason.source].title}

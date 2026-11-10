@@ -15,11 +15,13 @@ function trained(change: Partial<ReturnType<typeof defaultSettings>> = {}) {
 
 const topWord = (run: PlaygroundRun) => nextOptions(START.split(" "), run.weights)[0].token;
 
+const DEFAULT_RUN = trained();
+
 describe("playground settings change the real model", () => {
   test("the default settings train exactly like the lessons' model", () => {
     const lab = new ModelLab();
     lab.trainRounds(TARGET_ROUNDS);
-    expect(trained().latestLoss).toBeCloseTo(lab.latestLoss as number, 10);
+    expect(DEFAULT_RUN.latestLoss).toBeCloseTo(lab.latestLoss as number, 10);
   });
 
   test("every text group has lines, and together they are the whole text", () => {
@@ -36,13 +38,13 @@ describe("playground settings change the real model", () => {
   });
 
   test("removing text changes what it answers", () => {
-    expect(topWord(trained())).toBe("bone");
+    expect(topWord(DEFAULT_RUN)).toBe("bone");
     expect(topWord(trained({ textGroups: ["hungry cat", "bored dog", "bored cat", "likes", "chases"] }))).not.toBe("bone");
   });
 
   test("attention off removes its numbers and loses the difference between dog and cat", () => {
     const run = trained({ layers: [noAttention, noAttention] });
-    expect(run.numberCount).toBeLessThan(trained().numberCount);
+    expect(run.numberCount).toBeLessThan(DEFAULT_RUN.numberCount);
     expect(nextOptions(START.split(" "), run.weights)[0].chance).toBeLessThan(0.5);
   });
 
@@ -52,7 +54,7 @@ describe("playground settings change the real model", () => {
   });
 
   test("plain steps with the same step size learn slower than Adam", () => {
-    expect(trained({ optimizer: "plain" }).latestLoss as number).toBeGreaterThan(trained().latestLoss as number);
+    expect(trained({ optimizer: "plain" }).latestLoss as number).toBeGreaterThan(DEFAULT_RUN.latestLoss as number);
   });
 
   test("a run stops at its round count", () => {

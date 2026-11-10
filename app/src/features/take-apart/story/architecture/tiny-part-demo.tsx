@@ -12,7 +12,7 @@ const fixed = (value: number) => value.toFixed(4);
 function AllTerms({ terms }: { terms: Terms }) {
   return (
     <div className="watch-box">
-      <p className="section-title">{`${count(terms.pairs.length)} multiply-and-adds, all of them`}</p>
+      <p className="section-title">{terms.pairs.length === 1 ? "The one multiply" : `${count(terms.pairs.length)} multiply-and-adds, all of them`}</p>
       <ol className="term-list">
         {terms.pairs.map(([a, b], i) => (
           <li key={i}>

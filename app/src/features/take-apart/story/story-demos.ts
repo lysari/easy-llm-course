@@ -19,4 +19,7 @@ export const DEMOS: Record<DemoId, Demo> = {
   "tiny-test": lazy(() => import("./evaluation/tiny-test-demo").then((module) => ({ default: module.TinyTestDemo }))),
   safety: lazy(() => import("./evaluation/safety-demo").then((module) => ({ default: module.SafetyDemo }))),
   quantize: lazy(() => import("./evaluation/quantize-demo").then((module) => ({ default: module.QuantizeDemo }))),
+  "next-word": lazy(() => import("./output/next-word-demo").then((module) => ({ default: module.NextWordDemo }))),
+  generate: lazy(() => import("./generate/generate-demo").then((module) => ({ default: module.GenerateDemo }))),
+  "kv-cache": lazy(() => import("./generate/kv-cache-demo").then((module) => ({ default: module.KvCacheDemo }))),
 };

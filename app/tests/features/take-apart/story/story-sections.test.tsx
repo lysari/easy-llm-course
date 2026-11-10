@@ -19,16 +19,9 @@ describe.each(MODELS)("$title why, watch and when", (model) => {
   const parts = [model.modes.use, model.modes.build].flatMap(allParts);
   const told = parts.filter((part) => part.story);
 
-  const steps = (["use", "build"] as const).flatMap((mode) => (model.modes[mode].children ?? []).map((step) => ({ mode, step, missing: missingStory(step) })));
-  const unfinished = steps.filter(({ missing }) => missing.length > 0).map(({ mode, step, missing }) => `${mode} › ${step.title} (${missing.length})`);
-  if (unfinished.length > 0) console.info(`${model.title}: why, watch and when still missing in ${unfinished.join(", ")}`);
-
   describe.each(["use", "build"] as const)("%s mode", (mode) => {
-    for (const { step, missing } of steps.filter((each) => each.mode === mode)) {
-      const name = `${step.title}: every part says why, shows it happen and says when`;
-      const check = () => expect(missing).toEqual([]);
-      if (mode === "use" && missing.length > 0) test.todo(`${name} (still missing: ${missing.join(", ")})`, check);
-      else test(name, check);
+    for (const step of model.modes[mode].children ?? []) {
+      test(`${step.title}: every part says why, shows it happen and says when`, () => expect(missingStory(step)).toEqual([]));
     }
   });
 
@@ -45,6 +38,7 @@ describe.each(MODELS)("$title why, watch and when", (model) => {
     for (const part of told) {
       const reasons = part.facts.reasons ?? [];
       expect(reasons.length, part.id).toBeGreaterThan(0);
+      expect(new Set(reasons.map((reason) => reason.value)).size, part.id).toBe(reasons.length);
       for (const reason of reasons) {
         expect(SOURCES, `${part.id}: ${reason.source}`).toHaveProperty(reason.source);
         expect(reason.value.length, part.id).toBeGreaterThan(2);
@@ -52,9 +46,9 @@ describe.each(MODELS)("$title why, watch and when", (model) => {
     }
   });
 
-  test("the wide drawer puts why and when after What it does, and the demo in its own column", () => {
-    const root = model.modes.build;
-    for (const part of told.filter((each) => allParts(root).includes(each))) {
+  test.each(["use", "build"] as const)("in %s mode the wide drawer puts why and when after What it does, and the demo in its own column", (mode) => {
+    const root = model.modes[mode];
+    for (const part of allParts(root).filter((each) => each.story)) {
       const nextPart = parts.find((each) => each.id === part.story?.nextId);
       const html = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelId={model.id} modelTitle={model.title} part={part} tiny={tiny} sentence={readSentence("")} nextPart={nextPart} onOpen={() => {}} onClose={() => {}} />);
       const places = INFO_TITLES.map((title) => html.indexOf(`<p class="section-title">${title}</p>`));
@@ -68,8 +62,7 @@ describe.each(MODELS)("$title why, watch and when", (model) => {
   });
 
   test("a part with no story keeps the narrow drawer", () => {
-    const part = allParts(model.modes.use).find((each) => !each.story);
-    if (!part) return;
+    const part: ModelPart = { ...(model.modes.use.children?.[0] ?? model.modes.use), story: undefined };
     const html = renderToStaticMarkup(<PartDrawer ref={null} root={model.modes.use} modelId={model.id} modelTitle={model.title} part={part} tiny={tiny} sentence={readSentence("")} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
     expect(html).toContain('class="drawer"');
     expect(html).not.toContain("drawer-panel");
