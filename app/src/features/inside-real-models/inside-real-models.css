@@ -156,7 +156,7 @@
   font-weight: var(--weight-medium);
 }
 
-.part-card {
+.part-card > .card-body {
   gap: var(--space-block);
   padding: var(--space-surface) var(--space-wide);
 }
@@ -166,6 +166,7 @@
   grid-template-columns: var(--tile-size) minmax(0, 1fr) max-content;
   align-items: start;
   gap: var(--space-card);
+  padding: var(--space-item) var(--space-wide) var(--space-control);
 }
 
 .part-card-name {
@@ -175,6 +176,10 @@
   gap: var(--space-tight) var(--space-item);
   min-width: 0;
   min-height: var(--tile-size);
+}
+
+.part-card.is-active .part-card-name .card-title {
+  color: var(--band-ink);
 }
 
 .part-card-name .pill {
@@ -194,11 +199,16 @@
   transition: background var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast);
 }
 
+.part-card.is-selected {
+  border-color: var(--rule-line);
+  box-shadow: var(--shadow-card-active);
+}
+
 .part-card.is-active .step-badge,
-.part-card.is-active .tile {
-  border-color: var(--link);
-  background: var(--selected-bg);
-  color: var(--selected-ink);
+.part-card.is-active .part-card-head .tile {
+  border-color: var(--band-line);
+  background: var(--band-surface);
+  color: var(--band-ink);
 }
 
 .lesson-tag {
@@ -214,6 +224,19 @@
 .lesson-tag.is-muted {
   background: transparent;
   color: var(--ink-faint);
+}
+
+.part-card.is-active .part-card-name .pill,
+.part-card.is-active .lesson-tag {
+  border-radius: var(--radius-round);
+  background: var(--band-pill);
+  box-shadow: var(--shadow-band-pill);
+  color: var(--band-ink);
+}
+
+.part-card.is-active .lesson-tag.is-muted {
+  background: transparent;
+  box-shadow: none;
 }
 
 .part-summary {

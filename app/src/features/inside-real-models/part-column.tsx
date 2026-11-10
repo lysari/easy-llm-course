@@ -11,6 +11,7 @@ interface PartColumnProps {
   parent: ModelPart;
   parts: ModelPart[];
   selectedId: string | undefined;
+  activeId: string;
   openId: string | null;
   cards: RefObject<Map<string, HTMLElement>>;
   hasLinks: boolean;
@@ -19,7 +20,7 @@ interface PartColumnProps {
   onDetails: (id: string) => void;
 }
 
-export function PartColumn({ model, root, parent, parts, selectedId, openId, cards, hasLinks, width, onSelect, onDetails }: PartColumnProps) {
+export function PartColumn({ model, root, parent, parts, selectedId, activeId, openId, cards, hasLinks, width, onSelect, onDetails }: PartColumnProps) {
   const columnRef = useRef<HTMLElement>(null);
   const partIds = useMemo(() => parts.map((part) => part.id), [parts]);
   const isSteps = parent === root;
@@ -46,6 +47,7 @@ export function PartColumn({ model, root, parent, parts, selectedId, openId, car
           place={placeOf(model, root, part)}
           index={i}
           isSelected={part.id === selectedId}
+          isActive={part.id === activeId}
           isOpen={part.id === openId}
           onSelect={() => onSelect(part)}
           onDetails={() => onDetails(part.id)}

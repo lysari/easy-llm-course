@@ -42,6 +42,7 @@ export function InsideRealModelsPage({ isOpen }: { isOpen: boolean }) {
               parent={parent}
               parts={parts}
               selectedId={path[level + 1]?.id}
+              activeId={path[path.length - 1].id}
               openId={openId}
               cards={insideRealModels.cards}
               hasLinks={isOpen && !isNarrow}

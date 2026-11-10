@@ -22,6 +22,7 @@ interface PartCardProps {
   place: PartPlace;
   index: number;
   isSelected: boolean;
+  isActive: boolean;
   isOpen: boolean;
   onSelect: () => void;
   onDetails: () => void;
@@ -43,13 +44,13 @@ export const partsOf = (children: ModelPart[]) => `${children.length} ${children
 export const numbersOf = (part: ModelPart) =>
   part.copies > 1 && part.facts.weightCount > 0 ? `${count(part.facts.weightCount)} each · ${count(part.facts.weightCount * part.copies)} in all` : count(part.facts.weightCount);
 
-export function PartCard({ ref, root, modelTitle, part, place, index, isSelected, isOpen, onSelect, onDetails }: PartCardProps) {
+export function PartCard({ ref, root, modelTitle, part, place, index, isSelected, isActive, isOpen, onSelect, onDetails }: PartCardProps) {
   const step = stepOf(part, root);
   const tag = tagOf(part);
   return (
     <article
       ref={ref}
-      className={`card part-card is-entering${isSelected ? " is-active" : ""}${isOpen ? " is-open" : ""}`}
+      className={`card part-card is-entering${isActive ? " is-active" : isSelected ? " is-selected" : ""}${isOpen ? " is-open" : ""}`}
       id={`inside-real-models-${part.id}`}
       tabIndex={0}
       aria-label={titleOf(part, root)}
@@ -69,21 +70,23 @@ export function PartCard({ ref, root, modelTitle, part, place, index, isSelected
         </div>
         <span className={`lesson-tag${part.lesson === NO_LESSON ? " is-muted" : ""}`}>{part.lesson}</span>
       </div>
-      <p className="part-summary">{part.summary}</p>
-      <InOut facts={part.facts} isDetailed={false} />
-      <PartNumbers modelTitle={modelTitle} part={part} place={place} isExact={false} />
-      <div className="part-card-foot">
-        {part.children && <span>{partsOf(part.children)} <span aria-hidden="true">›</span></span>}
-        <button
-          type="button"
-          className="action"
-          onClick={(event) => {
-            event.stopPropagation();
-            onDetails();
-          }}
-        >
-          Details <span aria-hidden="true">›</span>
-        </button>
+      <div className="card-body">
+        <p className="part-summary">{part.summary}</p>
+        <InOut facts={part.facts} isDetailed={false} />
+        <PartNumbers modelTitle={modelTitle} part={part} place={place} isExact={false} />
+        <div className="part-card-foot">
+          {part.children && <span>{partsOf(part.children)} <span aria-hidden="true">›</span></span>}
+          <button
+            type="button"
+            className="action"
+            onClick={(event) => {
+              event.stopPropagation();
+              onDetails();
+            }}
+          >
+            Details <span aria-hidden="true">›</span>
+          </button>
+        </div>
       </div>
     </article>
   );

@@ -29,26 +29,28 @@ export function FlowCard({ ref, id, className, icon, title, lesson, status, task
         </div>
         <StatusPill status={status} />
       </div>
-      <p className="card-task">{task}</p>
-      <div className="card-foot">
-        <span className="foot-value">{foot}</span>
-        {actions.length > 0 && (
-          <span className="foot-actions">
-            {actions.map((action, i) => (
-              <button
-                key={i}
-                type="button"
-                className={`action${action.isStrong ? " action--strong" : ""}`}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onCommand(action.command);
-                }}
-              >
-                {action.label}
-              </button>
-            ))}
-          </span>
-        )}
+      <div className="card-body">
+        <p className="card-task">{task}</p>
+        <div className="card-foot">
+          <span className="foot-value">{foot}</span>
+          {actions.length > 0 && (
+            <span className="foot-actions">
+              {actions.map((action, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  className={`action${action.isStrong ? " action--strong" : ""}`}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onCommand(action.command);
+                  }}
+                >
+                  {action.label}
+                </button>
+              ))}
+            </span>
+          )}
+        </div>
       </div>
     </article>
   );

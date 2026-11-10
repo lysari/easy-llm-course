@@ -140,7 +140,7 @@ describe.each(MODELS)("$title", (model) => {
         const tiny = viewTiny(lab, sentence.words);
         for (const part of parts) {
           const place = placeOf(model, root, part);
-          const card = renderToStaticMarkup(<PartCard ref={null} root={root} modelTitle={model.title} part={part} place={place} index={0} isSelected={false} isOpen={false} onSelect={() => {}} onDetails={() => {}} />);
+          const card = renderToStaticMarkup(<PartCard ref={null} root={root} modelTitle={model.title} part={part} place={place} index={0} isSelected={false} isActive={false} isOpen={false} onSelect={() => {}} onDetails={() => {}} />);
           const drawer = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelId={model.id} modelTitle={model.title} part={part} place={place} tiny={tiny} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
           const info = drawer.split('<div class="drawer-panel">')[0];
           for (const html of [card, drawer]) {

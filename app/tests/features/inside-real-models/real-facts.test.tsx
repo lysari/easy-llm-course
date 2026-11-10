@@ -125,7 +125,7 @@ describe("published numbers", () => {
   test("a word ID is never shortened on the card", () => {
     const part = partIn(llama.modes.use, "stop-check");
     if (!part) throw new Error("stop-check");
-    const html = renderToStaticMarkup(<PartCard ref={null} root={llama.modes.use} modelTitle={llama.title} part={part} place={placeOf(llama, llama.modes.use, part)} index={0} isSelected={false} isOpen={false} onSelect={() => {}} onDetails={() => {}} />);
+    const html = renderToStaticMarkup(<PartCard ref={null} root={llama.modes.use} modelTitle={llama.title} part={part} place={placeOf(llama, llama.modes.use, part)} index={0} isSelected={false} isActive={false} isOpen={false} onSelect={() => {}} onDetails={() => {}} />);
     expect(html).toContain("<b>128,001</b>");
   });
 });

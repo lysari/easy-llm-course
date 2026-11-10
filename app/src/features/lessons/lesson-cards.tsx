@@ -32,7 +32,7 @@ export function StageCard({ ref, stage, session, isSelected, onSelect, onCommand
   return (
     <FlowCard
       ref={ref}
-      className={isSelected ? undefined : "is-dim"}
+      className={isSelected ? "is-active" : "is-dim"}
       id={`stage-${stage.id}`}
       aria-current={isSelected}
       onClick={onSelect}

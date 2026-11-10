@@ -50,15 +50,24 @@ button:disabled {
 .card {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-item);
+  gap: var(--space-tight);
   width: 100%;
-  padding: var(--space-block) var(--space-surface);
+  padding: var(--space-tight);
   border: var(--border-thin) solid var(--card-line);
   border-radius: var(--radius-card);
   background: var(--card);
   box-shadow: var(--shadow-card);
   cursor: pointer;
-  transition: opacity var(--motion-fast), box-shadow var(--motion-fast);
+  transition: opacity var(--motion-fast), box-shadow var(--motion-fast), border-color var(--motion-fast);
+}
+
+.card-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-item);
+  padding: var(--space-block) var(--space-surface);
+  border: var(--border-thin) solid transparent;
+  border-radius: var(--radius-card-body);
 }
 
 .card.is-dim {
@@ -70,12 +79,19 @@ button:disabled {
 }
 
 .card.is-active {
-  border-color: var(--link);
+  background: var(--card-gradient);
   box-shadow: var(--shadow-card-active);
+}
+
+.card.is-active > .card-body {
+  border-color: var(--card-body-line);
+  background: var(--card);
+  box-shadow: var(--shadow-card-body);
 }
 
 .card.is-open {
   border-color: var(--link);
+  box-shadow: var(--shadow-card-open);
 }
 
 .card.is-entering {
@@ -89,6 +105,10 @@ button:disabled {
   gap: var(--space-card);
 }
 
+.card > .card-head {
+  padding: var(--space-item) var(--space-surface) var(--space-control);
+}
+
 .tile {
   display: grid;
   place-items: center;
@@ -98,6 +118,12 @@ button:disabled {
   border-radius: var(--radius-tile);
   background: var(--tile);
   color: var(--ink);
+}
+
+.card.is-active > .card-head .tile {
+  border-color: var(--band-line);
+  background: var(--band-surface);
+  color: var(--band-ink);
 }
 
 .card-title {
@@ -111,6 +137,11 @@ button:disabled {
   font-size: var(--text-small);
 }
 
+.card.is-active > .card-head .card-title,
+.card.is-active > .card-head .card-lesson {
+  color: var(--band-ink);
+}
+
 .pill {
   display: inline-flex;
   align-items: center;
@@ -120,6 +151,13 @@ button:disabled {
   font-size: var(--text-small);
   font-weight: var(--weight-medium);
   white-space: nowrap;
+}
+
+.card.is-active > .card-head .pill {
+  border-radius: var(--radius-round);
+  background: var(--band-pill);
+  box-shadow: var(--shadow-band-pill);
+  color: var(--band-ink);
 }
 
 .pill--running {
@@ -151,6 +189,11 @@ button:disabled {
   border-top-color: var(--running-spin);
   border-radius: var(--radius-circle);
   animation: spin var(--motion-spin) infinite;
+}
+
+.card.is-active > .card-head .spinner {
+  border-color: var(--band-line);
+  border-top-color: var(--band-ink);
 }
 
 .action {
