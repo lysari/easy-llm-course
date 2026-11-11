@@ -8,7 +8,7 @@ import { WordCards } from "./lesson-plots";
 import type { Session } from "./session";
 
 const useStatus = (session: Session, whenTrained: Status): Status => (session.lab.isTrained ? whenTrained : "queued");
-const trainFirst = (session: Session) => (session.lab.isTrained ? "" : `Train the model first (${TARGET_ROUNDS} rounds). Until then, these numbers come from an unfinished model.`);
+const trainFirst = (session: Session) => (session.lab.isTrained ? "" : `Train Tiny GPT first (${TARGET_ROUNDS} rounds). Until then, these numbers come from an unfinished model.`);
 const LESSON_LOGITS = [2, 1, 0];
 const softmaxWith = (temperature: number) => {
   const raw = LESSON_LOGITS.map((score) => Math.exp(score / temperature));
@@ -115,7 +115,7 @@ export const useSteps: FlowStep[] = [
     from: () => "Repeated work",
     to: () => "Far less work",
     status: () => "lesson",
-    rowsTitle: "Units of attention work, from the lesson",
+    rowsTitle: "Word-steps of attention work (smaller = faster)",
     rows: (session) => {
       const length = session.startWords.length + session.written.length;
       const work = (n: number) => (n * (n + 1)) / 2;
@@ -156,7 +156,7 @@ export const beyondSteps: FlowStep[] = [
       { text: "GPT-2 (2019)", value: "1.5 billion" },
       { text: "GPT-3 (2020)", value: "175 billion" },
       { text: "GPT-4 (2023)", value: "unknown, rumored ~1 trillion" },
-      { text: "Doubling the numbers lowers loss by", value: `a factor of ${(2 ** 0.076).toFixed(3)}` },
+      { text: "Doubling the numbers gives", value: `about ${Math.round((1 - 2 ** -0.076) * 100)}% lower loss` },
     ],
     formula: { lines: ["L(N) ≈ (Nc / N)^0.076"] },
     why: "You can train a small model, measure it, and predict a much bigger one before paying for it. Chinchilla (2022) added how much data to use.",
@@ -178,7 +178,7 @@ export const beyondSteps: FlowStep[] = [
       { text: "Few-shot", value: "a few examples" },
     ],
     code: "const prompt = `Translate English to French:\ncheese →`;",
-    note: () => "No numbers change. It just continues the pattern. Our small model is far too small to do this.",
+    note: () => "No numbers change. It just continues the pattern. Tiny GPT is far too small to do this.",
     why: "GPT-3's big discovery. It needs a model that is large enough. Prompt engineering comes from this.",
   },
   {
@@ -198,7 +198,7 @@ export const beyondSteps: FlowStep[] = [
       { text: "Risk", value: "forgets old skills" },
       { text: "LoRA", value: "trains only small add-ons" },
     ],
-    note: (session) => `Our model is a base model too. Given "my dog", it writes "${session.sampleWriting()}". It continues the text and does not answer.`,
+    note: (session) => `Tiny GPT is a base model too. Given "my dog", it writes "${session.sampleWriting()}". It continues the text and does not answer.`,
     why: "Base models learned to predict the next token, not to be helpful. Fine-tuning is much cheaper than pre-training.",
   },
   {

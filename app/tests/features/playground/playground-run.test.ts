@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { START_CHOICES, TRAINING_SEQUENCES } from "@/core/model/corpus";
+import { GUESSING_LOSS, START_CHOICES, TRAINING_SEQUENCES } from "@/core/model/corpus";
 import { nextOptions } from "@/core/model/generate";
 import { ModelLab, TARGET_ROUNDS } from "@/core/model/lab";
 import { PlaygroundRun, TEXT_GROUPS, defaultSettings, sequencesFor } from "@/features/playground/playground-run";
@@ -55,6 +55,13 @@ describe("playground settings change the real model", () => {
 
   test("plain steps with the same step size learn slower than Adam", () => {
     expect(trained({ optimizer: "plain" }).latestLoss as number).toBeGreaterThan(DEFAULT_RUN.latestLoss as number);
+  });
+
+  test("step size 0.4 with Adam jumps above random guessing, then settles worse than the default", () => {
+    const run = trained({ learningRate: 0.4 });
+    expect(run.isBroken).toBe(false);
+    expect(Math.max(...run.history.map((point) => point.loss))).toBeGreaterThan(GUESSING_LOSS);
+    expect(run.latestLoss as number).toBeGreaterThan(DEFAULT_RUN.latestLoss as number);
   });
 
   test("a run stops at its round count", () => {

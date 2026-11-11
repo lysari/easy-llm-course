@@ -38,7 +38,7 @@ function Shell() {
   const isPlayground = oldHashPath ? oldHashPath === PLAYGROUND_PATH : isPlaygroundPath;
   const isInsideRealModels = !oldHashPath && isInsideRealModelsPath;
   const isLessons = !isPlayground && !isInsideRealModels;
-  const [stageId, setStageId] = useState<StageId>("learn");
+  const [stageId, setStageId] = useState<StageId>("simple");
   return (
     <>
       {oldHashPath && <Navigate to={oldHashPath} replace />}

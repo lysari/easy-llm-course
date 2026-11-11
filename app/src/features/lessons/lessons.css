@@ -1,6 +1,7 @@
 #lessons {
   --lessons-nest-indent: 24px;
   --lessons-dash-miss: 4 4;
+  --lessons-gradient-label: 13rem;
 }
 
 .fleet {
@@ -25,6 +26,10 @@
 
 .part-row > .card {
   width: var(--part-width);
+}
+
+#stages .card-task {
+  white-space: normal;
 }
 
 .part-column.is-leaving {
@@ -57,6 +62,10 @@
 .word.is-new {
   background: var(--running-bg);
   color: var(--running-ink);
+}
+
+.gradient-bars {
+  --chance-word-width: var(--lessons-gradient-label);
 }
 
 .table-scroll {

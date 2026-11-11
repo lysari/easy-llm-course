@@ -140,10 +140,10 @@ export function LossCurve({ chance }: { chance: number }) {
 export function GradientBars({ tables }: { tables: { name: string; size: number }[] }) {
   const largest = Math.max(...tables.map((table) => table.size));
   return (
-    <div className="chances">
+    <div className="chances gradient-bars">
       {tables.map(({ name, size }) => (
         <div key={name} className="chance" title={`${name}: ${size.toFixed(4)}`}>
-          <span>{name.replace("feed-forward", "FFN").replace("attention", "attn").replace("Layer ", "L")}</span>
+          <span>{name}</span>
           <span className="chance-track">
             <i className="chance-fill" style={{ width: `${Math.round((size / largest) * 100)}%` }} />
           </span>

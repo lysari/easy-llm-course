@@ -52,7 +52,7 @@ function menuFor({ id, settings, addedRows, onChange, onAddRow }: MenuProps): { 
   }
   if (kind === "add-text") {
     return {
-      help: "Add sentences for the model to learn from.",
+      help: "Add sentences for Tiny GPT to learn from.",
       items: TEXT_GROUPS.filter((group) => !settings.textGroups.includes(group.name)).map((group) => ({
         label: group.name,
         isOn: false,
@@ -61,7 +61,7 @@ function menuFor({ id, settings, addedRows, onChange, onAddRow }: MenuProps): { 
     };
   }
   return {
-    help: "Change how the model picks each word.",
+    help: "Change how Tiny GPT picks each word.",
     items: OPTIONAL_ROWS.filter((key) => !addedRows.includes(key)).map((key) => ({
       label: ROWS[key].label,
       isOn: false,

@@ -30,6 +30,7 @@ interface PartCardProps {
 
 export function StageCard({ ref, stage, session, isSelected, isActive, onSelect, onCommand }: StageCardProps) {
   const action = stage.action?.(session);
+  const detail = stage.detail(session);
   return (
     <FlowCard
       ref={ref}
@@ -42,7 +43,7 @@ export function StageCard({ ref, stage, session, isSelected, isActive, onSelect,
       lesson={stage.lesson}
       status={stage.status(session)}
       task={stage.task}
-      foot={<><b>{stage.value(session)}</b>{` · ${stage.detail(session)}`}</>}
+      foot={<><b>{stage.value(session)}</b>{detail && ` · ${detail}`}</>}
       actions={action ? [action] : []}
       onCommand={onCommand}
     />

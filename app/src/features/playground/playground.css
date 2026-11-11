@@ -419,11 +419,20 @@
   letter-spacing: var(--tracking-title);
 }
 
+.pg-next {
+  margin-top: var(--space-section);
+}
+
 .pg-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-item);
   margin: 0;
+}
+
+.pg-stats > div {
+  display: grid;
+  align-content: space-between;
 }
 
 .pg-stats dt {

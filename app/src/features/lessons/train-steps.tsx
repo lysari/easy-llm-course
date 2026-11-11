@@ -9,9 +9,9 @@ import { count } from "@/shared/utils/format";
 import { GradientBars, LossCurve } from "./lesson-plots";
 import type { Session } from "./session";
 
-const trainStatus = (session: Session): Status => {
+const trainStatus = (session: Session, whenUntrained: Status = "queued"): Status => {
   if (session.isRunning("train")) return "running";
-  return session.lab.isTrained ? "done" : "needs";
+  return session.lab.isTrained ? "done" : whenUntrained;
 };
 
 export const learnSteps: FlowStep[] = [
@@ -36,6 +36,7 @@ export const learnSteps: FlowStep[] = [
       ];
     },
     visual: (session) => <LossCurve chance={session.answerChanceNow()} />,
+    note: () => "ln is the natural log: a 100% chance gives 0, small chances give big numbers.",
     formula: { lines: ["loss = −ln(p(right word))", "p = 100% → loss 0"] },
     code: "function crossEntropyLoss(\n  probs: number[],\n  targetIndex: number,\n) {\n  return -Math.log(probs[targetIndex] + 1e-9);\n}",
     why: "Being confidently wrong is punished hard. This is the number the whole training loop tries to lower. An untrained model starts near random guessing.",
@@ -50,12 +51,12 @@ export const learnSteps: FlowStep[] = [
     from: () => "1 loss",
     to: (session) => `${count(countWeights(session.lab.live))} gradients`,
     status: trainStatus,
-    rowsTitle: "Path of the gradient, right to left",
+    rowsTitle: "Path of the gradient, right to left. Each row passes \"how much did I cause the error\" one step further back.",
     rows: () => [
       { text: "Loss → logits", value: "p − target" },
       { text: "logits → output table", value: "dC · Bᵀ" },
-      { text: "FFN → W2, ReLU, W1", value: "chain rule" },
-      { text: "attnOut → V and A", value: "dV = Aᵀ · dOut" },
+      { text: "Feed-forward → W2, ReLU, W1", value: "chain rule" },
+      { text: "Attention output → V and A", value: "dV = Aᵀ · dOut" },
       { text: "A → scores (softmax)", value: "A(i,j) (δ − A(i,l))" },
       { text: "scores → Q and K", value: "÷ √d" },
       { text: "Q, K, V → Wq, Wk, Wv", value: "chain rule" },
@@ -112,7 +113,7 @@ export const learnSteps: FlowStep[] = [
     goal: `Repeat the whole path ${TARGET_ROUNDS} times.`,
     from: () => "Random numbers",
     to: (session) => (session.lab.isTrained ? "A trained model" : `Round ${session.lab.round} of ${TARGET_ROUNDS}`),
-    status: trainStatus,
+    status: (session) => trainStatus(session, "needs"),
     actions: (session) => {
       if (session.lab.isTrained) return [{ label: "Forget everything", command: "forget" }];
       if (session.isRunning("train")) return [{ label: "Finish quickly", command: "finish", isStrong: true }];
@@ -128,6 +129,6 @@ export const learnSteps: FlowStep[] = [
     ],
     note: (session) => `It writes: "${session.sampleWriting()}". The loss stops near 0.2 because the text itself is unsure: bone or treat.`,
     code: "for (let round = 0; round < 200; round++) {\n  const loss = forward(text); // guess and score\n  backward(loss); // find gradients\n  adam.update(); // fix the numbers\n}",
-    why: "One step does almost nothing. Thousands of small steps add up to learning. Real models read so much they must learn general patterns, but ours just memorises.",
+    why: "One step does almost nothing. Thousands of small steps add up to learning. Real models read so much they must learn general patterns, but Tiny GPT just memorises.",
   },
 ];

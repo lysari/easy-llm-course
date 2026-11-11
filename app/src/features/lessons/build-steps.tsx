@@ -31,7 +31,7 @@ export const forwardSteps: FlowStep[] = [
     note: (session) => {
       const before = session.similarity("dog", "cat", session.lab.untrained);
       const now = session.similarity("dog", "cat", session.lab.live);
-      return `Similarity of "dog" and "cat": ${before.toFixed(2)} at the start, ${now.toFixed(2)} now. With huge text, training pulls words used in similar ways closer. Our tiny text barely shows this.`;
+      return `Similarity of "dog" and "cat" (−1 = opposite, 0 = unrelated, 1 = same direction): ${before.toFixed(2)} at the start, ${now.toFixed(2)} now. With huge text, training pulls words used in similar ways closer. Our tiny text barely shows this.`;
     },
     formula: { lines: [`table shape: ${VOCABULARY.length} × ${VECTOR_SIZE} (words × numbers)`, "cosine(a, b) = a · b / (|a| × |b|)"] },
     code: "function lookup(\n  tokenId: number,\n  table: number[][],\n): number[] {\n  return table[tokenId];\n}",
@@ -84,7 +84,7 @@ export const forwardSteps: FlowStep[] = [
     },
     formula: { lines: ["LayerNorm(x) = (x − mean(x)) / √(variance(x) + ε)"] },
     code: "const mean = x.reduce((s, v) => s + v, 0) / x.length;\nconst variance =\n  x.reduce((s, v) => s + (v - mean) ** 2, 0) / x.length;\nreturn x.map(\n  (v) => (v - mean) / Math.sqrt(variance + eps),\n);",
-    why: "Numbers can grow too large or too small as they pass through layers, which makes training unstable. This model normalizes before each job (Pre-LN, from GPT-2).",
+    why: "Numbers can grow too large or too small as they pass through layers, which makes training unstable. Tiny GPT normalizes before each job (Pre-LN: norm before each part, as in GPT-2).",
   },
   {
     id: "attention",
@@ -105,18 +105,18 @@ export const forwardSteps: FlowStep[] = [
       return [
         { text: "1. Query Q = X @ Wq", value: shortList(layer.queries[LAST], 3) },
         { text: `2. Key K of "${TEST_WORDS[top]}" = X @ Wk`, value: shortList(layer.keys[top], 3) },
-        { text: "3. Score Q · K / √24", value: layer.scores[LAST][top].toFixed(2) },
+        { text: `3. Score Q · K / √${VECTOR_SIZE} (${VECTOR_SIZE} = numbers per word in Tiny GPT)`, value: layer.scores[LAST][top].toFixed(2) },
         { text: "4. Softmax over this row", value: percent(shares[top]) },
         { text: "5. Output = Σ share × V", value: shortList(layer.collected[LAST], 3) },
       ];
     },
-    note: (session) => `Showing ${modelState(session)}, layer 1. Later words are hidden (causal mask). This model has 1 head. GPT-2 small runs 12 in parallel, each of 64 numbers.`,
+    note: (session) => `Showing ${modelState(session)}, layer 1. Later words are hidden (causal mask: each word can only see itself and the words before it). Tiny GPT has 1 head. GPT-2 small runs 12 in parallel, each of 64 numbers.`,
     formula: {
       lines: ["attention = softmax(Q · Kᵀ / √d) · V"],
       legend: [
-        { term: "Q", meaning: "what am I looking for?" },
-        { term: "K", meaning: "what do I offer?" },
-        { term: "V", meaning: "what do I contain?" },
+        { term: "Q", meaning: "what I'm looking for" },
+        { term: "K", meaning: "my name tag" },
+        { term: "V", meaning: "what I pass on" },
       ],
     },
     code: "const scores = matmul(Q, transpose(K)).map((row) =>\n  row.map((s) => s / Math.sqrt(dk)),\n);\nif (causal)\n  for (let i = 0; i < T; i++)\n    for (let j = i + 1; j < T; j++)\n      scores[i][j] = -Infinity;\nconst weights = scores.map((row) => softmax(row));",
@@ -138,7 +138,7 @@ export const forwardSteps: FlowStep[] = [
       const expanded = layer.expanded[LAST];
       const active = expanded.filter((value) => value > 0).length;
       return [
-        { text: "Attention + old list (residual)", value: shortList(layer.afterAttention[LAST], 3) },
+        { text: "Attention + old list (residual: add the old list back on)", value: shortList(layer.afterAttention[LAST], 3) },
         { text: `1. Expand: ${VECTOR_SIZE} → ${EXPANDED_SIZE} numbers`, value: "× W1" },
         { text: "2. ReLU: negatives become 0", value: `${active} of ${EXPANDED_SIZE} stay on` },
         { text: `3. Contract: ${EXPANDED_SIZE} → ${VECTOR_SIZE} numbers`, value: "× W2" },
@@ -170,7 +170,7 @@ export const forwardSteps: FlowStep[] = [
         ]),
       ];
     },
-    note: () => `This model has ${LAYER_COUNT} layers. GPT-1 and GPT-2 small have 12. The largest GPT-2 has 48.`,
+    note: () => `Tiny GPT has ${LAYER_COUNT} layers. GPT-1 and GPT-2 small have 12. The largest GPT-2 has 48.`,
     formula: { lines: ["x = x + attention(LayerNorm(x))", "x = x + FFN(LayerNorm(x))"] },
     why: "These are the hidden layers. The size going in equals the size coming out, so layers can stack. Residual additions keep gradients flowing through deep stacks.",
   },
@@ -189,7 +189,7 @@ export const forwardSteps: FlowStep[] = [
     note: () => "Only the last token's list predicts the next word. In training, every position predicts its own next word.",
     formula: { lines: ["logits = LayerNorm(x) @ Woutput", `(1 × ${VECTOR_SIZE}) @ (${VECTOR_SIZE} × ${VOCABULARY.length}) = (1 × ${VOCABULARY.length})`] },
     code: "const logits = matmul(layerNorm(x), outputTable);",
-    why: "Scores can be any size, and they do not add up to anything yet. GPT-2 reuses its token table here, which is called weight tying.",
+    why: "Scores can be any size, and they do not add up to anything yet. GPT-2 reuses its token table here, which is called weight tying (the same table is used twice).",
   },
   {
     id: "softmax",

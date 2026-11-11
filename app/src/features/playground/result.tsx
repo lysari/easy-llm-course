@@ -51,8 +51,9 @@ export function Result({ state, onTrain, onWriteAgain, onReset }: ResultProps) {
         <div><dt>Loss</dt><dd>{run?.latestLoss != null && Number.isFinite(run.latestLoss) ? run.latestLoss.toFixed(2) : "–"}</dd></div>
         <div><dt>Last run</dt><dd>{earlierLoss === null ? "–" : earlierLoss.toFixed(2)}</dd></div>
         <div><dt>Round</dt><dd>{`${run ? run.history.length : 0}/${settings.rounds}`}</dd></div>
-        <div><dt>Numbers</dt><dd>{run ? count(run.numberCount) : "–"}</dd></div>
+        <div><dt>Numbers it learns</dt><dd>{run ? count(run.numberCount) : "–"}</dd></div>
       </dl>
+      <p className="section-title">{`Loss: random guessing = ${GUESSING_LOSS.toFixed(2)}, lower is better`}</p>
       <LossPlot points={history} rounds={rounds} guessingLoss={GUESSING_LOSS} earlier={earlier} {...PLOT_SIZE} />
       {earlier.length > 0 && (
         <p className="pg-legend">
@@ -63,7 +64,7 @@ export function Result({ state, onTrain, onWriteAgain, onReset }: ResultProps) {
       {run && <p className="note">{resultNote(run)}</p>}
       <section className="section">
         <p className="section-title">{`Word after “${showWord(lastWord)}”`}</p>
-        {ranked.length > 0 ? <ChanceBars options={ranked} answer={ranked[0].token} /> : <p className="note">Train the model first.</p>}
+        {ranked.length > 0 ? <ChanceBars options={ranked} answer={ranked[0].token} /> : <p className="note">Train Tiny GPT first.</p>}
       </section>
       <section className="section">
         <p className="section-title">It writes</p>

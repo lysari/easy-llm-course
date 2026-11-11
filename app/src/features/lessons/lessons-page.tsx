@@ -1,6 +1,9 @@
 import "./lessons.css";
 import { Fragment, useMemo, useRef } from "react";
+import { Link } from "react-router";
+import { GUESSING_LOSS } from "@/core/model/corpus";
 import type { FlowStep, StageId } from "@/features/lessons/interfaces/story.interface";
+import { ConceptIcon } from "@/shared/components/concept-icon";
 import { FlowLinks } from "@/shared/components/flow-links";
 import { useFlowLinks } from "@/shared/hooks/use-flow-links";
 import { NARROW_WIDTH, useWindowWidth } from "@/shared/hooks/use-window-width";
@@ -31,6 +34,7 @@ export function LessonsPage({ isOpen, stageId, onSelectStage }: LessonsPageProps
   );
 
   const statuses = STEPS.map((step) => step.status(session));
+  const runningCount = statuses.filter((status) => status === "running").length;
   const partCard = (step: FlowStep) => (
     <PartCard
       key={step.id}
@@ -71,10 +75,13 @@ export function LessonsPage({ isOpen, stageId, onSelectStage }: LessonsPageProps
         <header className="top">
           <h1 className="page-title">Lessons</h1>
           <p className="top-stats" id="top-stats">
-            <span>{`${STAGES.length} stages / ${STEPS.length} parts`}</span>
-            <span>{`${statuses.filter((status) => status === "running").length} running`}</span>
-            <span>{`${statuses.filter((status) => status === "needs").length} need you`}</span>
-            <strong>{`Loss ${(session.lab.latestLoss ?? session.startLoss).toFixed(2)}`}</strong>
+            <span>{`${STAGES.length} stages, ${STEPS.length} parts`}</span>
+            {runningCount > 0 && <span>{`${runningCount} running`}</span>}
+            <span>{`${statuses.filter((status) => status === "needs").length} parts wait for a button press`}</span>
+            <span>
+              <strong>{`Loss ${(session.lab.latestLoss ?? session.startLoss).toFixed(2)}`}</strong>
+              {` (random guessing = ${GUESSING_LOSS.toFixed(2)}, lower is better)`}
+            </span>
           </p>
         </header>
         <div className="flow" id="flow" ref={flowRef} style={lessons.glowStyle}>
@@ -97,6 +104,13 @@ export function LessonsPage({ isOpen, stageId, onSelectStage }: LessonsPageProps
                 {isNarrow && stage.id === partsStageId && partColumn}
               </Fragment>
             ))}
+            <Link className="card" to="/playground">
+              <span className="card-head">
+                <ConceptIcon name="playground" size="card" />
+                <span className="card-title">Next: change the settings in the Playground</span>
+                <span aria-hidden="true">›</span>
+              </span>
+            </Link>
           </div>
           {!isNarrow && partColumn}
         </div>

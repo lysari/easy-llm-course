@@ -1,4 +1,5 @@
 import { END_TOKEN, TRAINING_LINES, TRAINING_SEQUENCES, VOCABULARY, joinTokens } from "@/core/model/corpus";
+import { LAYER_COUNT, VECTOR_SIZE } from "@/core/model/tiny-gpt";
 import type { FlowStep } from "@/features/lessons/interfaces/story.interface";
 import { count } from "@/shared/utils/format";
 import { WordCards } from "./lesson-plots";
@@ -14,14 +15,14 @@ export const dataSteps: FlowStep[] = [
     icon: "documents",
     title: "Training text",
     lesson: "Lessons 09, 14",
-    goal: "Collect the text the model will learn from.",
+    goal: "Collect the text Tiny GPT will learn from.",
     from: () => "Nothing",
     to: () => `${count(tokenTotal)} tokens of text`,
     status: () => "done",
     rowsTitle: `All ${TRAINING_LINES.length} kinds of sentence`,
     rows: () => TRAINING_LINES.map((line) => ({ text: joinTokens(line.text.split(" ")), value: `${line.times}×` })),
     note: () => "A hungry dog gets a bone 3 times and a treat 1 time. Watch for that later.",
-    why: "A model only knows what is in its text. GPT-1 read about 800 million words. Ours reads a few sentences, so it can only memorise them.",
+    why: `From here on, you build Tiny GPT: a small GPT with ${LAYER_COUNT} layers and ${VECTOR_SIZE} numbers per word, small enough to train in your browser. A model only knows what is in its text. GPT-1 read about 800 million words. Tiny GPT reads a few sentences, so it can only memorise them.`,
   },
   {
     id: "tokenizer",
@@ -37,7 +38,7 @@ export const dataSteps: FlowStep[] = [
     rowsTitle: "Three ways to cut text",
     rows: () => [
       { text: "Characters (Lesson 09)", value: "small dictionary, long text" },
-      { text: "Whole words (this model)", value: `${VOCABULARY.length} tokens, unknown words fail` },
+      { text: "Whole words (Tiny GPT)", value: `${VOCABULARY.length} tokens, unknown words fail` },
       { text: "BPE word pieces (Lesson 18)", value: "GPT-2: 50,257 tokens, any text" },
       { text: `Encode "my dog"`, value: `[${VOCABULARY.indexOf("my")}, ${VOCABULARY.indexOf("dog")}]` },
       { text: `Decode [${VOCABULARY.indexOf("my")}, ${VOCABULARY.indexOf("dog")}]`, value: `"my dog"` },

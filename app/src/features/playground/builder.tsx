@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { LEARNING_RATE } from "@/core/model/adam";
 import { START_CHOICES, joinTokens } from "@/core/model/corpus";
 import type { PlaygroundSettings, RowKey } from "@/features/playground/interfaces/playground.interface";
 import { ConceptIcon } from "@/shared/components/concept-icon";
@@ -36,8 +37,8 @@ const numbered = (values: number[], unit: string) => values.map((value) => ({ la
 export const ROWS: Record<RowKey, Row> = {
   isEvenAnswers: {
     icon: "pairs", label: "Usual answer", verb: "appears", lesson: "Lesson 14", retrains: true,
-    help: "How often the text uses its usual answer. The model copies this pattern.",
-    options: [{ label: "3 times more", value: false }, { label: "Just as often", value: true }],
+    help: "The hungry and bored sentences each have a usual answer and a rare one. After \"my dog is hungry\", the text says bone 3 times and treat 1 time. Tiny GPT copies this pattern.",
+    options: [{ label: "3 times more (bone 3, treat 1)", value: false }, { label: "Just as often (bone 1, treat 1)", value: true }],
   },
   vectorSize: {
     icon: "vector", label: "Each word", verb: "is", lesson: "Lesson 10", retrains: true,
@@ -52,7 +53,12 @@ export const ROWS: Record<RowKey, Row> = {
   learningRate: {
     icon: "descent", label: "Step size", verb: "is", lesson: "Lesson 03", retrains: true,
     help: "How far the numbers move in one round. Too small learns slowly. Too big jumps past the answer.",
-    options: [0.0004, 0.004, 0.04, 0.4].map((value) => ({ label: String(value), value })),
+    options: [
+      { label: "0.0004", value: 0.0004 },
+      { label: `${LEARNING_RATE} (default)`, value: LEARNING_RATE },
+      { label: "0.04", value: 0.04 },
+      { label: "0.4 (too big for Adam)", value: 0.4 },
+    ],
   },
   optimizer: {
     icon: "optimizer", label: "Fix numbers", verb: "with", lesson: "Lesson 17", retrains: true,
@@ -61,7 +67,7 @@ export const ROWS: Record<RowKey, Row> = {
   },
   start: {
     icon: "prompt", label: "Start with", verb: "", lesson: "Lesson 14", retrains: false,
-    help: "The words you give the model. It continues from here.",
+    help: "The words you give Tiny GPT. It continues from here.",
     options: START_CHOICES.map((value) => ({ label: joinTokens(value.split(" ")), value })),
   },
   temperature: {
@@ -142,7 +148,7 @@ function TextRow({ settings, menu, onChange }: Pick<BuilderProps, "settings" | "
   const remove = (name: string) => onChange({ ...settings, textGroups: settings.textGroups.filter((group) => group !== name) }, true);
   return (
     <div className="rule">
-      <Label icon="documents" text="Learn from" />
+      <Label icon="documents" text="Sentences about" />
       <span className="tags">
         {settings.textGroups.map((name) => (
           <span key={name} className="tag">

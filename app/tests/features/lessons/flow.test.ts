@@ -139,11 +139,13 @@ describe("statuses follow what really happens", () => {
   test("training asks for you, runs, then finishes", () => {
     const session = new Session();
     expect(step("train-loop").status(session)).toBe("needs");
+    expect(step("loss").status(session)).toBe("queued");
     session.runCommand("start:train");
     expect(step("train-loop").status(session)).toBe("running");
     session.tick(LONG_ENOUGH);
     expect(session.lab.round).toBe(TARGET_ROUNDS);
     expect(step("train-loop").status(session)).toBe("done");
+    expect(step("loss").status(session)).toBe("done");
   });
 
   test("using the model stays queued until it is trained", () => {

@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import type { Status } from "@/shared/interfaces/card.interface";
 
-const STATUS_TEXT: Record<Status, string> = { running: " Running", done: "✓ Done", needs: " Needs you", queued: "• Queued", lesson: "◦ Lesson only", "ground-zero": "◆ Ground zero" };
+const STATUS_TEXT: Record<Status, string> = { running: " Running", done: "✓ Done", needs: " Press the button", queued: "• Train first", lesson: "◦ Read only (not run here)", "ground-zero": "◆ Smallest step" };
+const STATUS_TITLES: Partial<Record<Status, string>> = { "ground-zero": "Nothing smaller inside: one multiply, one stored number or one simple action." };
 const STATUS_ICONS: Partial<Record<Status, ReactNode>> = {
   running: <i className="spinner" />,
   needs: (
@@ -13,5 +14,5 @@ const STATUS_ICONS: Partial<Record<Status, ReactNode>> = {
 };
 
 export function StatusPill({ status }: { status: Status }) {
-  return <span className={`pill pill--${status}`}>{STATUS_ICONS[status]}{STATUS_TEXT[status]}</span>;
+  return <span className={`pill pill--${status}`} title={STATUS_TITLES[status]}>{STATUS_ICONS[status]}{STATUS_TEXT[status]}</span>;
 }
