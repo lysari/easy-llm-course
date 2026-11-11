@@ -141,7 +141,6 @@ const wordOrder: ModelPart = {
     feeds: "The word rows go into layer 1 unchanged, and RoPE turns their queries and keys inside attention.",
     nextId: "layers",
   },
-  formula: { lines: ["vector = word table[id]", "place: added later by RoPE"] },
   groundZero: "action",
 };
 

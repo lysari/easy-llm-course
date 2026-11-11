@@ -21,7 +21,6 @@ function dataStep(facts: BuildFacts): ModelPart {
       feeds: "The clean pile of documents goes to the tokenizer, which builds the word list from it.",
       nextId: "tokenizer",
     },
-    formula: { lines: ["gather → filter → remove copies"] },
     children: [
       {
         id: "gather",
@@ -39,7 +38,6 @@ function dataStep(facts: BuildFacts): ModelPart {
           feeds: "What comes out, one plain-text document, goes next to the quality check, which keeps it or drops it.",
           nextId: "filter",
         },
-        formula: { lines: ["document = text(page)"] },
         groundZero: "action",
       },
       {
@@ -58,7 +56,6 @@ function dataStep(facts: BuildFacts): ModelPart {
           feeds: "A document that passes goes on to the deduplication check; one that fails is dropped.",
           nextId: "dedupe",
         },
-        formula: { lines: ["keep = passes(document, rule)"] },
         groundZero: "action",
       },
       {
@@ -77,7 +74,6 @@ function dataStep(facts: BuildFacts): ModelPart {
           feeds: "Only new documents join the pile; the finished pile goes to the tokenizer and then to training.",
           nextId: "tokenizer",
         },
-        formula: { lines: ["drop if seen.has(fingerprint(document))"] },
         groundZero: "action",
       },
     ],
@@ -102,7 +98,6 @@ function tokenizerStep(facts: BuildFacts): ModelPart {
       feeds: "The word list fixes how many rows the word table has and turns every training text into IDs.",
       nextId: "merge-round",
     },
-    formula: { lines: ["repeat: count pairs, merge the top pair", "until the list is full"] },
     children: [
       {
         id: "merge-round",
@@ -120,7 +115,6 @@ function tokenizerStep(facts: BuildFacts): ModelPart {
           feeds: "Each round adds one merge rule and one new piece to the list.",
           nextId: "count-pair",
         },
-        formula: { lines: ["top = most common pair", "rules.push(top)"] },
         children: [
           {
             id: "count-pair",
@@ -138,7 +132,6 @@ function tokenizerStep(facts: BuildFacts): ModelPart {
               feeds: "The counts pick the top pair, which becomes the next merge rule.",
               nextId: "learn-merge",
             },
-            formula: { lines: ["count[a + b] = count[a + b] + 1"] },
             groundZero: "action",
           },
           {
@@ -157,7 +150,6 @@ function tokenizerStep(facts: BuildFacts): ModelPart {
               feeds: "The rules are saved in order, and the new piece gets the next free ID.",
               nextId: "assign-id",
             },
-            formula: { lines: ["rule: \"do\" + \"g\" → \"dog\""] },
             groundZero: "action",
           },
         ],
@@ -178,7 +170,6 @@ function tokenizerStep(facts: BuildFacts): ModelPart {
           feeds: "Every training text is turned into IDs, and each ID picks its row in the word table.",
           nextId: "architecture",
         },
-        formula: { lines: ["list[id] = piece"] },
         groundZero: "action",
       },
     ],
@@ -203,7 +194,6 @@ function architectureStep(model: ModelPart): ModelPart {
       feeds: "The model, with random numbers, goes into pre-training, which sets every number.",
       nextId: "pre-training",
     },
-    formula: { lines: ["numbers = random()", "model = layers(numbers)"] },
     children: [model],
   };
 }
@@ -218,7 +208,6 @@ export function lifecycleRoot(model: ModelPart, facts: BuildFacts): ModelPart {
     facts: { shape: "6 stages", weightCount: model.facts.weightCount, headline: model.facts.headline, input: "online text", output: "a model ready to use", inputDetail: "publicly available online text", sources: model.facts.sources },
     explanation: "How a model is made: collect text, build the word list, write the model code, train it to guess the next word, teach it to answer, then test and shrink it.",
     why: "Only the architecture stage holds stored numbers. Every other stage shapes what those numbers end up being.",
-    formula: { lines: ["data → word list → code → pre-train → post-train → test"] },
     children: [
       dataStep(facts),
       tokenizerStep(facts),

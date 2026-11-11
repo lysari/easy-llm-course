@@ -23,6 +23,8 @@ const IN_OUT_LIMIT = 35;
 const KEY_FACT_LIMIT = 100;
 const TINY_COMPARISON = /tiny model|our tiny|tiny corpus|lesson model|tiny gpt/i;
 const SENTENCES = ["my dog is hungry , so i give it a", "My ELEPHANT is hungry, so", ""];
+const FORMULA_TITLE = '<p class="section-title">Formula</p>';
+const FORMULA_COPY = "Copy formula";
 
 const allParts = (part: ModelPart): ModelPart[] => [part, ...(part.children ?? []).flatMap(allParts)];
 const escaped = (text: string) => text.replaceAll("'", "&#x27;").replaceAll('"', "&quot;");
@@ -72,12 +74,21 @@ describe.each(MODELS)("$title", (model) => {
       expect(new Set(ids).size).toBe(ids.length);
     });
 
-    test("every part has text and a formula or code", () => {
+    test("every part has text", () => {
       for (const part of parts) {
         expect(part.explanation.length, part.id).toBeGreaterThan(20);
         expect(part.why.length, part.id).toBeGreaterThan(20);
-        expect(Boolean(part.formula || part.code), part.id).toBe(true);
         expect(part.copies, part.id).toBeGreaterThanOrEqual(1);
+      }
+    });
+
+    test("the drawer shows a Formula section only for a part with a formula", () => {
+      const sentence = readSentence(SENTENCES[0]);
+      const tiny = viewTiny(new ModelLab(), sentence.words);
+      for (const part of parts) {
+        const drawer = renderToStaticMarkup(<PartDrawer ref={null} mode={mode} root={root} modelId={model.id} modelTitle={model.title} part={part} place={placeOf(model, root, part)} tiny={tiny} text={SENTENCES[0]} sentence={sentence} onTextChange={() => {}} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
+        expect(drawer.includes(FORMULA_TITLE), part.id).toBe(Boolean(part.formula));
+        expect(drawer.includes(FORMULA_COPY), part.id).toBe(Boolean(part.formula));
       }
     });
 

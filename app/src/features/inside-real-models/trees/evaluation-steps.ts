@@ -19,7 +19,6 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
       feeds: "The scores are published with the model, and the model ships.",
       nextId: "benchmarks",
     },
-    formula: { lines: ["score = right answers / questions"] },
     children: [
       {
         id: "benchmarks",
@@ -55,7 +54,6 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
               feeds: "The 1s and 0s are averaged into the test's score.",
               nextId: "safety",
             },
-            formula: { lines: ["right = answer === key ? 1 : 0"] },
             code: "const right = answer === key ? 1 : 0;",
             groundZero: "action",
           },
@@ -77,7 +75,6 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
           feeds: "The failures found lead to more tuning, or to filters that check prompts and answers.",
           nextId: "safety-check",
         },
-        formula: { lines: ["pass = answer follows the rule"] },
         children: [
           {
             id: "safety-check",
@@ -95,7 +92,6 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
               feeds: "The passes and fails add up to the safety test's result.",
               nextId: "quantization",
             },
-            formula: { lines: ["pass = follows(answer, rule)"] },
             groundZero: "action",
           },
         ],

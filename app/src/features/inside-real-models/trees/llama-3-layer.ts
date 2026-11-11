@@ -94,7 +94,6 @@ export const llama3Layers: ModelPart = {
     feeds: "The 32nd layer's output goes to the final norm, then to the output table.",
     nextId: "layer",
   },
-  formula: { lines: ["x32 = layer32(… layer2(layer1(x0)) …)"] },
   code: "for (const layer of layers) {\n  x = layer(x);\n}",
   children: [layer],
 };

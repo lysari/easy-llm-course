@@ -52,7 +52,7 @@ export function attentionMathParts({ headSize, context, sources, scoreReasons, m
             feeds: "All the scores for a word are turned into shares by softmax.",
             nextId: "score-multiply-add",
           },
-          formula: { lines: [`score = q1 × k1 + q2 × k2 + … + q${headSize} × k${headSize}`] },
+          formula: { lines: [`score = (q1 × k1 + q2 × k2 + … + q${headSize} × k${headSize}) / √${headSize}`] },
           code: `let sum = 0;\nfor (let i = 0; i < ${headSize}; i++) {\n  sum = sum + q[i] * k[i];\n}`,
           children: [
             {

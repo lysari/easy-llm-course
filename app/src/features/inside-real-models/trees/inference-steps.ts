@@ -27,7 +27,6 @@ function tokenizeStep(spec: InferenceSpec): ModelPart {
       feeds: "The list of word IDs goes to Embedding, which swaps each ID for its list of numbers.",
       nextId: "embedding",
     },
-    formula: { lines: ["text → pieces → IDs"] },
     code: "const ids = pieces.map((piece) => list.indexOf(piece));",
     children: [
       {
@@ -46,7 +45,6 @@ function tokenizeStep(spec: InferenceSpec): ModelPart {
           feeds: "The pieces go to the lookup, which gives each one its ID.",
           nextId: "lookup",
         },
-        formula: { lines: ["\"d\" \"o\" \"g\" → \"do\" \"g\" → \"dog\""] },
         children: [
           {
             id: "apply-merge",
@@ -64,7 +62,6 @@ function tokenizeStep(spec: InferenceSpec): ModelPart {
               feeds: "When no rule fits any more, the pieces left are final and each is looked up for its ID.",
               nextId: "lookup",
             },
-            formula: { lines: ["if a = \"do\" and b = \"g\", then ab = \"dog\""] },
             groundZero: "action",
           },
         ],
@@ -85,7 +82,6 @@ function tokenizeStep(spec: InferenceSpec): ModelPart {
           feeds: "The ID picks that word's row in the word table, at the Embedding step.",
           nextId: "embedding",
         },
-        formula: { lines: ["id = list.indexOf(piece)"] },
         code: "const id = list.indexOf(piece);",
         groundZero: "action",
       },
@@ -111,7 +107,6 @@ function embeddingStep(spec: InferenceSpec): ModelPart {
       feeds: "Each word's numbers go into the first of the layers, which work on them one layer after another.",
       nextId: "layers",
     },
-    formula: { lines: ["vector = word table[id]"] },
     code: "const vectors = ids.map((id) => wordTable[id]);",
     children: spec.embedding,
   };
@@ -192,7 +187,6 @@ export function inferenceRoot(spec: InferenceSpec): ModelPart {
     facts: { shape: "5 steps", weightCount: numbersIn(steps), headline: { value: numbersIn(steps), unit: "numbers", isComputed: true }, input: "your text", output: "the next words", sources: spec.sources },
     explanation: `How ${spec.modelTitle} turns your text into the next word: cut it into word IDs, look up their vectors, run the layers, score every word, and pick one.`,
     why: "Every step is a lookup, a multiply-and-add or a random pick. None of them needs understanding.",
-    formula: { lines: ["text → IDs → vectors → layers → chances → word"] },
     children: steps,
   };
 }

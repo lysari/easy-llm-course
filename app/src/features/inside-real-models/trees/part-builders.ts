@@ -184,7 +184,6 @@ export function tablePart(spec: TableSpec): ModelPart {
       feeds: "The copied row is what the first layer reads.",
       nextId: `${id}-number`,
     },
-    formula: { lines: [`row = table[id], ${count(cols)} numbers`] },
     code: "const row: number[] = table[id];",
     children: [storedNumber],
   };
@@ -199,7 +198,6 @@ export function tablePart(spec: TableSpec): ModelPart {
     explanation: spec.explanation,
     why: spec.why,
     story: spec.story,
-    formula: { lines: [`table shape: ${count(rows)} × ${count(cols)}`] },
     code: "const vectors = ids.map((id) => table[id]);",
     children: [row],
   };

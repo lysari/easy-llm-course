@@ -21,7 +21,6 @@ export function generateStep(spec: InferenceSpec): ModelPart {
       feeds: "Each picked word's ID goes back in at Embedding, and the loop runs again until it stops.",
       nextId: "embedding",
     },
-    formula: { lines: ["repeat: pick, add, run again", "until stop or full"] },
     children: [
       {
         id: "write-round",
@@ -39,7 +38,6 @@ export function generateStep(spec: InferenceSpec): ModelPart {
           feeds: "The longer text goes back into the model for the next round's chances.",
           nextId: "pick",
         },
-        formula: { lines: ["word = pick(chances)", "words = [...words, word]"] },
         children: [
           {
             id: "pick",
@@ -77,7 +75,6 @@ export function generateStep(spec: InferenceSpec): ModelPart {
               feeds: "The text, now one word longer, goes to the stop check.",
               nextId: "stop-check",
             },
-            formula: { lines: ["ids = [...ids, picked]"] },
             code: "ids.push(picked);",
             groundZero: "action",
           },
@@ -118,7 +115,6 @@ export function generateStep(spec: InferenceSpec): ModelPart {
           feeds: "Each layer's attention reads the saved keys and values back, beside the new word's own.",
           nextId: "layers",
         },
-        formula: { lines: ["cache[layer].push(key, value)"] },
         groundZero: "action",
       },
     ],

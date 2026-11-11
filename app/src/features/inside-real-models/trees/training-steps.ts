@@ -19,7 +19,6 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
       feeds: "Out comes a base model that continues text well; post-training then teaches it to answer.",
       nextId: "training-round",
     },
-    formula: { lines: ["repeat: guess, score, find the cause, fix"] },
     children: [
       {
         id: "training-round",
@@ -37,7 +36,6 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
           feeds: "The nudged numbers are what the next round starts from.",
           nextId: "guess",
         },
-        formula: { lines: ["loss = score(guess(text))", "w = w − step(slope)"] },
         children: [
           {
             id: "guess",
@@ -55,7 +53,6 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
               feeds: "The chance goes to the score, which says how wrong this guess was.",
               nextId: "loss-term",
             },
-            formula: { lines: ["p = chances[right word]"] },
             groundZero: "action",
           },
           {
@@ -114,7 +111,15 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
               feeds: "The moved number is used in the next round's guesses.",
               nextId: "post-training",
             },
-            formula: { lines: ["m = 0.9 m + 0.1 g", "v = 0.999 v + 0.001 g²", "w = w − step size × m / √v"] },
+            formula: {
+              lines: ["m = β1 × m + (1 − β1) × g", "v = β2 × v + (1 − β2) × g²", "w = w − step size × m̂ / (√v̂ + ε)"],
+              legend: [
+                { term: "g", meaning: "this number's slope" },
+                { term: "β1, β2", meaning: "how much of the old averages to keep, chosen by whoever trains the model" },
+                { term: "m̂, v̂", meaning: "m and v, corrected for starting at 0" },
+                { term: "ε", meaning: "a tiny number that stops a divide by 0" },
+              ],
+            },
             groundZero: "action",
           },
         ],
@@ -140,7 +145,6 @@ export function postTrainingStep(facts: BuildFacts): ModelPart {
       feeds: "Out comes a chat model, which is then tested and made ready to ship.",
       nextId: "sft",
     },
-    formula: { lines: ["base model → SFT → preference tuning"] },
     children: [
       {
         id: "sft",
@@ -158,7 +162,6 @@ export function postTrainingStep(facts: BuildFacts): ModelPart {
           feeds: "The tuned model then goes on to preference tuning.",
           nextId: "sft-term",
         },
-        formula: { lines: ["loss on the answer words only"] },
         children: [
           {
             id: "sft-term",
@@ -197,7 +200,6 @@ export function postTrainingStep(facts: BuildFacts): ModelPart {
           feeds: "The model, now leaning toward preferred answers, goes on to evaluation.",
           nextId: "preference-pair",
         },
-        formula: { lines: ["gap = ln p(better) − ln p(worse)", "nudge numbers to grow the gap"] },
         children: [
           {
             id: "preference-pair",

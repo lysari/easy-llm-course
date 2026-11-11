@@ -257,7 +257,13 @@ export const beyondSteps: FlowStep[] = [
       { text: "Output", value: "weighted sum of the K" },
       { text: "Problem to manage", value: "load balancing" },
     ],
-    formula: { lines: ["Input → Router → K of N experts → weighted sum → Output"] },
+    formula: {
+      lines: ["scores = softmax(x · W_router)", "out = Σ w_k × E_k(x), over the top K experts"],
+      legend: [
+        { term: "E_k", meaning: "expert k, one small FFN" },
+        { term: "w_k", meaning: "expert k's score, rescaled so the top K add up to 1" },
+      ],
+    },
     why: "In a normal model, every token passes through every number. This breaks that link, so capacity grows without the same cost.",
   },
   {
@@ -281,7 +287,6 @@ export const beyondSteps: FlowStep[] = [
       { text: "Lesson 29", value: "GPT-4" },
     ],
     note: () => "Lesson 30 also points to what to read and build next.",
-    formula: { lines: ["tokens → model → probability of the next token"] },
     why: "Every language model is a function that takes tokens and gives a probability for the next one. The learning is in the numbers.",
   },
 ];

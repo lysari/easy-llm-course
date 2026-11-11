@@ -107,6 +107,7 @@ docs/                           # one doc per page, kept out of git by docs/.git
 - Playground page look: reference video of a "Guard risky commands" rule builder.
 - Every chip and control must change something real. Never add a control that only looks like the reference.
 - Text is simple English, written directly in the code.
+- A Formula block appears only for real math or a sourced rule with a number; never a restatement of the title, the summary or the code. `formula` is optional on Lessons parts and Inside real models parts, and a part without one shows no Formula section.
 
 ## Verification Commands
 - Lint: none. There is no linter or formatter for project source. Prettier only checks lesson code snippets, inside `bun run test`.
