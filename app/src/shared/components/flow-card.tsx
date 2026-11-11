@@ -1,14 +1,15 @@
 import type { HTMLAttributes, ReactNode, Ref } from "react";
 import type { CardAction, Status } from "@/shared/interfaces/card.interface";
+import type { ConceptName } from "@/shared/interfaces/concept.interface";
 import { activateOnKey } from "@/shared/utils/keyboard";
-import { Icon } from "./icon";
+import { ConceptIcon } from "./concept-icon";
 import { StatusPill } from "./status-pill";
 import "./flow-card.css";
 
 interface FlowCardProps extends Omit<HTMLAttributes<HTMLElement>, "title" | "onKeyDown"> {
   ref: Ref<HTMLElement>;
   id: string;
-  icon: string;
+  icon: ConceptName;
   title: string;
   lesson: string;
   status: Status;
@@ -22,7 +23,7 @@ export function FlowCard({ ref, id, className, icon, title, lesson, status, task
   return (
     <article ref={ref} className={className ? `card ${className}` : "card"} id={id} tabIndex={0} aria-label={title} {...article} onKeyDown={activateOnKey}>
       <div className="card-head">
-        <span className="tile"><Icon name={icon} /></span>
+        <ConceptIcon name={icon} size="card" />
         <div>
           <h3 className="card-title">{title}</h3>
           <p className="card-lesson">{lesson}</p>

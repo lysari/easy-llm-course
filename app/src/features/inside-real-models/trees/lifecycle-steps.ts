@@ -7,7 +7,7 @@ import { postTrainingStep, preTrainingStep } from "./training-steps";
 function dataStep(facts: BuildFacts): ModelPart {
   return {
     id: "data",
-    icon: "book",
+    icon: "documents",
     title: "Data collection and prep",
     summary: "Gathers a huge pile of text and cleans it up for training.",
     copies: 1,
@@ -25,7 +25,7 @@ function dataStep(facts: BuildFacts): ModelPart {
     children: [
       {
         id: "gather",
-        icon: "down",
+        icon: "add-document",
         title: "Copy one document in",
         summary: "Copies the plain text of one web page into the pile.",
         copies: 1,
@@ -44,7 +44,7 @@ function dataStep(facts: BuildFacts): ModelPart {
       },
       {
         id: "filter",
-        icon: "sliders",
+        icon: "filter",
         title: "One quality check",
         summary: "Checks one document against one rule, then keeps it or drops it.",
         copies: 1,
@@ -63,7 +63,7 @@ function dataStep(facts: BuildFacts): ModelPart {
       },
       {
         id: "dedupe",
-        icon: "copy",
+        icon: "duplicate",
         title: "One deduplication check",
         summary: "Drops a document if it copies, or nearly copies, one already kept.",
         copies: 1,
@@ -87,7 +87,7 @@ function dataStep(facts: BuildFacts): ModelPart {
 function tokenizerStep(facts: BuildFacts): ModelPart {
   return {
     id: "tokenizer",
-    icon: "text",
+    icon: "tokens",
     title: "Tokenizer",
     summary: "Builds the word list the model will use, by counting common pairs of letters.",
     copies: 1,
@@ -105,7 +105,7 @@ function tokenizerStep(facts: BuildFacts): ModelPart {
     children: [
       {
         id: "merge-round",
-        icon: "repeat",
+        icon: "merge-round",
         title: "One merge round",
         summary: "Joins the most common pair of pieces into one new piece.",
         copies: 1,
@@ -123,7 +123,7 @@ function tokenizerStep(facts: BuildFacts): ModelPart {
         children: [
           {
             id: "count-pair",
-            icon: "hash",
+            icon: "pair-count",
             title: "Count one pair",
             summary: "Adds 1 to the count for one pair of side-by-side pieces.",
             copies: 1,
@@ -163,7 +163,7 @@ function tokenizerStep(facts: BuildFacts): ModelPart {
       },
       {
         id: "assign-id",
-        icon: "hash",
+        icon: "token-id",
         title: "Give one piece an ID",
         summary: "Writes one piece into the list, and its place number becomes its ID.",
         copies: 1,
@@ -187,7 +187,7 @@ function tokenizerStep(facts: BuildFacts): ModelPart {
 function architectureStep(model: ModelPart): ModelPart {
   return {
     id: "architecture",
-    icon: "network",
+    icon: "model",
     title: "Architecture",
     summary: "Writes the model as code, with every stored number starting out random.",
     copies: 1,
@@ -209,7 +209,7 @@ function architectureStep(model: ModelPart): ModelPart {
 export function lifecycleRoot(model: ModelPart, facts: BuildFacts): ModelPart {
   return {
     id: "build",
-    icon: "pen",
+    icon: "model",
     title: "Build a model",
     summary: "How a model is made, from raw text to a model you can use, in 6 stages.",
     copies: 1,

@@ -17,7 +17,7 @@ export function attentionMathParts({ headSize, context, sources, scoreReasons, m
   return [
     {
       id: "scores",
-      icon: "percent",
+      icon: "scores",
       title: "Match scores",
       summary: "Checks how well this word matches each earlier word, as shares that add up to 1.",
       copies: 1,
@@ -37,7 +37,7 @@ export function attentionMathParts({ headSize, context, sources, scoreReasons, m
       children: [
         {
           id: "score",
-          icon: "hash",
+          icon: "number",
           title: "One score",
           summary: "How well this word's question matches one earlier word's label, as one number.",
           copies: context,
@@ -57,7 +57,7 @@ export function attentionMathParts({ headSize, context, sources, scoreReasons, m
           children: [
             {
               id: "score-multiply-add",
-              icon: "plus",
+              icon: "multiply-add",
               title: "One multiply-and-add",
               summary: "Multiplies one query number by one key number and adds it to the sum.",
               copies: headSize,
@@ -81,7 +81,7 @@ export function attentionMathParts({ headSize, context, sources, scoreReasons, m
     },
     {
       id: "mix",
-      icon: "merge",
+      icon: "mix",
       title: "Weighted mix",
       summary: "Blends the earlier words' values, giving more weight to the best matches.",
       copies: 1,
@@ -101,7 +101,7 @@ export function attentionMathParts({ headSize, context, sources, scoreReasons, m
       children: [
         {
           id: "mix-number",
-          icon: "hash",
+          icon: "number",
           title: "One mixed number",
           summary: "One number of the blend: each earlier word's share times its value, added up.",
           copies: headSize,
@@ -121,7 +121,7 @@ export function attentionMathParts({ headSize, context, sources, scoreReasons, m
           children: [
             {
               id: "mix-multiply-add",
-              icon: "plus",
+              icon: "multiply-add",
               title: "One multiply-and-add",
               summary: "Multiplies one share by one value number and adds it to the sum.",
               copies: context,

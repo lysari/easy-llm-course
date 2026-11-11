@@ -11,7 +11,7 @@ export const dataSteps: FlowStep[] = [
   {
     id: "text",
     stage: "data",
-    icon: "text",
+    icon: "documents",
     title: "Training text",
     lesson: "Lessons 09, 14",
     goal: "Collect the text the model will learn from.",
@@ -26,7 +26,7 @@ export const dataSteps: FlowStep[] = [
   {
     id: "tokenizer",
     stage: "data",
-    icon: "hash",
+    icon: "tokens",
     title: "Tokenizer",
     lesson: "Lessons 09, 18",
     goal: "Turn text into numbers, and back again.",
@@ -49,7 +49,7 @@ export const dataSteps: FlowStep[] = [
   {
     id: "pairs",
     stage: "data",
-    icon: "question",
+    icon: "pairs",
     title: "Training pairs",
     lesson: "Lessons 09, 11",
     goal: "Make questions: given these tokens, what comes next?",

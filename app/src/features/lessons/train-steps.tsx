@@ -18,7 +18,7 @@ export const learnSteps: FlowStep[] = [
   {
     id: "loss",
     stage: "learn",
-    icon: "gauge",
+    icon: "loss",
     title: "Cross-entropy loss",
     lesson: "Lesson 11",
     goal: "Score the guess by the chance given to the right word.",
@@ -43,7 +43,7 @@ export const learnSteps: FlowStep[] = [
   {
     id: "backprop",
     stage: "learn",
-    icon: "back",
+    icon: "backprop",
     title: "Backprop through attention",
     lesson: "Lesson 16",
     goal: "Go right to left, and find the gradient of every number.",
@@ -77,7 +77,7 @@ export const learnSteps: FlowStep[] = [
   {
     id: "adam",
     stage: "learn",
-    icon: "sliders",
+    icon: "optimizer",
     title: "Adam optimizer",
     lesson: "Lesson 17",
     goal: "Give every number its own step size.",
@@ -106,7 +106,7 @@ export const learnSteps: FlowStep[] = [
   {
     id: "train-loop",
     stage: "learn",
-    icon: "repeat",
+    icon: "train-loop",
     title: "The training loop",
     lesson: "Lessons 14, 22",
     goal: `Repeat the whole path ${TARGET_ROUNDS} times.`,

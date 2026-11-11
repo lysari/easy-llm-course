@@ -16,7 +16,7 @@ export const forwardSteps: FlowStep[] = [
   {
     id: "embedding",
     stage: "forward",
-    icon: "grid",
+    icon: "embedding",
     title: "Token embedding",
     lesson: "Lesson 10",
     goal: "Each token ID opens a row of numbers.",
@@ -40,7 +40,7 @@ export const forwardSteps: FlowStep[] = [
   {
     id: "position",
     stage: "forward",
-    icon: "order",
+    icon: "position",
     title: "Position",
     lesson: "Lessons 14, 25",
     goal: "Add word order to the numbers.",
@@ -63,7 +63,7 @@ export const forwardSteps: FlowStep[] = [
   {
     id: "layernorm",
     stage: "forward",
-    icon: "gauge",
+    icon: "norm",
     title: "LayerNorm",
     lesson: "Lessons 13, 20",
     goal: "Keep each list's numbers in a steady range.",
@@ -89,7 +89,7 @@ export const forwardSteps: FlowStep[] = [
   {
     id: "attention",
     stage: "forward",
-    icon: "eye",
+    icon: "attention",
     title: "Attention",
     lesson: "Lessons 12, 19",
     goal: "Each word looks back and collects from earlier words.",
@@ -125,7 +125,7 @@ export const forwardSteps: FlowStep[] = [
   {
     id: "ffn",
     stage: "forward",
-    icon: "merge",
+    icon: "feed-forward",
     title: "Feed-forward network",
     lesson: "Lessons 13, 15",
     goal: "Each word thinks alone about what it collected.",
@@ -152,7 +152,7 @@ export const forwardSteps: FlowStep[] = [
   {
     id: "repeat-layer",
     stage: "forward",
-    icon: "repeat",
+    icon: "layers",
     title: "Stack the hidden layers",
     lesson: "Lessons 13, 20",
     goal: "Repeat attention and feed-forward, layer after layer.",
@@ -177,7 +177,7 @@ export const forwardSteps: FlowStep[] = [
   {
     id: "logits",
     stage: "forward",
-    icon: "percent",
+    icon: "scores",
     title: "Output scores (logits)",
     lesson: "Lessons 11, 20",
     goal: "Turn the last word's list into one score per dictionary word.",
@@ -194,7 +194,7 @@ export const forwardSteps: FlowStep[] = [
   {
     id: "softmax",
     stage: "forward",
-    icon: "percent",
+    icon: "chances",
     title: "Softmax",
     lesson: "Lesson 11",
     goal: "Turn the scores into percents that add up to 100.",

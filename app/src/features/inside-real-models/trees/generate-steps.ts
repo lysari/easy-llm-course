@@ -7,7 +7,7 @@ export function generateStep(spec: InferenceSpec): ModelPart {
   const stopSources = [...new Set([...spec.sources, ...spec.stopWord.notes.map((note) => note.source)])];
   return {
     id: "generate",
-    icon: "pen",
+    icon: "generate",
     title: "Generate",
     summary: "Picks a word, adds it to the end, and runs again until it stops.",
     copies: 1,
@@ -25,7 +25,7 @@ export function generateStep(spec: InferenceSpec): ModelPart {
     children: [
       {
         id: "write-round",
-        icon: "repeat",
+        icon: "write-round",
         title: "One writing round",
         summary: "One pass of the loop: pick a word, add it, then check whether to stop.",
         copies: 1,
@@ -63,7 +63,7 @@ export function generateStep(spec: InferenceSpec): ModelPart {
           },
           {
             id: "append",
-            icon: "plus",
+            icon: "append",
             title: "Add it to the end",
             summary: "Adds the picked word's ID to the end of the text, ready for the next round.",
             copies: 1,
@@ -83,7 +83,7 @@ export function generateStep(spec: InferenceSpec): ModelPart {
           },
           {
             id: "stop-check",
-            icon: "check",
+            icon: "stop",
             title: "Stop check",
             summary: "Stops when the stop word is picked or the text is full.",
             copies: 1,
@@ -104,7 +104,7 @@ export function generateStep(spec: InferenceSpec): ModelPart {
       },
       {
         id: "kv-cache",
-        icon: "key",
+        icon: "cache",
         title: "KV cache",
         summary: "Saves work done for earlier words, so each new word runs faster.",
         copies: 1,

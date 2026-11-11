@@ -13,7 +13,7 @@ const CONTEXT = 1024;
 
 const wordTable = tablePart({
   id: "word-table",
-  icon: "grid",
+  icon: "embedding",
   title: "Word table",
   summary: "Holds one list of numbers for every word the model knows.",
   copies: 1,
@@ -38,7 +38,7 @@ const wordTable = tablePart({
 
 const positionTable = tablePart({
   id: "position-table",
-  icon: "order",
+  icon: "position",
   title: "Position table",
   summary: "Holds one list of numbers for each place in the text, so word order counts.",
   copies: 1,
@@ -62,7 +62,7 @@ const positionTable = tablePart({
 
 const finalNorm = normPart({
   id: "final-norm",
-  icon: "gauge",
+  icon: "norm",
   title: "Final norm",
   summary: "Keeps the last word's numbers in a steady range before they are scored.",
   copies: 1,
@@ -85,7 +85,7 @@ const finalNorm = normPart({
 
 const outputHead: ModelPart = {
   id: "output-head",
-  icon: "percent",
+  icon: "scores",
   title: "Output table",
   summary: "Scores every word against the last word's numbers, reusing the word table.",
   copies: 1,
@@ -106,7 +106,7 @@ const outputHead: ModelPart = {
   children: [
     {
       id: "output-score",
-      icon: "hash",
+      icon: "number",
       title: "One word's score",
       summary: "Scores one word: the last word's numbers times that word's row, added up.",
       copies: WORD_COUNT,
@@ -126,7 +126,7 @@ const outputHead: ModelPart = {
       children: [
         {
           id: "output-score-multiply-add",
-          icon: "plus",
+          icon: "multiply-add",
           title: "One multiply-and-add",
           summary: "Multiplies one of the last word's numbers by one from the word table, and adds.",
           copies: WIDTH,
@@ -151,7 +151,7 @@ const outputHead: ModelPart = {
 
 const root: ModelPart = {
   id: "model",
-  icon: "network",
+  icon: "model",
   title: "GPT-2 small",
   summary: "The whole model: word IDs go in, and a score for every word comes out.",
   copies: 1,

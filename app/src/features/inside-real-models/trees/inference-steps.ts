@@ -11,7 +11,7 @@ const sourcesOf = (notes: RealNote[]) => [...new Set(notes.map((note) => note.so
 function tokenizeStep(spec: InferenceSpec): ModelPart {
   return {
     id: "tokenize",
-    icon: "text",
+    icon: "tokens",
     title: "Tokenization",
     summary: "Splits your text into small pieces and gives each piece an ID.",
     copies: 1,
@@ -69,7 +69,7 @@ function tokenizeStep(spec: InferenceSpec): ModelPart {
       },
       {
         id: "lookup",
-        icon: "hash",
+        icon: "token-id",
         title: "Look up one piece",
         summary: "Finds one piece in the word list and writes down its place number.",
         copies: 1,
@@ -94,7 +94,7 @@ function tokenizeStep(spec: InferenceSpec): ModelPart {
 function embeddingStep(spec: InferenceSpec): ModelPart {
   return {
     id: "embedding",
-    icon: "grid",
+    icon: "embedding",
     title: "Embedding",
     summary: "Swaps each word ID for a list of numbers that stands for that word.",
     copies: 1,
@@ -118,7 +118,7 @@ function embeddingStep(spec: InferenceSpec): ModelPart {
 function outputStep(spec: InferenceSpec): ModelPart {
   const softmax: ModelPart = {
     id: "softmax",
-    icon: "percent",
+    icon: "chances",
     title: "Softmax",
     summary: "Turns the scores into chances that add up to 100%.",
     copies: 1,
@@ -136,7 +136,7 @@ function outputStep(spec: InferenceSpec): ModelPart {
     children: [
       {
         id: "chance",
-        icon: "hash",
+        icon: "number",
         title: "One word's chance",
         summary: "Turns one word's score into its chance, by comparing it with all the others.",
         copies: spec.wordCount,
@@ -159,7 +159,7 @@ function outputStep(spec: InferenceSpec): ModelPart {
   const parts = [spec.finalNorm, spec.outputHead, softmax];
   return {
     id: "output",
-    icon: "percent",
+    icon: "scores",
     title: "Output head",
     summary: "Scores every word in the list and turns the scores into chances.",
     copies: 1,
@@ -182,7 +182,7 @@ export function inferenceRoot(spec: InferenceSpec): ModelPart {
   const steps = [tokenizeStep(spec), embeddingStep(spec), spec.layers, outputStep(spec), generateStep(spec)];
   return {
     id: "use",
-    icon: "play",
+    icon: "generate",
     title: "Use a model",
     summary: "How a model turns your text into the next word, in 5 steps.",
     copies: 1,

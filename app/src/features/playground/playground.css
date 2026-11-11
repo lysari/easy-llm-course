@@ -12,7 +12,6 @@
   --pg-rule-height: 44px;
   --pg-chip-height: 30px;
   --pg-chip-pad: 9px;
-  --pg-chip-tile-size: 22px;
   --pg-tags-basis: 200px;
   --pg-icon-button-size: 24px;
   --pg-switch-width: 32px;
@@ -28,7 +27,6 @@
   --pg-plot-text: 13px;
   --pg-section-tracking: 0.04em;
   --pg-tag-remove-opacity: 0.7;
-  background: var(--card);
 }
 
 .pg {
@@ -167,8 +165,9 @@
   gap: var(--space-item);
   min-height: var(--pg-rule-height);
   padding: var(--space-control) var(--space-card);
+  border: var(--border-thin) solid var(--glass-edge);
   border-radius: var(--radius-group);
-  background: var(--group);
+  background: linear-gradient(var(--card), var(--card)), var(--glass-backing);
 }
 
 .rule-word {
@@ -232,35 +231,6 @@
 
 .chip[aria-expanded="true"] .chip-chevron {
   transform: rotate(180deg);
-}
-
-.chip-tile {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: var(--pg-chip-tile-size);
-  height: var(--pg-chip-tile-size);
-  border-radius: var(--radius-pill);
-}
-
-.chip-tile--green {
-  background: var(--done-bg);
-  color: var(--done-ink);
-}
-
-.chip-tile--orange {
-  background: var(--needs-bg);
-  color: var(--needs-ink);
-}
-
-.chip-tile--blue {
-  background: var(--running-bg);
-  color: var(--running-ink);
-}
-
-.chip-tile--grey {
-  background: var(--queued-bg);
-  color: var(--queued-ink);
 }
 
 .tags {
@@ -327,7 +297,7 @@
   padding: var(--space-card) var(--space-block) var(--space-block) var(--pg-group-inset);
   border: var(--border-thin) solid var(--card-line);
   border-radius: var(--radius-card);
-  background: var(--card);
+  background: var(--grain), linear-gradient(var(--card), var(--card)), var(--glass-backing);
   box-shadow: var(--shadow-group);
 }
 
@@ -428,7 +398,7 @@
   padding: var(--space-surface);
   border: var(--border-thin) solid var(--card-line);
   border-radius: var(--radius-card);
-  background: var(--card);
+  background: var(--grain), linear-gradient(var(--card), var(--card)), var(--glass-backing);
   box-shadow: var(--shadow-result);
 }
 

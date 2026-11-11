@@ -1,11 +1,12 @@
 import type { ModelPart, PartStory, TinyPartId } from "@/features/inside-real-models/interfaces/model-part.interface";
 import type { RealFacts, RealNote, StepFacts } from "@/features/inside-real-models/interfaces/real-facts.interface";
+import type { ConceptName } from "@/shared/interfaces/concept.interface";
 import { count } from "@/shared/utils/format";
 import type { SourceId } from "./sources";
 
 interface PartText {
   id: string;
-  icon: string;
+  icon: ConceptName;
   title: string;
   summary: string;
   copies: number;
@@ -65,7 +66,7 @@ export function projectionPart(spec: ProjectionSpec): ModelPart {
   const sizeOut = count(outSize);
   const multiplyAdd: ModelPart = {
     id: `${id}-multiply-add`,
-    icon: "plus",
+    icon: "multiply-add",
     title: "One multiply-and-add",
     summary: "Multiplies one input number by one stored number and adds it to a running sum.",
     copies: inSize,
@@ -86,7 +87,7 @@ export function projectionPart(spec: ProjectionSpec): ModelPart {
   };
   const bias: ModelPart = {
     id: `${id}-bias`,
-    icon: "plus",
+    icon: "bias",
     title: "Bias",
     summary: "Adds one stored number at the end, so the output can move up or down.",
     copies: 1,
@@ -106,7 +107,7 @@ export function projectionPart(spec: ProjectionSpec): ModelPart {
   };
   const number: ModelPart = {
     id: `${id}-number`,
-    icon: "hash",
+    icon: "number",
     title: "One output number",
     summary: "Makes one output number: each input times its own stored number, all added up.",
     copies: outSize,
@@ -146,7 +147,7 @@ export function tablePart(spec: TableSpec): ModelPart {
   const { id, rows, cols, rowName, tinyPart, sources, codeReasons } = spec;
   const storedNumber: ModelPart = {
     id: `${id}-number`,
-    icon: "hash",
+    icon: "number",
     title: "One stored number",
     summary: "One number in the table, set by training, that means nothing on its own.",
     copies: cols,
@@ -166,7 +167,7 @@ export function tablePart(spec: TableSpec): ModelPart {
   };
   const row: ModelPart = {
     id: `${id}-row`,
-    icon: "grid",
+    icon: "vector",
     title: `One ${rowName}'s row`,
     summary: `The list of numbers for one ${rowName}, copied out each time that ${rowName} comes up.`,
     copies: rows,
@@ -206,7 +207,7 @@ export function normPart(spec: NormSpec): ModelPart {
   const { id, size, hasShift, tinyPart, sources, codeReasons } = spec;
   const number: ModelPart = {
     id: `${id}-number`,
-    icon: "hash",
+    icon: "number",
     title: "One output number",
     summary: hasShift ? "Scales one number by its own stored number, then shifts it by another." : "Scales one number by its own stored number.",
     copies: size,

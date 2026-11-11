@@ -10,7 +10,7 @@ const LAYER_COUNT = 32;
 
 const layer: ModelPart = {
   id: "layer",
-  icon: "layers",
+  icon: "layer",
   title: "One layer",
   summary: "Looks back at earlier words, then picks out patterns, adding each result back on.",
   copies: LAYER_COUNT,
@@ -30,7 +30,7 @@ const layer: ModelPart = {
   children: [
     normPart({
       id: "norm-1",
-      icon: "gauge",
+      icon: "norm",
       title: "RMSNorm before attention",
       summary: "Keeps a word's numbers at a steady size before attention reads them.",
       copies: 1,
@@ -53,7 +53,7 @@ const layer: ModelPart = {
     llama3Attention,
     normPart({
       id: "norm-2",
-      icon: "gauge",
+      icon: "norm",
       title: "RMSNorm before feed-forward",
       summary: "Keeps a word's numbers at a steady size before the feed-forward reads them.",
       copies: 1,
@@ -79,7 +79,7 @@ const layer: ModelPart = {
 
 export const llama3Layers: ModelPart = {
   id: "layers",
-  icon: "repeat",
+  icon: "layers",
   title: "Layers × 32",
   summary: "Runs every word through 32 layers of the same shape, one after another.",
   copies: 1,

@@ -14,7 +14,7 @@ const KV_WIDTH = 1024;
 
 const wordTable = tablePart({
   id: "word-table",
-  icon: "grid",
+  icon: "embedding",
   title: "Word table",
   summary: "Holds one list of numbers for every word the model knows.",
   copies: 1,
@@ -38,7 +38,7 @@ const wordTable = tablePart({
 
 const finalNorm = normPart({
   id: "final-norm",
-  icon: "gauge",
+  icon: "norm",
   title: "Final norm",
   summary: "Keeps the last word's numbers in a steady range before they are scored.",
   copies: 1,
@@ -61,7 +61,7 @@ const finalNorm = normPart({
 
 const outputHead = projectionPart({
   id: "output-head",
-  icon: "percent",
+  icon: "scores",
   title: "Output table",
   summary: "Scores every word in the list against the last word's numbers.",
   copies: 1,
@@ -89,7 +89,7 @@ const outputHead = projectionPart({
 
 const root: ModelPart = {
   id: "model",
-  icon: "network",
+  icon: "model",
   title: "Llama 3 8B",
   summary: "The whole model: word IDs go in, and a score for every word comes out.",
   copies: 1,
@@ -125,7 +125,7 @@ const root: ModelPart = {
 
 const wordOrder: ModelPart = {
   id: "word-order",
-  icon: "order",
+  icon: "position",
   title: "Word order comes later",
   summary: "Adds nothing here, because Llama marks word order later, inside attention.",
   copies: 1,

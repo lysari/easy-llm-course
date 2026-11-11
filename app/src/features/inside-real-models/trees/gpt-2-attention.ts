@@ -12,7 +12,7 @@ const GPT_2_TABLE_CODE = [GPT_2_MATMUL, GPT_2_BIAS];
 
 const head: ModelPart = {
   id: "head",
-  icon: "eye",
+  icon: "head",
   title: "One head",
   summary: "Finds which earlier words matter to this word and pulls in what they offer.",
   copies: HEAD_COUNT,
@@ -33,7 +33,7 @@ const head: ModelPart = {
   children: [
     projectionPart({
       id: "query",
-      icon: "question",
+      icon: "query",
       title: "Query projection",
       summary: "Turns a word's numbers into its query: what this word is looking for.",
       copies: 1,
@@ -87,7 +87,7 @@ const head: ModelPart = {
     }),
     projectionPart({
       id: "value",
-      icon: "text",
+      icon: "value",
       title: "Value projection",
       summary: "Turns a word's numbers into its value: what it passes on to later words.",
       copies: 1,
@@ -118,7 +118,7 @@ const head: ModelPart = {
 
 export const gpt2Attention: ModelPart = {
   id: "attention",
-  icon: "eye",
+  icon: "attention",
   title: "Attention",
   summary: "Lets each word look back at earlier words and take in what it needs.",
   copies: 1,
@@ -140,7 +140,7 @@ export const gpt2Attention: ModelPart = {
     head,
     projectionPart({
       id: "attention-output",
-      icon: "merge",
+      icon: "matrix",
       title: "Output projection",
       summary: "Joins what all the heads found back into one list of numbers for the word.",
       copies: 1,

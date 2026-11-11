@@ -20,7 +20,7 @@ export const useSteps: FlowStep[] = [
   {
     id: "prompt",
     stage: "use",
-    icon: "text",
+    icon: "prompt",
     title: "You send a prompt",
     lesson: "Lesson 14",
     goal: "The same path runs, but with no right answer to compare.",
@@ -87,7 +87,7 @@ export const useSteps: FlowStep[] = [
   {
     id: "generate",
     stage: "use",
-    icon: "pen",
+    icon: "generate",
     title: "Generate the reply",
     lesson: "Lesson 14",
     goal: "Add the token, then run the whole path again.",
@@ -108,7 +108,7 @@ export const useSteps: FlowStep[] = [
   {
     id: "kv-cache",
     stage: "use",
-    icon: "grid",
+    icon: "cache",
     title: "KV cache",
     lesson: "Lesson 21",
     goal: "Save earlier K and V, so only the new token needs work.",
@@ -143,7 +143,7 @@ export const beyondSteps: FlowStep[] = [
   {
     id: "scale",
     stage: "beyond",
-    icon: "down",
+    icon: "scale",
     title: "Scaling laws",
     lesson: "Lesson 22",
     goal: "Bigger models improve in a predictable way.",
@@ -164,7 +164,7 @@ export const beyondSteps: FlowStep[] = [
   {
     id: "in-context",
     stage: "beyond",
-    icon: "question",
+    icon: "in-context",
     title: "In-context learning",
     lesson: "Lesson 24",
     goal: "A large model can follow examples inside your prompt.",
@@ -184,7 +184,7 @@ export const beyondSteps: FlowStep[] = [
   {
     id: "finetune",
     stage: "beyond",
-    icon: "sliders",
+    icon: "fine-tune",
     title: "Instruction fine-tuning",
     lesson: "Lesson 26",
     goal: "Teach a text completer to follow instructions.",
@@ -204,7 +204,7 @@ export const beyondSteps: FlowStep[] = [
   {
     id: "reward",
     stage: "beyond",
-    icon: "gauge",
+    icon: "reward",
     title: "Reward model",
     lesson: "Lesson 27",
     goal: "Learn which replies people prefer.",
@@ -224,7 +224,7 @@ export const beyondSteps: FlowStep[] = [
   {
     id: "rlhf",
     stage: "beyond",
-    icon: "repeat",
+    icon: "rlhf",
     title: "RLHF with PPO",
     lesson: "Lesson 28",
     goal: "Nudge the model toward replies that score well.",
@@ -244,7 +244,7 @@ export const beyondSteps: FlowStep[] = [
   {
     id: "moe",
     stage: "beyond",
-    icon: "network",
+    icon: "experts",
     title: "Mixture of Experts",
     lesson: "Lesson 29",
     goal: "Have many numbers, but use only some per token.",
@@ -263,7 +263,7 @@ export const beyondSteps: FlowStep[] = [
   {
     id: "capstone",
     stage: "beyond",
-    icon: "line",
+    icon: "pipeline",
     title: "The complete picture",
     lesson: "Lesson 30",
     goal: "Everything you built, from y = wx + b to GPT-4.",

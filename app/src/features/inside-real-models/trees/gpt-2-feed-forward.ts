@@ -9,7 +9,7 @@ const GPT_2_TABLE_CODE = [GPT_2_MATMUL, GPT_2_BIAS];
 
 const gelu: ModelPart = {
   id: "gelu",
-  icon: "line",
+  icon: "activation",
   title: "GELU",
   summary: "Bends each number: big positives pass, negatives shrink to near 0.",
   copies: 1,
@@ -29,7 +29,7 @@ const gelu: ModelPart = {
   children: [
     {
       id: "gelu-number",
-      icon: "hash",
+      icon: "number",
       title: "One bent number",
       summary: "Bends one number by multiplying it by a value from a fixed curve.",
       copies: EXPANDED,
@@ -52,7 +52,7 @@ const gelu: ModelPart = {
 
 export const gpt2FeedForward: ModelPart = {
   id: "feed-forward",
-  icon: "network",
+  icon: "feed-forward",
   title: "Feed-forward",
   summary: "Works on each word alone, picking out patterns stored in its tables.",
   copies: 1,
@@ -72,7 +72,7 @@ export const gpt2FeedForward: ModelPart = {
   children: [
     projectionPart({
       id: "expand",
-      icon: "network",
+      icon: "expand",
       title: "Expand",
       summary: "Spreads a word's numbers out to four times as many, to spot patterns.",
       copies: 1,
@@ -99,7 +99,7 @@ export const gpt2FeedForward: ModelPart = {
     gelu,
     projectionPart({
       id: "contract",
-      icon: "down",
+      icon: "contract",
       title: "Contract",
       summary: "Squeezes the numbers back down so they can be added onto the word.",
       copies: 1,

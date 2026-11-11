@@ -5,7 +5,7 @@ import { stepFacts } from "./part-builders";
 export function preTrainingStep(facts: BuildFacts): ModelPart {
   return {
     id: "pre-training",
-    icon: "repeat",
+    icon: "train-loop",
     title: "Pre-training",
     summary: "Trains the model to guess the next word, over and over, on all the text.",
     copies: 1,
@@ -23,7 +23,7 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
     children: [
       {
         id: "training-round",
-        icon: "repeat",
+        icon: "train-loop",
         title: "One training round",
         summary: "Guess, score the guess, find what caused the error, and nudge every number.",
         copies: 1,
@@ -41,7 +41,7 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
         children: [
           {
             id: "guess",
-            icon: "eye",
+            icon: "chances",
             title: "Guess: one word's chance",
             summary: "Reads the chance the model gives the word that really comes next.",
             copies: 1,
@@ -60,7 +60,7 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
           },
           {
             id: "loss-term",
-            icon: "gauge",
+            icon: "loss",
             title: "Score: one loss term",
             summary: "Turns that chance into one number saying how wrong the guess was.",
             copies: 1,
@@ -80,7 +80,7 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
           },
           {
             id: "slope",
-            icon: "line",
+            icon: "slope",
             title: "Find the cause: one slope",
             summary: "Works out which way to move one number to make the guess less wrong.",
             copies: 1,
@@ -100,7 +100,7 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
           },
           {
             id: "adam-update",
-            icon: "sliders",
+            icon: "optimizer",
             title: "Fix: one update",
             summary: "Moves one stored number a small step the right way.",
             copies: 1,
@@ -126,7 +126,7 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
 export function postTrainingStep(facts: BuildFacts): ModelPart {
   return {
     id: "post-training",
-    icon: "sliders",
+    icon: "chat",
     title: "Post-training",
     summary: "Teaches a model that only continues text to answer questions instead.",
     copies: 1,
@@ -144,7 +144,7 @@ export function postTrainingStep(facts: BuildFacts): ModelPart {
     children: [
       {
         id: "sft",
-        icon: "pen",
+        icon: "fine-tune",
         title: "Supervised fine-tuning",
         summary: "Trains on questions paired with good answers written by people.",
         copies: 1,
@@ -162,7 +162,7 @@ export function postTrainingStep(facts: BuildFacts): ModelPart {
         children: [
           {
             id: "sft-term",
-            icon: "gauge",
+            icon: "loss",
             title: "One answer word's loss",
             summary: "Scores one word of a written answer, the same way as in pre-training.",
             copies: 1,
@@ -183,7 +183,7 @@ export function postTrainingStep(facts: BuildFacts): ModelPart {
       },
       {
         id: "preference",
-        icon: "check",
+        icon: "preference",
         title: "Preference tuning",
         summary: "Nudges the model toward the answers people picked as better.",
         copies: 1,
@@ -201,7 +201,7 @@ export function postTrainingStep(facts: BuildFacts): ModelPart {
         children: [
           {
             id: "preference-pair",
-            icon: "split",
+            icon: "pairs",
             title: "One preference pair",
             summary: "Makes the better of two answers more likely than the worse one.",
             copies: 1,

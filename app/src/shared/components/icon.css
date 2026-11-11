@@ -1,0 +1,7 @@
+.icon--plus {
+  color: var(--action-add);
+}
+
+.icon--trash {
+  color: var(--action-remove);
+}

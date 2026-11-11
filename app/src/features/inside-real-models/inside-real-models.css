@@ -30,8 +30,9 @@
   grid-template-columns: 1fr 1fr;
   gap: var(--space-hair);
   padding: var(--space-tight);
+  border: var(--border-thin) solid var(--glass-edge);
   border-radius: var(--radius-group);
-  background: var(--group);
+  background: linear-gradient(var(--card), var(--card)), var(--glass-backing);
 }
 
 .mode-switch button {
@@ -50,7 +51,7 @@
 }
 
 .mode-switch [aria-pressed="true"] {
-  background: var(--card);
+  background: var(--card-raised);
   box-shadow: var(--shadow-chip);
   color: var(--ink);
 }
@@ -112,6 +113,11 @@
   padding: var(--space-block) var(--space-region) var(--space-tight);
 }
 
+.part-card-head > .concept-icon {
+  justify-self: center;
+  margin-block: calc((var(--tile-size) - var(--icon-card)) / 2);
+}
+
 .part-card-name {
   align-self: baseline;
   display: flex;
@@ -142,8 +148,7 @@
   transition: background var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast);
 }
 
-.part-card.is-active .step-badge,
-.part-card.is-active .part-card-head .tile {
+.part-card.is-active .step-badge {
   border-color: var(--band-line);
   background: var(--band-surface);
   color: var(--band-ink);

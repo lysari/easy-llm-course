@@ -32,7 +32,7 @@ export const simpleSteps: FlowStep[] = [
   {
     id: "model",
     stage: "simple",
-    icon: "line",
+    icon: "function",
     title: "What is a model?",
     lesson: "Lesson 00",
     goal: "A model is a function that predicts something useful.",
@@ -56,7 +56,7 @@ export const simpleSteps: FlowStep[] = [
   {
     id: "lines",
     stage: "simple",
-    icon: "line",
+    icon: "fit-line",
     title: "Linear regression",
     lesson: "Lesson 01",
     goal: "Find the straight line closest to the data.",
@@ -77,7 +77,7 @@ export const simpleSteps: FlowStep[] = [
   {
     id: "mse",
     stage: "simple",
-    icon: "gauge",
+    icon: "loss",
     title: "Loss function",
     lesson: "Lesson 02",
     goal: "Measure how wrong the model is, as one number.",
@@ -102,7 +102,7 @@ export const simpleSteps: FlowStep[] = [
   {
     id: "descent",
     stage: "simple",
-    icon: "down",
+    icon: "descent",
     title: "Gradient descent",
     lesson: "Lesson 03",
     goal: "Change w and b, a little at a time, to lower the loss.",
@@ -133,7 +133,7 @@ export const simpleSteps: FlowStep[] = [
   {
     id: "class",
     stage: "simple",
-    icon: "grid",
+    icon: "model",
     title: "OOP model",
     lesson: "Lesson 04",
     goal: "Put the model and its training into one class.",
@@ -152,7 +152,7 @@ export const simpleSteps: FlowStep[] = [
   {
     id: "activation",
     stage: "simple",
-    icon: "merge",
+    icon: "activation",
     title: "Activation functions",
     lesson: "Lesson 05",
     goal: "Add a curve, so the model can bend.",
@@ -181,7 +181,7 @@ export const simpleSteps: FlowStep[] = [
   {
     id: "network",
     stage: "simple",
-    icon: "network",
+    icon: "feed-forward",
     title: "Neural network",
     lesson: "Lesson 06",
     goal: "Join neurons into layers.",
@@ -208,7 +208,7 @@ export const simpleSteps: FlowStep[] = [
   {
     id: "backprop-small",
     stage: "simple",
-    icon: "back",
+    icon: "backprop",
     title: "Backpropagation",
     lesson: "Lesson 07",
     goal: "Find how every weight affected the loss, working backwards.",
@@ -239,7 +239,7 @@ export const simpleSteps: FlowStep[] = [
   {
     id: "matrix",
     stage: "simple",
-    icon: "grid",
+    icon: "matrix",
     title: "Matrix math",
     lesson: "Lesson 08",
     goal: "Do thousands of sums at once.",

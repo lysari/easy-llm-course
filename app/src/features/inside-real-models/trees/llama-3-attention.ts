@@ -10,7 +10,7 @@ const CONTEXT = 8192;
 
 const rope: ModelPart = {
   id: "rope",
-  icon: "repeat",
+  icon: "rope",
   title: "RoPE",
   summary: "Turns the query numbers by an angle that grows with the word's place.",
   copies: 1,
@@ -31,7 +31,7 @@ const rope: ModelPart = {
   children: [
     {
       id: "rope-number",
-      icon: "hash",
+      icon: "number",
       title: "One turned number",
       summary: "Turns one number of a pair, using the cos and sin of its angle.",
       copies: HEAD_SIZE,
@@ -51,7 +51,7 @@ const rope: ModelPart = {
       children: [
         {
           id: "rope-multiply-add",
-          icon: "plus",
+          icon: "multiply-add",
           title: "One multiply-and-add",
           summary: "Multiplies one number by the cos or sin of its angle and adds it to the sum.",
           copies: 2,
@@ -76,7 +76,7 @@ const rope: ModelPart = {
 
 const head: ModelPart = {
   id: "head",
-  icon: "eye",
+  icon: "head",
   title: "One query head",
   summary: "Finds which earlier words matter to this word, using its group's shared keys.",
   copies: 4,
@@ -96,7 +96,7 @@ const head: ModelPart = {
   children: [
     projectionPart({
       id: "query",
-      icon: "question",
+      icon: "query",
       title: "Query projection",
       summary: "Turns a word's numbers into its query: what this word is looking for.",
       copies: 1,
@@ -128,7 +128,7 @@ const head: ModelPart = {
 
 const group: ModelPart = {
   id: "group",
-  icon: "merge",
+  icon: "kv-group",
   title: "Key-value group",
   summary: "4 query heads that share one key and one value, to save memory.",
   copies: 8,
@@ -176,7 +176,7 @@ const group: ModelPart = {
     }),
     projectionPart({
       id: "value",
-      icon: "text",
+      icon: "value",
       title: "Value projection",
       summary: "Turns a word's numbers into its value: what it passes on to later words.",
       copies: 1,
@@ -206,7 +206,7 @@ const group: ModelPart = {
 
 export const llama3Attention: ModelPart = {
   id: "attention",
-  icon: "eye",
+  icon: "attention",
   title: "Attention",
   summary: "Lets each word look back at earlier words and take in what it needs.",
   copies: 1,
@@ -227,7 +227,7 @@ export const llama3Attention: ModelPart = {
     group,
     projectionPart({
       id: "attention-output",
-      icon: "merge",
+      icon: "matrix",
       title: "Output projection",
       summary: "Joins what all the heads found back into one list of numbers for the word.",
       copies: 1,

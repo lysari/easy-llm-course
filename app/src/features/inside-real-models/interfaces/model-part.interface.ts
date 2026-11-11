@@ -1,4 +1,5 @@
 import type { ModelLab } from "@/core/model/lab";
+import type { ConceptName } from "@/shared/interfaces/concept.interface";
 import type { Formula } from "@/shared/interfaces/formula.interface";
 import type { ForwardTrace, RankedToken, TinyGptWeights } from "@/shared/interfaces/model.interface";
 import type { RealFacts } from "./real-facts.interface";
@@ -67,7 +68,7 @@ export interface PartStory {
 
 export interface ModelPart {
   id: string;
-  icon: string;
+  icon: ConceptName;
   title: string;
   summary: string;
   copies: number;

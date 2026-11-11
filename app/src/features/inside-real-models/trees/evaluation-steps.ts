@@ -5,7 +5,7 @@ import { stepFacts } from "./part-builders";
 export function evaluationStep(facts: BuildFacts): ModelPart {
   return {
     id: "evaluation",
-    icon: "gauge",
+    icon: "evaluation",
     title: "Evaluation and optimisation",
     summary: "Tests the finished model, checks it for harm, and makes it smaller.",
     copies: 1,
@@ -23,7 +23,7 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
     children: [
       {
         id: "benchmarks",
-        icon: "check",
+        icon: "benchmark",
         title: "Benchmarks",
         summary: "Asks sets of test questions with known answers and counts the right ones.",
         copies: 1,
@@ -41,7 +41,7 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
         children: [
           {
             id: "test-question",
-            icon: "question",
+            icon: "test-question",
             title: "One test question",
             summary: "Asks one question and marks the model's top answer right or wrong.",
             copies: 1,
@@ -63,7 +63,7 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
       },
       {
         id: "safety",
-        icon: "eye",
+        icon: "safety",
         title: "Safety checks",
         summary: "Tries risky questions on the model and checks its answers against rules.",
         copies: 1,
@@ -81,7 +81,7 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
         children: [
           {
             id: "safety-check",
-            icon: "check",
+            icon: "safety-check",
             title: "One safety check",
             summary: "Sends one risky question and checks the answer against one rule.",
             copies: 1,
@@ -102,7 +102,7 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
       },
       {
         id: "quantization",
-        icon: "hash",
+        icon: "quantize",
         title: "Quantization",
         summary: "Stores every number with fewer digits, so the model is smaller and faster.",
         copies: 1,
@@ -120,7 +120,7 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
         children: [
           {
             id: "round-number",
-            icon: "hash",
+            icon: "number",
             title: "Round one number",
             summary: "Rounds one stored number so it fits in less space.",
             copies: 1,

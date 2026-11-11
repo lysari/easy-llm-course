@@ -2,7 +2,7 @@ import type { Ref } from "react";
 import type { ModelPart } from "@/features/inside-real-models/interfaces/model-part.interface";
 import type { PartPlace } from "@/features/inside-real-models/interfaces/part-place.interface";
 import { STAGGER_MS } from "@/shared/components/flow-links";
-import { Icon } from "@/shared/components/icon";
+import { ConceptIcon } from "@/shared/components/concept-icon";
 import { StatusPill } from "@/shared/components/status-pill";
 import type { Status } from "@/shared/interfaces/card.interface";
 import { count } from "@/shared/utils/format";
@@ -61,7 +61,7 @@ export function PartCard({ ref, root, modelTitle, part, place, index, isSelected
       onKeyDown={activateOnKey}
     >
       <div className="part-card-head">
-        {step > 0 ? <span className="step-badge">{step}</span> : <span className="tile"><Icon name={part.icon} /></span>}
+        {step > 0 ? <span className="step-badge">{step}</span> : <ConceptIcon name={part.icon} size="card" />}
         <div className="part-card-name">
           <h3 className="card-title">{nameOf(part)}</h3>
           {tag && <StatusPill status={tag} />}

@@ -1,14 +1,13 @@
 import type { ReactNode } from "react";
 import { START_CHOICES, joinTokens } from "@/core/model/corpus";
 import type { PlaygroundSettings, RowKey } from "@/features/playground/interfaces/playground.interface";
+import { ConceptIcon } from "@/shared/components/concept-icon";
 import { Icon } from "@/shared/components/icon";
+import type { ConceptName } from "@/shared/interfaces/concept.interface";
 import { TEXT_GROUPS } from "./playground-run";
 
-type Tint = "green" | "orange" | "blue" | "grey";
-
 interface Row {
-  icon: string;
-  tint: Tint;
+  icon: ConceptName;
   label: string;
   verb: string;
   lesson: string;
@@ -36,47 +35,47 @@ const numbered = (values: number[], unit: string) => values.map((value) => ({ la
 
 export const ROWS: Record<RowKey, Row> = {
   isEvenAnswers: {
-    icon: "order", tint: "orange", label: "Usual answer", verb: "appears", lesson: "Lesson 14", retrains: true,
+    icon: "pairs", label: "Usual answer", verb: "appears", lesson: "Lesson 14", retrains: true,
     help: "How often the text uses its usual answer. The model copies this pattern.",
     options: [{ label: "3 times more", value: false }, { label: "Just as often", value: true }],
   },
   vectorSize: {
-    icon: "grid", tint: "blue", label: "Each word", verb: "is", lesson: "Lesson 10", retrains: true,
+    icon: "vector", label: "Each word", verb: "is", lesson: "Lesson 10", retrains: true,
     help: "How many numbers describe each word. More numbers hold more, but train slower.",
     options: numbered([6, 12, 24, 48], "numbers"),
   },
   rounds: {
-    icon: "repeat", tint: "blue", label: "Repeat", verb: "for", lesson: "Lesson 14", retrains: true,
+    icon: "train-loop", label: "Repeat", verb: "for", lesson: "Lesson 14", retrains: true,
     help: "One round is: guess, score, find the cause, fix.",
     options: numbered([20, 50, 200, 500], "rounds"),
   },
   learningRate: {
-    icon: "down", tint: "orange", label: "Step size", verb: "is", lesson: "Lesson 03", retrains: true,
+    icon: "descent", label: "Step size", verb: "is", lesson: "Lesson 03", retrains: true,
     help: "How far the numbers move in one round. Too small learns slowly. Too big jumps past the answer.",
     options: [0.0004, 0.004, 0.04, 0.4].map((value) => ({ label: String(value), value })),
   },
   optimizer: {
-    icon: "sliders", tint: "grey", label: "Fix numbers", verb: "with", lesson: "Lesson 17", retrains: true,
+    icon: "optimizer", label: "Fix numbers", verb: "with", lesson: "Lesson 17", retrains: true,
     help: "Adam gives every number its own step size. Plain steps use one size for all.",
     options: [{ label: "Adam", value: "adam" }, { label: "Plain steps", value: "plain" }],
   },
   start: {
-    icon: "pen", tint: "green", label: "Start with", verb: "", lesson: "Lesson 14", retrains: false,
+    icon: "prompt", label: "Start with", verb: "", lesson: "Lesson 14", retrains: false,
     help: "The words you give the model. It continues from here.",
     options: START_CHOICES.map((value) => ({ label: joinTokens(value.split(" ")), value })),
   },
   temperature: {
-    icon: "gauge", tint: "orange", label: "Temperature", verb: "is", lesson: "Lesson 23", retrains: false,
+    icon: "temperature", label: "Temperature", verb: "is", lesson: "Lesson 23", retrains: false,
     help: "Low picks the top word more often. High takes more risks.",
     options: [0.5, 1, 2].map((value) => ({ label: String(value), value })),
   },
   topK: {
-    icon: "hash", tint: "blue", label: "Top-K", verb: "keeps", lesson: "Lesson 23", retrains: false,
+    icon: "top-k", label: "Top-K", verb: "keeps", lesson: "Lesson 23", retrains: false,
     help: "Only pick from this many top words.",
     options: [{ label: "All words", value: 0 }, ...numbered([2, 3, 5], "words")],
   },
   topP: {
-    icon: "percent", tint: "grey", label: "Top-P", verb: "keeps", lesson: "Lesson 23", retrains: false,
+    icon: "top-p", label: "Top-P", verb: "keeps", lesson: "Lesson 23", retrains: false,
     help: "Only pick from the top words that add up to this chance.",
     options: [1, 0.9, 0.75, 0.5].map((value) => ({ label: `${Math.round(value * 100)}%`, value })),
   },
@@ -86,10 +85,10 @@ function optionLabel(settings: PlaygroundSettings, key: RowKey) {
   return ROWS[key].options.find((option) => option.value === settings[key])?.label ?? "";
 }
 
-function Label({ icon, tint, text }: { icon: string; tint: Tint; text: string }) {
+function Label({ icon, text }: { icon: ConceptName; text: string }) {
   return (
     <span className="chip">
-      <span className={`chip-tile chip-tile--${tint}`}><Icon name={icon} /></span> {text}
+      <ConceptIcon name={icon} size="chip" /> {text}
     </span>
   );
 }
@@ -122,7 +121,7 @@ function RuleRow({ rowKey, settings, menu, onRemove }: { rowKey: RowKey; setting
   const row = ROWS[rowKey];
   return (
     <div className="rule">
-      <Label icon={row.icon} tint={row.tint} text={row.label} />
+      <Label icon={row.icon} text={row.label} />
       {row.verb !== "" && <span className="rule-word">{row.verb}</span>}
       <ValueChip menuId={`set:${rowKey}`} text={optionLabel(settings, rowKey)} isWide={rowKey === "start"} menu={menu} />
       <span className="rule-end">
@@ -143,7 +142,7 @@ function TextRow({ settings, menu, onChange }: Pick<BuilderProps, "settings" | "
   const remove = (name: string) => onChange({ ...settings, textGroups: settings.textGroups.filter((group) => group !== name) }, true);
   return (
     <div className="rule">
-      <Label icon="text" tint="green" text="Learn from" />
+      <Label icon="documents" text="Learn from" />
       <span className="tags">
         {settings.textGroups.map((name) => (
           <span key={name} className="tag">
@@ -175,18 +174,17 @@ function TextRow({ settings, menu, onChange }: Pick<BuilderProps, "settings" | "
 
 interface PartRowProps {
   menuId: string;
-  icon: string;
-  tint: Tint;
+  icon: ConceptName;
   text: string;
   isOn: boolean;
   lesson: string;
   menu: MenuControl;
 }
 
-function PartRow({ menuId, icon, tint, text, isOn, lesson, menu }: PartRowProps) {
+function PartRow({ menuId, icon, text, isOn, lesson, menu }: PartRowProps) {
   return (
     <div className="rule">
-      <Label icon={icon} tint={tint} text={text} />
+      <Label icon={icon} text={text} />
       <span className="rule-word">is</span>
       <ValueChip menuId={menuId} text={isOn ? "On" : "Off"} menu={menu} />
       <span className="rule-end"><span className="rule-lesson">{lesson}</span></span>
@@ -208,8 +206,8 @@ function LayerGroup({ settings, index, menu, onChange }: Pick<BuilderProps, "set
       </header>
       <Bracket
         rows={[
-          <PartRow key="attention" menuId={`layer:${index}:attention`} icon="eye" tint="blue" text="Attention" isOn={layer.hasAttention} lesson="Lesson 12" menu={menu} />,
-          <PartRow key="feed" menuId={`layer:${index}:feed`} icon="merge" tint="orange" text="Feed-forward" isOn={layer.hasFeedForward} lesson="Lesson 15" menu={menu} />,
+          <PartRow key="attention" menuId={`layer:${index}:attention`} icon="attention" text="Attention" isOn={layer.hasAttention} lesson="Lesson 12" menu={menu} />,
+          <PartRow key="feed" menuId={`layer:${index}:feed`} icon="feed-forward" text="Feed-forward" isOn={layer.hasFeedForward} lesson="Lesson 15" menu={menu} />,
         ]}
       />
     </section>
@@ -233,7 +231,7 @@ export function Builder({ settings, addedRows, openMenuId, onToggleMenu, onChang
       />
       <div className="add-row">
         <button type="button" className="add-button" disabled={settings.layers.length >= MAX_LAYERS} onClick={addLayer}>
-          <Icon name="layers" /> Add layer
+          <Icon name="plus" /> Add layer
         </button>
       </div>
       <p className="pg-section">Run</p>

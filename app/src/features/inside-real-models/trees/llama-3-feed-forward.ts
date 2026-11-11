@@ -8,7 +8,7 @@ const EXPANDED = 14_336;
 
 const swiglu: ModelPart = {
   id: "swiglu",
-  icon: "line",
+  icon: "mix",
   title: "SwiGLU mix",
   summary: "Lets each gate number decide how much of its up number gets through.",
   copies: 1,
@@ -28,7 +28,7 @@ const swiglu: ModelPart = {
   children: [
     {
       id: "swiglu-number",
-      icon: "hash",
+      icon: "number",
       title: "One mixed number",
       summary: "Makes one number from one gate number and one up number.",
       copies: EXPANDED,
@@ -48,7 +48,7 @@ const swiglu: ModelPart = {
       children: [
         {
           id: "silu",
-          icon: "plus",
+          icon: "activation",
           title: "SiLU",
           summary: "Multiplies the gate number by a squashed copy of itself, between 0 and 1.",
           copies: 1,
@@ -69,7 +69,7 @@ const swiglu: ModelPart = {
         },
         {
           id: "gate-times-up",
-          icon: "plus",
+          icon: "multiply-add",
           title: "Gate times up",
           summary: "Multiplies the gate number by its up number, so a gate near 0 shuts it out.",
           copies: 1,
@@ -94,7 +94,7 @@ const swiglu: ModelPart = {
 
 export const llama3FeedForward: ModelPart = {
   id: "feed-forward",
-  icon: "network",
+  icon: "feed-forward",
   title: "Feed-forward",
   summary: "Works on each word alone, picking out patterns stored in its tables.",
   copies: 1,
@@ -114,7 +114,7 @@ export const llama3FeedForward: ModelPart = {
   children: [
     projectionPart({
       id: "gate",
-      icon: "sliders",
+      icon: "gate",
       title: "Gate projection",
       summary: "Makes gate numbers that decide how much of each up number gets through.",
       copies: 1,
@@ -141,7 +141,7 @@ export const llama3FeedForward: ModelPart = {
     }),
     projectionPart({
       id: "up",
-      icon: "network",
+      icon: "expand",
       title: "Up projection",
       summary: "Spreads a word's numbers out to many more, to spot patterns.",
       copies: 1,
@@ -168,7 +168,7 @@ export const llama3FeedForward: ModelPart = {
     swiglu,
     projectionPart({
       id: "down",
-      icon: "down",
+      icon: "contract",
       title: "Down projection",
       summary: "Squeezes the numbers back down so they can be added onto the word.",
       copies: 1,

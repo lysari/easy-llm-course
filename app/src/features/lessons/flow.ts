@@ -44,7 +44,7 @@ const questionTotal = TRAINING_SEQUENCES.reduce((sum, sequence) => sum + sequenc
 export const STAGES: FlowStage[] = [
   {
     id: "simple",
-    icon: "line",
+    icon: "fit-line",
     title: "Start simple",
     lesson: "Lessons 00–08",
     task: "Train a small model on salary data",
@@ -54,7 +54,7 @@ export const STAGES: FlowStage[] = [
   },
   {
     id: "data",
-    icon: "text",
+    icon: "documents",
     title: "Prepare the data",
     lesson: "Lessons 09, 11, 14, 18",
     task: "Turn text into practice questions",
@@ -64,7 +64,7 @@ export const STAGES: FlowStage[] = [
   },
   {
     id: "forward",
-    icon: "network",
+    icon: "model",
     title: "Build the model",
     lesson: "Lessons 10–15, 19, 20, 25",
     task: "Input → hidden layers → output",
@@ -74,7 +74,7 @@ export const STAGES: FlowStage[] = [
   },
   {
     id: "learn",
-    icon: "repeat",
+    icon: "train-loop",
     title: "Train the model",
     lesson: "Lessons 11, 14, 16, 17, 22",
     task: "Repeat: guess, score, find the cause, fix",
@@ -85,7 +85,7 @@ export const STAGES: FlowStage[] = [
   },
   {
     id: "use",
-    icon: "pen",
+    icon: "generate",
     title: "Use the model",
     lesson: "Lessons 14, 21, 23",
     task: "Give it a start, and it writes the rest",
@@ -95,7 +95,7 @@ export const STAGES: FlowStage[] = [
   },
   {
     id: "beyond",
-    icon: "sliders",
+    icon: "chat",
     title: "Make it big and helpful",
     lesson: "Lessons 22, 24, 26–30",
     task: "How real models become assistants",

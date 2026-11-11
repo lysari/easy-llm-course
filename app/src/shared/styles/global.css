@@ -20,6 +20,23 @@ body {
   scrollbar-color: var(--rule-line) transparent;
 }
 
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+}
+
+body::before {
+  background: var(--backdrop);
+}
+
+body::after {
+  background: var(--grain);
+}
+
 p,
 h1,
 h2,
@@ -65,9 +82,9 @@ a:where(:hover) {
   gap: var(--space-tight);
   width: 100%;
   padding: var(--space-tight);
-  border: var(--border-thin) solid var(--card-line);
+  border: var(--border-thin) solid var(--glass-edge);
   border-radius: var(--radius-card);
-  background: var(--card);
+  background: var(--grain), linear-gradient(var(--card), var(--card)), var(--glass-backing);
   box-shadow: var(--shadow-card);
   cursor: pointer;
   transition: opacity var(--motion-fast), box-shadow var(--motion-fast), border-color var(--motion-fast);
@@ -91,13 +108,28 @@ a:where(:hover) {
 }
 
 .card.is-active {
-  background: var(--card-gradient);
+  position: relative;
   box-shadow: var(--shadow-card-active);
+}
+
+.card.is-active::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--card-band);
+  -webkit-mask-image: var(--card-band-fade);
+  mask-image: var(--card-band-fade);
+  pointer-events: none;
+}
+
+.card.is-active > * {
+  position: relative;
 }
 
 .card.is-active > .card-body {
   border-color: var(--card-body-line);
-  background: var(--card);
+  background: var(--card-raised);
   box-shadow: var(--shadow-card-body);
 }
 
@@ -121,21 +153,8 @@ a:where(:hover) {
   padding: var(--space-block) var(--space-region) var(--space-item);
 }
 
-.tile {
-  display: grid;
-  place-items: center;
-  width: var(--tile-size);
-  height: var(--tile-size);
-  border: var(--border-thin) solid var(--card-line);
-  border-radius: var(--radius-tile);
-  background: var(--tile);
-  color: var(--ink);
-}
-
-.card.is-active > .card-head .tile {
-  border-color: var(--band-line);
-  background: var(--band-surface);
-  color: var(--band-ink);
+.card-head > .concept-icon {
+  justify-self: center;
 }
 
 .card-title {

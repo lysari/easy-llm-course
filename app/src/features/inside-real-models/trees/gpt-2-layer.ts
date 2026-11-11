@@ -10,7 +10,7 @@ const LAYER_COUNT = 12;
 
 const layer: ModelPart = {
   id: "layer",
-  icon: "layers",
+  icon: "layer",
   title: "One layer",
   summary: "Looks back at earlier words, then picks out patterns, adding each result back on.",
   copies: LAYER_COUNT,
@@ -31,7 +31,7 @@ const layer: ModelPart = {
   children: [
     normPart({
       id: "norm-1",
-      icon: "gauge",
+      icon: "norm",
       title: "Norm before attention",
       summary: "Keeps a word's numbers in a steady range before attention reads them.",
       copies: 1,
@@ -54,7 +54,7 @@ const layer: ModelPart = {
     gpt2Attention,
     normPart({
       id: "norm-2",
-      icon: "gauge",
+      icon: "norm",
       title: "Norm before feed-forward",
       summary: "Keeps a word's numbers in a steady range before the feed-forward reads them.",
       copies: 1,
@@ -80,7 +80,7 @@ const layer: ModelPart = {
 
 export const gpt2Layers: ModelPart = {
   id: "layers",
-  icon: "repeat",
+  icon: "layers",
   title: "Layers × 12",
   summary: "Runs every word through 12 layers of the same shape, one after another.",
   copies: 1,

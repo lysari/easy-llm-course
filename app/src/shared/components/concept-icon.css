@@ -1,0 +1,160 @@
+.concept-icon {
+  flex: none;
+  width: var(--concept-icon-size);
+  height: var(--concept-icon-size);
+  overflow: visible;
+}
+
+.concept-icon--nav {
+  --concept-icon-size: var(--icon-nav);
+}
+
+.concept-icon--chip {
+  --concept-icon-size: var(--icon-chip);
+}
+
+.concept-icon--card {
+  --concept-icon-size: var(--icon-card);
+}
+
+.concept-icon--drawer {
+  --concept-icon-size: var(--icon-drawer);
+}
+
+.concept-icon--data {
+  --concept-icon-light: var(--icon-data-light);
+  --concept-icon-top: var(--icon-data-top);
+  --concept-icon-bottom: var(--icon-data-bottom);
+  --concept-icon-deep: var(--icon-data-deep);
+  --concept-icon-line: var(--icon-data-line);
+}
+
+.concept-icon--text {
+  --concept-icon-light: var(--icon-text-light);
+  --concept-icon-top: var(--icon-text-top);
+  --concept-icon-bottom: var(--icon-text-bottom);
+  --concept-icon-deep: var(--icon-text-deep);
+  --concept-icon-line: var(--icon-text-line);
+}
+
+.concept-icon--model {
+  --concept-icon-light: var(--icon-model-light);
+  --concept-icon-top: var(--icon-model-top);
+  --concept-icon-bottom: var(--icon-model-bottom);
+  --concept-icon-deep: var(--icon-model-deep);
+  --concept-icon-line: var(--icon-model-line);
+}
+
+.concept-icon--train {
+  --concept-icon-light: var(--icon-train-light);
+  --concept-icon-top: var(--icon-train-top);
+  --concept-icon-bottom: var(--icon-train-bottom);
+  --concept-icon-deep: var(--icon-train-deep);
+  --concept-icon-line: var(--icon-train-line);
+}
+
+.concept-icon--tune {
+  --concept-icon-light: var(--icon-tune-light);
+  --concept-icon-top: var(--icon-tune-top);
+  --concept-icon-bottom: var(--icon-tune-bottom);
+  --concept-icon-deep: var(--icon-tune-deep);
+  --concept-icon-line: var(--icon-tune-line);
+}
+
+.concept-icon--test {
+  --concept-icon-light: var(--icon-test-light);
+  --concept-icon-top: var(--icon-test-top);
+  --concept-icon-bottom: var(--icon-test-bottom);
+  --concept-icon-deep: var(--icon-test-deep);
+  --concept-icon-line: var(--icon-test-line);
+}
+
+.concept-icon--output {
+  --concept-icon-light: var(--icon-output-light);
+  --concept-icon-top: var(--icon-output-top);
+  --concept-icon-bottom: var(--icon-output-bottom);
+  --concept-icon-deep: var(--icon-output-deep);
+  --concept-icon-line: var(--icon-output-line);
+}
+
+.concept-icon--math {
+  --concept-icon-light: var(--icon-math-light);
+  --concept-icon-top: var(--icon-math-top);
+  --concept-icon-bottom: var(--icon-math-bottom);
+  --concept-icon-deep: var(--icon-math-deep);
+  --concept-icon-line: var(--icon-math-line);
+}
+
+.card.is-active .concept-icon {
+  --concept-icon-light: var(--band-icon-light);
+  --concept-icon-top: var(--band-icon-top);
+  --concept-icon-bottom: var(--band-icon-bottom);
+  --concept-icon-deep: var(--band-icon-deep);
+  --concept-icon-line: var(--band-icon-line);
+  --icon-muted: var(--band-icon-deep);
+}
+
+.ci-stop-top {
+  stop-color: var(--concept-icon-top);
+}
+
+.ci-stop-bottom {
+  stop-color: var(--concept-icon-bottom);
+}
+
+.ci-light {
+  fill: var(--concept-icon-light);
+}
+
+.ci-deep {
+  fill: var(--concept-icon-deep);
+}
+
+.ci-round {
+  stroke-linejoin: round;
+}
+
+.ci-light.ci-round {
+  stroke: var(--concept-icon-light);
+}
+
+.ci-deep.ci-round {
+  stroke: var(--concept-icon-deep);
+}
+
+.ci-muted {
+  fill: var(--icon-muted);
+}
+
+.ci-line,
+.ci-light-line,
+.ci-badge-mark {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ci-line {
+  stroke: var(--concept-icon-line);
+}
+
+.ci-light-line {
+  stroke: var(--concept-icon-light);
+}
+
+.ci-badge {
+  stroke: var(--icon-badge-ring);
+}
+
+.ci-badge--plus,
+.ci-badge--check {
+  fill: var(--icon-badge-add);
+}
+
+.ci-badge--repeat {
+  fill: var(--icon-badge-repeat);
+}
+
+.ci-badge-mark {
+  stroke: var(--icon-badge-mark);
+}
