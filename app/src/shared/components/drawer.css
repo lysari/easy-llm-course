@@ -1,6 +1,4 @@
 .drawer {
-  --card: var(--card-nested);
-  --card-shell: var(--card-nested);
   position: fixed;
   z-index: 3;
   inset: 0 0 0 auto;
@@ -10,7 +8,7 @@
   padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) 0;
   border-left: var(--border-thin) solid var(--glass-edge);
   border-radius: var(--radius-card) 0 0 var(--radius-card);
-  background: var(--grain), var(--glass-gloss), var(--panel);
+  background: var(--grain), var(--panel);
   -webkit-backdrop-filter: var(--blur-glass);
   backdrop-filter: var(--blur-glass);
   box-shadow: var(--shadow-float);

@@ -71,7 +71,6 @@ export function Sidebar({ isLessons, stageId, onSelectStage }: SidebarProps) {
           <button type="button" aria-pressed={look === "auto"} onClick={() => setLook("auto")}>Auto</button>
           <button type="button" aria-pressed={look === "light"} onClick={() => setLook("light")}>Light</button>
           <button type="button" aria-pressed={look === "dark"} onClick={() => setLook("dark")}>Dark</button>
-          <button type="button" aria-pressed={look === "fresh"} onClick={() => setLook("fresh")}>Fresh</button>
         </div>
         <div className="side-swatches" role="group" aria-label="Background">
           <span className="side-switch-label" aria-hidden="true">Background · {BACKDROP_LABELS[backdrop]}</span>

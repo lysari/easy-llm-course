@@ -85,7 +85,7 @@
   --concept-icon-line: var(--icon-math-line);
 }
 
-:root:not([data-look="fresh"]) .card.is-active .concept-icon {
+.card.is-active .concept-icon {
   --concept-icon-light: var(--band-icon-light);
   --concept-icon-top: var(--band-icon-top);
   --concept-icon-bottom: var(--band-icon-bottom);

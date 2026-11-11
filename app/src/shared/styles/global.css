@@ -84,7 +84,7 @@ a:where(:hover) {
   padding: var(--space-tight);
   border: var(--border-thin) solid var(--glass-edge);
   border-radius: var(--radius-card);
-  background: var(--grain), var(--glass-gloss), linear-gradient(var(--card), var(--card)), var(--glass-backing);
+  background: var(--grain), linear-gradient(var(--card), var(--card)), var(--glass-backing);
   box-shadow: var(--shadow-card);
   cursor: pointer;
   transition: opacity var(--motion-fast), box-shadow var(--motion-fast), border-color var(--motion-fast);
@@ -109,7 +109,6 @@ a:where(:hover) {
 
 .card.is-active {
   position: relative;
-  border-color: var(--card-active-edge);
   box-shadow: var(--shadow-card-active);
 }
 
@@ -181,24 +180,13 @@ a:where(:hover) {
   gap: var(--space-stack);
   padding: var(--space-label) var(--space-item);
   border-radius: var(--radius-pill);
-  box-shadow: inset 0 0 0 var(--border-thin) var(--pill-edge);
   font-size: var(--text-micro);
   font-weight: var(--weight-medium);
   white-space: nowrap;
 }
 
 .pill-mark {
-  display: var(--pill-mark-display);
-}
-
-.pill::before {
-  content: "";
-  display: var(--pill-dot-display);
-  flex: none;
-  width: var(--pill-dot-size);
-  height: var(--pill-dot-size);
-  border-radius: var(--radius-circle);
-  background: var(--pill-dot);
+  display: contents;
 }
 
 .card.is-active > .card-head .pill {
@@ -209,19 +197,16 @@ a:where(:hover) {
 }
 
 .pill--running {
-  --pill-dot: var(--running-dot);
   background: var(--running-bg);
   color: var(--running-ink);
 }
 
 .pill--done {
-  --pill-dot: var(--done-dot);
   background: var(--done-bg);
   color: var(--done-ink);
 }
 
 .pill--needs {
-  --pill-dot: var(--needs-dot);
   background: var(--needs-bg);
   color: var(--needs-ink);
 }
@@ -229,7 +214,6 @@ a:where(:hover) {
 .pill--queued,
 .pill--lesson,
 .pill--ground-zero {
-  --pill-dot: var(--queued-dot);
   background: var(--queued-bg);
   color: var(--queued-ink);
 }
@@ -254,7 +238,6 @@ a:where(:hover) {
   border: 0;
   border-radius: var(--radius-pill);
   background: var(--button);
-  box-shadow: inset 0 0 0 var(--border-thin) var(--button-edge);
   color: var(--ink);
   font-size: var(--text-small);
   font-weight: var(--weight-medium);

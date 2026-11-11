@@ -294,12 +294,10 @@
 }
 
 .rule-group {
-  --card: var(--card-nested);
-  --glass-backing: var(--nested-backing);
   padding: var(--space-card) var(--space-block) var(--space-block) var(--pg-group-inset);
   border: var(--border-thin) solid var(--card-line);
   border-radius: var(--radius-card);
-  background: var(--grain), var(--glass-gloss), linear-gradient(var(--card-shell), var(--card-shell)), var(--glass-backing);
+  background: var(--grain), linear-gradient(var(--card), var(--card)), var(--glass-backing);
   box-shadow: var(--shadow-group);
 }
 
@@ -363,7 +361,7 @@
   padding: var(--space-control);
   border: var(--border-thin) solid var(--card-line);
   border-radius: var(--pg-menu-radius);
-  background: var(--menu);
+  background: var(--chip);
   box-shadow: var(--shadow-float);
   animation: appear var(--motion-fast);
 }
@@ -400,7 +398,7 @@
   padding: var(--space-surface);
   border: var(--border-thin) solid var(--card-line);
   border-radius: var(--radius-card);
-  background: var(--grain), var(--glass-gloss), linear-gradient(var(--card), var(--card)), var(--glass-backing);
+  background: var(--grain), linear-gradient(var(--card), var(--card)), var(--glass-backing);
   box-shadow: var(--shadow-result);
 }
 

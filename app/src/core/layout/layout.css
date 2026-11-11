@@ -14,7 +14,7 @@
   overflow-y: auto;
   padding: var(--page-pad-top) var(--sidebar-pad) var(--space-region) max(var(--sidebar-pad), env(safe-area-inset-left, 0px));
   border-right: var(--border-thin) solid var(--glass-edge);
-  background: var(--grain), var(--glass-gloss), var(--sidebar-glass);
+  background: var(--grain), var(--sidebar-glass);
   -webkit-backdrop-filter: var(--blur-glass);
   backdrop-filter: var(--blur-glass);
 }
