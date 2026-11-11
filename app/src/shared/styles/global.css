@@ -189,6 +189,15 @@ a:where(:hover) {
   display: contents;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: var(--space-hair);
+  height: var(--space-hair);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .card.is-active > .card-head .pill {
   border-radius: var(--radius-round);
   background: var(--band-pill);
