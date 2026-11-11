@@ -3,6 +3,7 @@ import type { ModelPart } from "@/features/inside-real-models/interfaces/model-p
 import type { RealNote } from "@/features/inside-real-models/interfaces/real-facts.interface";
 import { count } from "@/shared/utils/format";
 import { generateStep } from "./generate-steps";
+import { TOKEN_TERM } from "./part-builders";
 
 const numbersIn = (parts: ModelPart[]) => parts.reduce((sum, part) => sum + part.facts.weightCount * part.copies, 0);
 
@@ -14,6 +15,7 @@ function tokenizeStep(spec: InferenceSpec): ModelPart {
     icon: "tokens",
     title: "Tokenization",
     summary: "Splits your text into small pieces and gives each piece an ID.",
+    term: TOKEN_TERM,
     copies: 1,
     facts: { shape: `${spec.tokenizer} · ${count(spec.wordCount)} words`, weightCount: 0, headline: { value: spec.wordCount, unit: "words" }, input: "text", output: "word IDs", sources: [...new Set([...spec.sources, ...sourcesOf(spec.tokenizerNotes)])], notes: spec.tokenizerNotes, reasons: spec.reasons.tokenize },
     explanation: `Your text is cut into pieces, and each piece is swapped for its number in ${spec.modelTitle}'s list of ${count(spec.wordCount)} words. From here on the model only sees those numbers.`,
@@ -53,7 +55,7 @@ function tokenizeStep(spec: InferenceSpec): ModelPart {
             summary: "Joins two side-by-side pieces into one, when a learned rule names them.",
             copies: 1,
             facts: { shape: "1 rule", weightCount: 0, headline: spec.merges, input: "two pieces", output: "one joined piece", inputDetail: "two neighbouring pieces", outputDetail: "one joined piece, or no change", sources: sourcesOf(spec.mergeNotes), notes: spec.mergeNotes, reasons: spec.reasons["apply-merge"] },
-            explanation: "Ground zero. One learned rule, such as \"do\" + \"g\" → \"dog\". If those two pieces sit side by side, join them into one.",
+            explanation: "One learned rule, such as \"do\" + \"g\" → \"dog\". If those two pieces sit side by side, join them into one.",
             why: "It is a find-and-replace. Nothing here knows what a dog is.",
             story: {
               problem: "Starting from single bytes, text would be one piece per letter, far too long. Joining the pairs the tokenizer learned makes common words one piece, so the model reads fewer pieces.",
@@ -74,7 +76,7 @@ function tokenizeStep(spec: InferenceSpec): ModelPart {
         summary: "Finds one piece in the word list and writes down its place number.",
         copies: 1,
         facts: { shape: "1 row of the list", weightCount: 0, headline: { value: spec.wordCount, unit: "words in the list" }, input: "one piece", output: "its ID", sources: spec.sources, notes: [{ label: "IDs", value: `0 to ${count(spec.wordCount - 1)}, one for each word in the list`, source: spec.sources[0] }], reasons: spec.reasons.lookup },
-        explanation: "Ground zero. Look up one piece in the vocabulary, the list of words, and write down its place in the list.",
+        explanation: "Look up one piece in the vocabulary, the list of words, and write down its place in the list.",
         why: "This is the whole trick of turning text into numbers: a lookup in a list.",
         story: {
           problem: "The model's tables are found by number, not by text. Without the lookup a piece like \"dog\" could not pick its row in the word table.",
@@ -96,7 +98,7 @@ function embeddingStep(spec: InferenceSpec): ModelPart {
     id: "embedding",
     icon: "embedding",
     title: "Embedding",
-    summary: "Swaps each word ID for a list of numbers that stands for that word.",
+    summary: "Swaps each word ID for a list of numbers (a vector) that stands for that word.",
     copies: 1,
     facts: { shape: `${count(spec.width)} numbers per word`, weightCount: numbersIn(spec.embedding), headline: { value: spec.width, unit: "numbers per word" }, input: "word IDs", output: "vectors", sources: spec.sources, reasons: spec.reasons.embedding },
     tiny: { part: "embedding", level: "whole" },
@@ -141,7 +143,7 @@ function outputStep(spec: InferenceSpec): ModelPart {
         summary: "Turns one word's score into its chance, by comparing it with all the others.",
         copies: spec.wordCount,
         facts: { shape: "1", weightCount: 0, headline: { value: spec.wordCount, unit: "per new word" }, input: "1 score, the total", output: "1 chance", inputDetail: "one score and the total", sources: spec.sources, notes: [spec.writingNotes.chance], reasons: spec.reasons.chance },
-        explanation: "Ground zero. e to the power of one word's score, divided by the total for all words.",
+        explanation: "e to the power of one word's score, divided by the total for all words.",
         why: "One power and one divide. That is all a \"chance\" is here.",
         story: {
           problem: "A single score means nothing alone: it only counts next to all the others. This step turns one word's score into its share of the total.",
@@ -162,6 +164,7 @@ function outputStep(spec: InferenceSpec): ModelPart {
     icon: "scores",
     title: "Output head",
     summary: "Scores every word in the list and turns the scores into chances.",
+    term: "\"Head\" here just means the last part of the model. A score's real name is logit.",
     copies: 1,
     facts: { shape: "final norm, output table, softmax", weightCount: numbersIn(parts), headline: { value: spec.wordCount, unit: "chances" }, input: "last word's vector", output: "chances", inputDetail: "the last word's vector", sources: spec.sources, reasons: spec.reasons.output },
     explanation: `The last word's ${count(spec.width)} numbers are steadied by one last norm, scored against every word in the list, and the scores are turned into chances.`,

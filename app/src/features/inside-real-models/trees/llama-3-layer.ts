@@ -14,7 +14,7 @@ const layer: ModelPart = {
   title: "One layer",
   summary: "Looks back at earlier words, then picks out patterns, adding each result back on.",
   copies: LAYER_COUNT,
-  facts: { shape: "norm, attention, norm, feed-forward", weightCount: 218_112_000, headline: { value: 218_112_000, unit: "numbers", isComputed: true }, input: "4,096 per word", output: "4,096 per word", inputDetail: "4,096 numbers per word", outputDetail: "4,096 numbers per word", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_ADD_BACK, LLAMA_3_NO_REASON] },
+  facts: { shape: "norm, attention, norm, feed-forward", weightCount: 218_112_000, headline: { value: 218_112_000, unit: "numbers", isComputed: true }, input: "4,096 per word", output: "4,096, updated", inputDetail: "4,096 numbers per word", outputDetail: "4,096 numbers per word, with attention's and the feed-forward's results added on", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_ADD_BACK, LLAMA_3_NO_REASON] },
   tiny: { part: "layer", level: "whole" },
   explanation: "One of 32 identical layers. An RMSNorm, then attention, added back on; a second RMSNorm, then the feed-forward, added back on.",
   why: "Adding each result back (x + part(x)) lets the numbers flow straight through 32 layers, so training can reach the first one.",
@@ -80,7 +80,7 @@ const layer: ModelPart = {
 export const llama3Layers: ModelPart = {
   id: "layers",
   icon: "layers",
-  title: "Layers × 32",
+  title: "Stack of 32 layers",
   summary: "Runs every word through 32 layers of the same shape, one after another.",
   copies: 1,
   facts: { shape: "32 layers", weightCount: 6_979_584_000, headline: { value: 6_979_584_000, unit: "numbers", isComputed: true }, input: "word vectors", output: "updated word vectors", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_LAYER_LOOP, LLAMA_3_NO_REASON] },

@@ -71,6 +71,7 @@ export interface ModelPart {
   icon: ConceptName;
   title: string;
   summary: string;
+  term?: string;
   copies: number;
   facts: RealFacts;
   tiny?: TinyLink;

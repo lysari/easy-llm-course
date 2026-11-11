@@ -6,7 +6,7 @@ import { FactRows } from "@/features/inside-real-models/fact-rows";
 import type { DemoProps } from "@/features/inside-real-models/interfaces/model-part.interface";
 import { MODELS } from "@/features/inside-real-models/models";
 import { layerNormParts } from "@/features/inside-real-models/story/architecture/exact-formulas";
-import { BeforeAfter, HonestNote, NumberRow } from "@/features/inside-real-models/story/watch-parts";
+import { BeforeAfter, HonestNote, NumberRow, NumbersNote } from "@/features/inside-real-models/story/watch-parts";
 import { ChanceBars } from "@/shared/components/chance-bars";
 import { count, percent, showWord } from "@/shared/utils/format";
 import { type ChanceRow, showPower, softmaxOf } from "./next-word";
@@ -59,9 +59,10 @@ export function NextWordDemo({ part, modelId, tiny }: DemoProps) {
 
   return (
     <div className="watch">
-      <p className="note">{`Our tiny model, live on "${sentence}": what it gives for the word after "${showWord(tiny.words[last])}".`}</p>
+      <p className="note">{`Tiny GPT, live on "${sentence}": what it gives for the word after "${showWord(tiny.words[last])}".`}</p>
       {part.id === "output" && (
         <>
+          <NumbersNote />
           <BeforeAfter
             beforeLabel={`The last word's numbers after layer ${LAYER_COUNT}`}
             before={<NumberRow label="into the final norm" values={finalIn} />}
@@ -99,7 +100,7 @@ export function NextWordDemo({ part, modelId, tiny }: DemoProps) {
         </>
       )}
       <HonestNote>
-        {`Worked out live from our tiny model's real scores, ${count(VOCABULARY.length)} of them, one per word it knows; ${real.title} makes ${"value" in headline ? count(headline.value) : "one per word"} the same way. ${modelId === "gpt-2-small" ? "GPT-2's own trained numbers are not shipped in this app, so its scores are not shown." : "Llama 3's trained numbers are only given out under Meta's licence, so its scores are not shown. Its final norm is RMSNorm; our tiny model's is LayerNorm."}`}
+        {`Worked out live from Tiny GPT's real scores, ${count(VOCABULARY.length)} of them, one per word it knows; ${real.title} makes ${"value" in headline ? count(headline.value) : "one per word"} the same way. ${modelId === "gpt-2-small" ? "GPT-2's own trained numbers are not shipped in this app, so its scores are not shown." : "Llama 3's trained numbers are only given out under Meta's licence, so its scores are not shown. Its final norm is RMSNorm; Tiny GPT's is LayerNorm."}`}
       </HonestNote>
     </div>
   );

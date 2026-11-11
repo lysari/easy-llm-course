@@ -70,7 +70,7 @@ export function SafetyDemo({ part, modelId, tiny }: DemoProps) {
           after={<FactRows rows={results.map((result): [string, string] => [joinTokens(result.prompt), `${result.fails} failed`])} />}
         />
       )}
-      <HonestNote>{`The rule is hand-made for this demo, and the answers are written live by our tiny model with seeded random rolls. ${modelId === "gpt-2-small" ? "No safety tests for GPT-2 are published in its paper or model card; the card advises studying biases first." : "Meta red-teamed Llama 3 Instruct with experts and automated attack prompts, which are not published, and offers Llama Guard 2, a separate model that filters prompts and answers, which cannot run in this page."}`}</HonestNote>
+      <HonestNote>{`The rule is hand-made for this demo, and the answers are written live by Tiny GPT with seeded random rolls. ${modelId === "gpt-2-small" ? "No safety tests for GPT-2 are published in its paper or model card; the card advises studying biases first." : "Meta red-teamed Llama 3 Instruct with experts and automated attack prompts, which are not published, and offers Llama Guard 2, a separate model that filters prompts and answers, which cannot run in this page."}`}</HonestNote>
     </div>
   );
 }

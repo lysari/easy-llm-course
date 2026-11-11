@@ -1,6 +1,6 @@
 import type { ModelPart, RealModel } from "@/features/inside-real-models/interfaces/model-part.interface";
 import { GPT_2_BUILD } from "./gpt-2-build-facts";
-import { GPT_2_CONTEXT, GPT_2_FINAL_NORM, GPT_2_MERGES, GPT_2_NORM_CODE, GPT_2_NORM_PLACE, GPT_2_NO_REASON, GPT_2_OUTPUT, GPT_2_POSITION_TABLE, GPT_2_RANDOM_START, GPT_2_SIZE_HELPS, GPT_2_TRANSFORMER, GPT_2_USE_REASONS, GPT_2_WORD_TABLE, GPT_2_WRITING_NOTES } from "./gpt-2-reasons";
+import { GPT_2_CONTEXT, GPT_2_FINAL_NORM, GPT_2_MERGES, GPT_2_NORM_CODE, GPT_2_NORM_PLACE, GPT_2_NO_REASON, GPT_2_OUTPUT, GPT_2_PARTS_UNEXPLAINED, GPT_2_POSITION_TABLE, GPT_2_RANDOM_START, GPT_2_SIZE_HELPS, GPT_2_TRANSFORMER, GPT_2_USE_REASONS, GPT_2_WORD_TABLE, GPT_2_WRITING_NOTES } from "./gpt-2-reasons";
 import { gpt2Layers } from "./gpt-2-layer";
 import { inferenceRoot } from "./inference-steps";
 import { lifecycleRoot } from "./lifecycle-steps";
@@ -132,7 +132,7 @@ const outputHead: ModelPart = {
           copies: WIDTH,
           facts: { shape: "1 × 1", weightCount: 0, headline: { value: WIDTH, unit: "per output number" }, input: "1 number, 1 stored", output: "the running sum", inputDetail: "1 number and 1 number from the word table", sources: GPT_2_SETTINGS, reasons: [GPT_2_OUTPUT] },
           tiny: { part: "output-table", level: "multiply-add" },
-          explanation: "Ground zero. One of the last word's numbers times one number from the word table, added to the running sum. The number is counted once, in the word table.",
+          explanation: "One of the last word's numbers times one number from the word table, added to the running sum. The number is counted once, in the word table.",
           why: "Choosing the next word comes down to this, done 768 × 50,257 times.",
           story: {
             problem: "This is the bottom of choosing a word. Without this one multiply and add, no score could be made at all.",
@@ -168,7 +168,7 @@ const root: ModelPart = {
       { label: "Size", value: "124,439,808, worked out from config.json; the model card says 124 million", source: "gpt-2-card" },
       { label: "In the paper", value: "listed as 117M for the smallest size", source: "gpt-2-paper" },
     ],
-    reasons: [GPT_2_TRANSFORMER, GPT_2_SIZE_HELPS, GPT_2_RANDOM_START],
+    reasons: [GPT_2_TRANSFORMER, GPT_2_SIZE_HELPS, GPT_2_RANDOM_START, GPT_2_PARTS_UNEXPLAINED],
   },
   explanation:
     "The whole model, released by OpenAI in 2019. Words go in as ids, and out comes one score for every word in its list. The highest scores are the likely next words. Everything inside is stored numbers, multiplied and added.",

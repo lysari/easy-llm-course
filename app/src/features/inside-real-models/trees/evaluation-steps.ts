@@ -46,7 +46,7 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
             summary: "Asks one question and marks the model's top answer right or wrong.",
             copies: 1,
             facts: stepFacts(facts["test-question"], "one question", "right or wrong"),
-            explanation: "Ground zero. Ask one question, take the model's most likely answer, and compare it with the right one: 1 if it matches, 0 if not.",
+            explanation: "Ask one question, take the model's most likely answer, and compare it with the right one: 1 if it matches, 0 if not.",
             why: "A benchmark score is many of these 1s and 0s, averaged.",
             story: {
               problem: "A score is many single marks. Each question is marked right or wrong by comparing the model's top answer with the key.",
@@ -86,7 +86,7 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
             summary: "Sends one risky question and checks the answer against one rule.",
             copies: 1,
             facts: stepFacts(facts["safety-check"], "one risky prompt", "pass or fail"),
-            explanation: "Ground zero. Send one risky prompt and check the answer against one safety rule: pass or fail.",
+            explanation: "Send one risky prompt and check the answer against one safety rule: pass or fail.",
             why: "Like a test question, but the answer key is a rule about what not to say.",
             story: {
               problem: "Safety is tested one prompt at a time. Each risky prompt and its answer are checked against one rule: pass or fail.",
@@ -125,7 +125,7 @@ export function evaluationStep(facts: BuildFacts): ModelPart {
             summary: "Rounds one stored number so it fits in less space.",
             copies: 1,
             facts: stepFacts(facts["round-number"], "1 full-size number", "1 smaller number", { inputDetail: "one number, full size", outputDetail: "the nearest smaller-size number" }),
-            explanation: "Ground zero. Divide one stored number by a scale, round it to the nearest whole number that fits in the smaller size, and keep that instead.",
+            explanation: "Divide one stored number by a scale, round it to the nearest whole number that fits in the smaller size, and keep that instead.",
             why: "Rounding loses a tiny bit of each number, like rounding prices to whole dollars.",
             story: {
               problem: "Each stored number has more digits than it needs. Rounding it to the nearest step that fits in fewer bits is how the model shrinks.",

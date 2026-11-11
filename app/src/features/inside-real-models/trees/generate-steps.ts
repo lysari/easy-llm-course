@@ -48,7 +48,7 @@ export function generateStep(spec: InferenceSpec): ModelPart {
             summary: "Rolls a random number and walks down the chances to choose one word.",
             copies: 1,
             facts: { shape: "1 random roll", weightCount: 0, headline: { value: spec.wordCount, unit: "words to pick from" }, input: "chances", output: "one word", sources: spec.sources, notes: [spec.writingNotes.pick], reasons: spec.reasons.pick },
-            explanation: "Ground zero. Roll a random number from 0 to 1, then walk down the chances, taking each away, until the roll runs out. That word is picked.",
+            explanation: "Roll a random number from 0 to 1, then walk down the chances, taking each away, until the roll runs out. That word is picked.",
             why: "Likely words are picked more often, but not always. That is why the same start can give different endings.",
             story: {
               problem: "The chances say which words are likely, not which one to write. Something has to choose, and always taking the top word gives dull, repeating text, so most apps roll a weighted dice.",
@@ -68,7 +68,7 @@ export function generateStep(spec: InferenceSpec): ModelPart {
             summary: "Adds the picked word's ID to the end of the text, ready for the next round.",
             copies: 1,
             facts: { shape: "1 more ID", weightCount: 0, headline: { value: spec.context, unit: "words at most" }, input: "words and the pick", output: "one word longer", inputDetail: "words so far and the picked word", sources: spec.sources, notes: [spec.writingNotes.append], reasons: spec.reasons.append },
-            explanation: "Ground zero. Append the picked word's ID to the input, ready for the next round.",
+            explanation: "Append the picked word's ID to the input, ready for the next round.",
             why: "The model's own guess becomes part of what it reads next.",
             story: {
               problem: "The model reads only what is in its text. Without adding the picked word, the next round would see the same words and guess the same way again.",
@@ -88,7 +88,7 @@ export function generateStep(spec: InferenceSpec): ModelPart {
             summary: "Stops when the stop word is picked or the text is full.",
             copies: 1,
             facts: { shape: "stop word, or full length", weightCount: 0, headline: { value: spec.stopWord.id, unit: "is the stop word's ID", isComputed: spec.stopWord.isComputed, isId: true }, input: "pick and length", output: "go on, or stop", inputDetail: "the picked word and the length", sources: stopSources, notes: spec.stopWord.notes, reasons: spec.reasons["stop-check"] },
-            explanation: `Ground zero. Compare the picked word with the stop word, and the length with ${count(spec.context)} words. Stop if either matches.`,
+            explanation: `Compare the picked word with the stop word, and the length with ${count(spec.context)} words. Stop if either matches.`,
             why: "The model does not decide it is finished. It picks the stop word like any other word.",
             story: {
               problem: "Left alone, the loop would write until the text is full. Without a stop check an answer could not end where it should, and would run on to the length limit.",
@@ -109,7 +109,7 @@ export function generateStep(spec: InferenceSpec): ModelPart {
         summary: "Saves work done for earlier words, so each new word runs faster.",
         copies: 1,
         facts: { shape: `2 × ${count(spec.kvWidth)} numbers per word, per layer`, weightCount: 0, headline: { value: 2 * spec.kvWidth, unit: "saved per word, per layer", isComputed: true }, input: "new keys and values", output: "saved for reuse", inputDetail: "each new word's keys and values", outputDetail: "earlier keys and values, ready to reuse", sources: spec.sources, notes: [{ label: "A full text", value: `${count(2 * spec.kvWidth * layerCount * spec.context)} numbers for ${count(spec.context)} words in all ${layerCount} layers, worked out`, source: spec.sources[0] }], reasons: spec.reasons["kv-cache"] },
-        explanation: "Ground zero. Save one word's key and value from one layer, so the next round reads them back instead of working them out again. Only the new word is run through the layers.",
+        explanation: "Save one word's key and value from one layer, so the next round reads them back instead of working them out again. Only the new word is run through the layers.",
         why: "It changes nothing about the answer, only the speed. These are saved results, not stored numbers learned in training.",
         story: {
           problem: "Each round the model would read the whole text again, though the earlier words' keys and values have not changed. Without saving them, every new word would cost more work than the one before.",

@@ -26,7 +26,9 @@ const NO_FINE_TUNING: RealNote = { label: "No post-training", value: "\"No train
 
 const FINE_TUNING_LATER: RealNote = { label: "Left for later", value: "\"it is not clear where the ceiling is with finetuning\"", source: "gpt-2-paper" };
 
-const STEP_SIZE: RealNote = { label: "Step size", value: "\"The learning rate of each model was manually tuned for the best perplexity\", measured on 5% of WebText held back", source: "gpt-2-paper" };
+const LARGEST_LAMBADA: RealNote = { label: "Largest size", value: "LAMBADA 63.24% right (the paper lists this size as 1542M numbers)", source: "gpt-2-paper" };
+
+const STEP_SIZE: RealNote ={ label: "Step size", value: "\"The learning rate of each model was manually tuned for the best perplexity\", measured on 5% of WebText held back", source: "gpt-2-paper" };
 
 const OVER_REPORTING: RealNote = { label: "Why copies matter", value: "near-duplicates between training and test data lead to \"an over-reporting of the generalization performance of machine learning systems\"", source: "gpt-2-paper" };
 
@@ -161,7 +163,12 @@ export const GPT_2_BUILD: BuildFacts = {
     shape: "8 language tests, with no extra training",
     headline: { value: 45.99, unit: "% right on LAMBADA" },
     sources: ["gpt-2-paper"],
-    notes: [{ label: "Setting", value: "zero-shot, \"without any parameter or architecture modification\"", source: "gpt-2-paper" }, { label: "Smallest size", value: "LAMBADA 45.99% right (the paper lists this size as 117M numbers)", source: "gpt-2-paper" }],
+    notes: [
+      { label: "LAMBADA", value: "guess the last word of a short passage", source: "gpt-2-paper" },
+      { label: "Setting", value: "zero-shot, \"without any parameter or architecture modification\"", source: "gpt-2-paper" },
+      { label: "Smallest size", value: "LAMBADA 45.99% right (the paper lists this size as 117M numbers)", source: "gpt-2-paper" },
+      LARGEST_LAMBADA,
+    ],
     reasons: [{ label: "OpenAI's reason", value: "\"We test whether this is the case by analyzing the performance of language models in a zero-shot setting on a wide variety of tasks\"", source: "gpt-2-paper" }],
   },
   benchmarks: {
@@ -172,6 +179,7 @@ export const GPT_2_BUILD: BuildFacts = {
       { label: "Overlap check", value: "test sets share 1–6% of their 8-word runs with WebText, 3.2% on average", source: "gpt-2-paper" },
       { label: "Tests", value: "LAMBADA, Children's Book Test, WikiText-2, Penn Treebank, enwik8, text8, WikiText-103, One Billion Word", source: "gpt-2-paper" },
       { label: "Smallest size", value: "LAMBADA 45.99% right (the paper lists this size as 117M numbers)", source: "gpt-2-paper" },
+      LARGEST_LAMBADA,
     ],
     reasons: [{ label: "Overlap check", value: "\"Common LM datasets' test sets have between 1-6% overlap with WebText train, with an average of overlap of 3.2%\"", source: "gpt-2-paper" }, OVER_REPORTING],
   },

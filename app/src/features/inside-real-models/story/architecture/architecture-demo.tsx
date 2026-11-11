@@ -5,7 +5,7 @@ import { nextOptions } from "@/core/model/generate";
 import { LAYER_COUNT, countWeights, createWeights } from "@/core/model/tiny-gpt";
 import { FactRows } from "@/features/inside-real-models/fact-rows";
 import type { DemoProps, ModelPart } from "@/features/inside-real-models/interfaces/model-part.interface";
-import { HonestNote, NumberRow } from "@/features/inside-real-models/story/watch-parts";
+import { HonestNote, NumberRow, NumbersNote } from "@/features/inside-real-models/story/watch-parts";
 import { ChanceBars } from "@/shared/components/chance-bars";
 import { count, showWord } from "@/shared/utils/format";
 
@@ -32,8 +32,9 @@ export function ArchitectureDemo({ part, tiny }: DemoProps) {
   if (part.id !== "architecture") {
     return (
       <div className="watch">
-        <p className="note">{`The whole tiny model, live on "${sentence}": IDs in, one score per word out. Nothing else happens in between but table lookups, multiplies and adds.`}</p>
+        <p className="note">{`The whole of Tiny GPT, live on "${sentence}": IDs in, one score per word out. Nothing else happens in between but table lookups, multiplies and adds.`}</p>
         <FactRows rows={tiny.words.map((word, i): [string, string] => [showWord(word), `ID ${tiny.ids[i]}`])} />
+        <NumbersNote />
         <NumberRow label={`The last word's numbers going in (word row + place row)`} values={tiny.trace.combined[last]} />
         {tiny.trace.layers.map((layer, i) => (
           <NumberRow key={i} label={`After layer ${i + 1} of ${LAYER_COUNT}`} values={layer.afterFeedForward[last]} />
@@ -41,14 +42,14 @@ export function ArchitectureDemo({ part, tiny }: DemoProps) {
         <p className="section-title">Scores turned into chances for the next word</p>
         <ChanceBars options={tiny.options} answer={tiny.options[0].token} />
         {model && <RealShape model={model} modelTitle={part.title} />}
-        <HonestNote>{`Live in our tiny model (${count(countWeights(tiny.weights))} numbers, round ${tiny.lab.round} of training). The real model runs the same kind of pass with its own published sizes.`}</HonestNote>
+        <HonestNote>{`Live in Tiny GPT (${count(countWeights(tiny.weights))} numbers, round ${tiny.lab.round} of training). The real model runs the same kind of pass with its own published sizes.`}</HonestNote>
       </div>
     );
   }
 
   return (
     <div className="watch">
-      <p className="note">{`Same code, two sets of numbers. Both columns run our tiny model's code on "${sentence}". Only the stored numbers differ.`}</p>
+      <p className="note">{`Same code, two sets of numbers. Both columns run Tiny GPT's code on "${sentence}". Only the stored numbers differ.`}</p>
       <div className="watch-grid">
         <div className="watch-box">
           <p className="section-title">{seed === FIRST_SEED ? "Its starting random numbers" : `New random numbers (seed ${seed})`}</p>
@@ -64,7 +65,7 @@ export function ArchitectureDemo({ part, tiny }: DemoProps) {
       </div>
       <p className="card-lesson">With random numbers the guesses are close to even and change with every draw. Training is what makes one word stand out.</p>
       {model && <RealShape model={model} modelTitle={model.title} />}
-      <HonestNote>The guesses are live from our tiny model. The real model's part sizes are worked out exactly from its published settings; its own random starting numbers are not published.</HonestNote>
+      <HonestNote>The guesses are live from Tiny GPT. The real model's part sizes are worked out exactly from its published settings; its own random starting numbers are not published.</HonestNote>
     </div>
   );
 }

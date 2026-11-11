@@ -82,9 +82,9 @@ describe.each(MODELS)("$title real facts", (model) => {
     for (const id of ["gather", "tokenizer", "pre-training"]) {
       const part = partIn(root, id);
       if (!part) throw new Error(id);
-      const html = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelId={model.id} modelTitle={model.title} part={part} place={placeOf(model, root, part)} tiny={tiny} text="" sentence={sentence} onTextChange={() => {}} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
-      expect(html, id).toContain("<span>Numbers</span><span>None to learn</span>");
-      expect(html, id).not.toContain("<span>Numbers</span><span>0</span>");
+      const html = renderToStaticMarkup(<PartDrawer ref={null} mode="build" root={root} modelId={model.id} modelTitle={model.title} part={part} place={placeOf(model, root, part)} tiny={tiny} text="" sentence={sentence} onTextChange={() => {}} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
+      expect(html, id).toContain("<span>Learned numbers</span><span>None to learn</span>");
+      expect(html, id).not.toContain("<span>Learned numbers</span><span>0</span>");
     }
   });
 });
@@ -126,7 +126,7 @@ describe("published numbers", () => {
   test("a word ID is never shortened on the card", () => {
     const part = partIn(llama.modes.use, "stop-check");
     if (!part) throw new Error("stop-check");
-    const html = renderToStaticMarkup(<PartCard ref={null} root={llama.modes.use} modelTitle={llama.title} part={part} place={placeOf(llama, llama.modes.use, part)} index={0} isSelected={false} isActive={false} isOpen={false} onSelect={() => {}} onDetails={() => {}} />);
+    const html = renderToStaticMarkup(<PartCard ref={null} root={llama.modes.use} part={part} place={placeOf(llama, llama.modes.use, part)} index={0} isSelected={false} isActive={false} isOpen={false} onSelect={() => {}} onDetails={() => {}} />);
     expect(html).toContain("<b>128,001</b>");
   });
 });

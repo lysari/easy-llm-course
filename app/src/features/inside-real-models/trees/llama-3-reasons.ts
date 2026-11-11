@@ -3,7 +3,9 @@ import type { RealNote, UseReasons } from "@/features/inside-real-models/interfa
 
 export const LLAMA_3_TRANSFORMER: RealNote = { label: "Built on", value: "\"we opted for a relatively standard decoder-only transformer architecture in Llama 3\"", source: "llama-3-blog" };
 
-export const LLAMA_3_NO_REASON: RealNote = { label: "Meta's own reason", value: "Not published. The model card and blog do not say why this part is built this way.", source: "llama-3-card" };
+export const LLAMA_3_NO_REASON: RealNote = { label: "Meta's reason", value: "Not published.", source: "llama-3-card" };
+
+export const LLAMA_3_PARTS_UNEXPLAINED: RealNote = { label: "Meta's reasons for each part", value: "Not published. The model card and blog do not say why each part is built the way it is.", source: "llama-3-card" };
 
 export const LLAMA_3_AUTOREGRESSIVE: RealNote = { label: "What it is", value: "\"Llama 3 is an auto-regressive language model that uses an optimized transformer architecture\"", source: "llama-3-card" };
 

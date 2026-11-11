@@ -93,6 +93,7 @@ export function Gpt2TokenizerDemo({ part, modelId, tiny }: DemoProps) {
         afterLabel={`${count(tokens.length)} pieces, each with its real GPT-2 ID`}
         after={<PieceChips tokens={tokens} />}
       />
+      <p className="card-lesson">Ġ means "a space before this word".</p>
       {LOOKUP_PARTS.has(part.id) && word && <IdLookup token={word.tokens[word.tokens.length - 1]} vocab={vocab} />}
       {word && (
         <div className="watch-box">
@@ -117,9 +118,9 @@ export function Gpt2TokenizerDemo({ part, modelId, tiny }: DemoProps) {
       )}
       {part.id === "tokenize" && (
         <div className="watch-box">
-          <p className="section-title">{`Our tiny model's own split of "${joinTokens(tiny.words)}"`}</p>
+          <p className="section-title">{`Tiny GPT's own split of "${joinTokens(tiny.words)}"`}</p>
           <PieceChips tokens={tiny.words.map((each, i) => ({ piece: each, id: tiny.ids[i] }))} />
-          <p className="card-lesson">It has no merge rules: it splits on spaces and looks each word up in its own list. These are the IDs the next steps use.</p>
+          <p className="card-lesson">Tiny GPT, our small practice model, has no merge rules: it splits on spaces and looks each word up in its own list. These are the IDs the next steps use.</p>
         </div>
       )}
       <GptTwoNote />

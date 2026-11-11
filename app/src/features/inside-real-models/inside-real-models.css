@@ -5,6 +5,13 @@
   gap: var(--space-item) var(--space-section);
 }
 
+.top-lead {
+  flex-basis: 100%;
+  color: var(--ink-soft);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+}
+
 .model-picker {
   display: inline-flex;
   align-items: center;
@@ -136,6 +143,16 @@
   padding: var(--space-edge) var(--space-control);
 }
 
+.part-card-copies {
+  flex-basis: 100%;
+  color: var(--ink-soft);
+  font-size: var(--text-small);
+}
+
+.part-card.is-active .part-card-copies {
+  color: var(--band-ink);
+}
+
 .step-badge {
   display: grid;
   place-items: center;
@@ -165,12 +182,6 @@
   color: var(--ink);
   font-size: var(--text-body);
   line-height: var(--leading-body);
-}
-
-.drawer-body .part-summary {
-  font-size: var(--text-title);
-  line-height: var(--leading-title);
-  letter-spacing: var(--tracking-title);
 }
 
 .in-out,
@@ -205,24 +216,12 @@
 .part-numbers {
   display: grid;
   gap: var(--space-surface);
-  margin: 0;
   padding-top: var(--space-surface);
   border-top: var(--border-thin) solid var(--card-line);
 }
 
-.part-numbers > div {
-  display: grid;
-  gap: var(--space-tight);
+.part-numbers > p {
   min-width: 0;
-}
-
-.part-numbers dt {
-  color: var(--ink-soft);
-  font-size: var(--text-small);
-}
-
-.part-numbers dd {
-  margin: 0;
   color: var(--ink-soft);
   font-size: var(--text-small);
   overflow-wrap: anywhere;
@@ -235,14 +234,17 @@
   font-variant-numeric: tabular-nums;
 }
 
-.part-numbers-key dd {
+.part-numbers-key {
+  display: grid;
+  gap: var(--space-tight);
+}
+
+.part-numbers > .part-numbers-key {
   color: var(--ink);
 }
 
-.part-numbers-basis {
-  display: block;
+.part-numbers-key > span {
   color: var(--ink-soft);
-  font-size: var(--text-micro);
 }
 
 .source-list {
@@ -259,17 +261,21 @@
   justify-content: space-between;
   gap: var(--space-block);
   min-height: var(--card-foot-height);
+  margin-inline: calc(-1 * var(--space-item));
   color: var(--ink-soft);
   font-size: var(--text-small);
 }
 
 .part-card-foot .action {
-  margin-left: auto;
   padding-inline: var(--space-item);
   background: transparent;
   color: var(--ink-soft);
   font-weight: var(--weight-regular);
   transition: background var(--motion-fast), color var(--motion-fast);
+}
+
+.part-card-foot .action:last-child {
+  margin-left: auto;
 }
 
 .part-card-foot .action:hover {

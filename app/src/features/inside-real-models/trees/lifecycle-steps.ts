@@ -1,7 +1,7 @@
 import type { ModelPart } from "@/features/inside-real-models/interfaces/model-part.interface";
 import type { BuildFacts } from "@/features/inside-real-models/interfaces/real-facts.interface";
 import { evaluationStep } from "./evaluation-steps";
-import { stepFacts } from "./part-builders";
+import { TOKEN_TERM, stepFacts } from "./part-builders";
 import { postTrainingStep, preTrainingStep } from "./training-steps";
 
 function dataStep(facts: BuildFacts): ModelPart {
@@ -30,7 +30,7 @@ function dataStep(facts: BuildFacts): ModelPart {
         summary: "Copies the plain text of one web page into the pile.",
         copies: 1,
         facts: stepFacts(facts.gather, "one web page", "its plain text"),
-        explanation: "Ground zero. Take one web page, strip out the menus and code, and keep its plain text as one document.",
+        explanation: "Take one web page, strip out the menus and code, and keep its plain text as one document.",
         why: "Nobody reads it first. It goes in as a long run of characters.",
         story: {
           problem: "A web page is mostly not writing: it is HTML tags, menus, links, scripts and a footer wrapped around a few paragraphs. A model only learns to echo what it reads, so trained on raw pages it would learn to write menus and code. This step keeps just the words someone wrote.",
@@ -49,7 +49,7 @@ function dataStep(facts: BuildFacts): ModelPart {
         summary: "Checks one document against one rule, then keeps it or drops it.",
         copies: 1,
         facts: stepFacts(facts.filter, "one document", "keep or drop"),
-        explanation: "Ground zero. Check one document against one rule, and keep it or drop it. The rules the makers say they used are listed below.",
+        explanation: "Check one document against one rule, and keep it or drop it. The rules the makers say they used are listed below.",
         why: "Rules and small scoring models decide what counts as good text, long before training starts.",
         story: {
           problem: "Much of the web is spam, lists of links, broken pages or text nobody would want copied. Without a quality check, the model would learn to write that too.",
@@ -68,7 +68,7 @@ function dataStep(facts: BuildFacts): ModelPart {
         summary: "Drops a document if it copies, or nearly copies, one already kept.",
         copies: 1,
         facts: stepFacts(facts.dedupe, "one document", "keep or drop", { inputDetail: "one document and those kept", outputDetail: "keep, or drop as a copy" }),
-        explanation: "Ground zero. Compare one document with the ones already kept, and drop it if it is a copy or nearly one.",
+        explanation: "Compare one document with the ones already kept, and drop it if it is a copy or nearly one.",
         why: "Text seen many times gets copied back word for word, so copies are removed.",
         story: {
           problem: "The same text turns up again and again on the web. Text seen many times gets learned word for word, and copies of test questions in training make test scores look better than they are.",
@@ -90,6 +90,7 @@ function tokenizerStep(facts: BuildFacts): ModelPart {
     icon: "tokens",
     title: "Tokenizer",
     summary: "Builds the word list the model will use, by counting common pairs of letters.",
+    term: TOKEN_TERM,
     copies: 1,
     facts: stepFacts(facts.tokenizer, "clean text", "a word list", { inputDetail: "clean training text", outputDetail: "a word list: piece ↔ ID" }),
     explanation: "Build the list of words the model will use. BPE starts from single bytes, then keeps joining the most common pair of neighbouring pieces into a new piece, until the list is full.",
@@ -128,7 +129,7 @@ function tokenizerStep(facts: BuildFacts): ModelPart {
             summary: "Adds 1 to the count for one pair of side-by-side pieces.",
             copies: 1,
             facts: stepFacts(facts["count-pair"], "two pieces", "their count, plus 1", { inputDetail: "two neighbouring pieces" }),
-            explanation: "Ground zero. Add 1 to the count for one pair of neighbouring pieces, such as \"d\" then \"o\".",
+            explanation: "Add 1 to the count for one pair of neighbouring pieces, such as \"d\" then \"o\".",
             why: "The tokenizer is built from counts like this, nothing more.",
             story: {
               problem: "To know which pair to join, you must know which pair is most common. Counting is the only way the tokenizer learns anything.",
@@ -147,7 +148,7 @@ function tokenizerStep(facts: BuildFacts): ModelPart {
             summary: "Writes down one join rule and adds the joined piece to the list.",
             copies: 1,
             facts: stepFacts(facts["learn-merge"], "the most common pair", "one new piece"),
-            explanation: "Ground zero. Write down one rule, such as \"do\" + \"g\" → \"dog\", and add the joined piece to the list.",
+            explanation: "Write down one rule, such as \"do\" + \"g\" → \"dog\", and add the joined piece to the list.",
             why: "\"dog\" becomes one piece because it was common, not because anything knows it is an animal.",
             story: {
               problem: "A pair joined once must be joined the same way on every text later. Writing the rule down, in order, is what makes the tokenizer give the same pieces every time.",
@@ -168,7 +169,7 @@ function tokenizerStep(facts: BuildFacts): ModelPart {
         summary: "Writes one piece into the list, and its place number becomes its ID.",
         copies: 1,
         facts: stepFacts(facts["assign-id"], "one piece", "its number"),
-        explanation: "Ground zero. Write one piece and its place number into the list. That number is its ID from now on.",
+        explanation: "Write one piece and its place number into the list. That number is its ID from now on.",
         why: "The ID is only a place in a list. Nearby IDs mean nothing.",
         story: {
           problem: "The model can only take numbers in. Each piece needs one fixed number, its ID, so the same piece always picks the same row of the word table.",
@@ -190,6 +191,7 @@ function architectureStep(model: ModelPart): ModelPart {
     icon: "model",
     title: "Architecture",
     summary: "Writes the model as code, with every stored number starting out random.",
+    term: "Inside, each word is a list of numbers (a vector), and each word's score is called a logit.",
     copies: 1,
     facts: { shape: model.facts.shape, weightCount: model.facts.weightCount, headline: model.facts.headline, input: "sizes and parts", output: "a random model", outputDetail: "code with random numbers", sources: model.facts.sources, reasons: model.facts.reasons },
     explanation: "Write the model as code: the word table, the layers of attention and feed-forward with their norms and add-backs, and the output head. Every stored number starts random.",

@@ -46,7 +46,7 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
             summary: "Reads the chance the model gives the word that really comes next.",
             copies: 1,
             facts: stepFacts(facts.guess, "words before", "right word's chance", { inputDetail: "the words before", outputDetail: "the chance of the right next word" }),
-            explanation: "Ground zero. Run the model on the words before, and read the chance it gives the word that really comes next. Use a model shows every step inside.",
+            explanation: "Run the model on the words before, and read the chance it gives the word that really comes next. Use a model shows every step inside.",
             why: "The text itself is the answer key, so no person has to mark anything.",
             story: {
               problem: "To learn, the model must first try. Its guess is the chance it gives the word that really comes next; without a guess there is nothing to score.",
@@ -65,7 +65,7 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
             summary: "Turns that chance into one number saying how wrong the guess was.",
             copies: 1,
             facts: stepFacts(facts["loss-term"], "right word's chance", "how wrong it was", { inputDetail: "the chance of the right word", outputDetail: "how wrong the guess was" }),
-            explanation: "Ground zero. One loss term for one word: minus the log of the chance the model gave the right word. A chance of 100% gives 0. A chance of 1% gives 4.6.",
+            explanation: "One loss term for one word: minus the log of the chance the model gave the right word. A chance of 100% gives 0. A chance of 1% gives 4.6.",
             why: "The loss of a whole batch is just the average of these terms.",
             story: {
               problem: "A chance alone doesn't say how bad a guess was. The loss turns it into one number that is 0 for a perfect guess and grows the more sure the model was of the wrong thing.",
@@ -85,7 +85,7 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
             summary: "Works out which way to move one number to make the guess less wrong.",
             copies: 1,
             facts: stepFacts(facts.slope, "slope from above", "this number's slope", { inputDetail: "the slope from the part above" }),
-            explanation: "Ground zero. One step of the chain rule: the slope from the part above times one local number, added to this number's slope. It says which way to move the number to lower the loss.",
+            explanation: "One step of the chain rule: the slope from the part above times one local number, added to this number's slope. It says which way to move the number to lower the loss.",
             why: "Backpropagation is this one line, run backwards through every multiply in the model.",
             story: {
               problem: "There are millions of numbers, and nobody can tell by hand which ones caused a bad guess. The slope works it out exactly for every number at once.",
@@ -105,7 +105,7 @@ export function preTrainingStep(facts: BuildFacts): ModelPart {
             summary: "Moves one stored number a small step the right way.",
             copies: 1,
             facts: stepFacts(facts["adam-update"], "number and slope", "nudged number", { inputDetail: "one number and its slope", outputDetail: "the number, nudged" }),
-            explanation: "Ground zero. Move one stored number a small step against its slope. Adam, a common way to do it, keeps a running average of the slope and of the slope squared, then steps.",
+            explanation: "Move one stored number a small step against its slope. Adam, a common way to do it, keeps a running average of the slope and of the slope squared, then steps.",
             why: "This is all \"learning\" is: one number moved a tiny bit, round after round.",
             story: {
               problem: "Knowing the direction is not enough: steps that are too big overshoot, too small learn nothing. The update decides how far to move each number.",
@@ -167,7 +167,7 @@ export function postTrainingStep(facts: BuildFacts): ModelPart {
             summary: "Scores one word of a written answer, the same way as in pre-training.",
             copies: 1,
             facts: stepFacts(facts["sft-term"], "1 answer word", "how wrong it was", { inputDetail: "the chance of one answer word" }),
-            explanation: "Ground zero. The same loss term as pre-training, minus the log of the chance, but counted only for one word of a written answer.",
+            explanation: "The same loss term as pre-training, minus the log of the chance, but counted only for one word of a written answer.",
             why: "The prompt's own words are not scored, so the model learns to answer, not to ask.",
             story: {
               problem: "If the question's words were scored too, the model would learn to write questions. Scoring only the answer's words teaches it to answer.",
@@ -206,7 +206,7 @@ export function postTrainingStep(facts: BuildFacts): ModelPart {
             summary: "Makes the better of two answers more likely than the worse one.",
             copies: 1,
             facts: stepFacts(facts["preference-pair"], "better, worse answer", "one gap to grow", { inputDetail: "one prompt, a better and a worse answer" }),
-            explanation: "Ground zero. Compare the chance the model gives the better answer with the chance it gives the worse one, and nudge the numbers so the gap grows.",
+            explanation: "Compare the chance the model gives the better answer with the chance it gives the worse one, and nudge the numbers so the gap grows.",
             why: "Only a comparison between two chances. No rule about right and wrong is written anywhere.",
             story: {
               problem: "A preference is only useful once it is a number to push on. The gap between the better and the worse answer's chances is that number.",

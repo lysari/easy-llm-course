@@ -3,7 +3,7 @@ import { inferenceRoot } from "./inference-steps";
 import { lifecycleRoot } from "./lifecycle-steps";
 import { LLAMA_3_BUILD } from "./llama-3-build-facts";
 import { llama3Layers } from "./llama-3-layer";
-import { LLAMA_3_AUTOREGRESSIVE, LLAMA_3_FINAL_NORM, LLAMA_3_NO_REASON, LLAMA_3_OUTPUT, LLAMA_3_RMS_NORM, LLAMA_3_ROPE, LLAMA_3_TRANSFORMER, LLAMA_3_USE_REASONS, LLAMA_3_WORD_TABLE, LLAMA_3_WRITING_NOTES } from "./llama-3-reasons";
+import { LLAMA_3_AUTOREGRESSIVE, LLAMA_3_FINAL_NORM, LLAMA_3_NO_REASON, LLAMA_3_OUTPUT, LLAMA_3_PARTS_UNEXPLAINED, LLAMA_3_RMS_NORM, LLAMA_3_ROPE, LLAMA_3_TRANSFORMER, LLAMA_3_USE_REASONS, LLAMA_3_WORD_TABLE, LLAMA_3_WRITING_NOTES } from "./llama-3-reasons";
 import { normPart, projectionPart, tablePart } from "./part-builders";
 import { LLAMA_3_SETTINGS } from "./sources";
 
@@ -106,7 +106,7 @@ const root: ModelPart = {
       { label: "Size", value: "8,030,261,248, worked out from Meta's settings; Hugging Face lists the same count", source: "llama-3-weights" },
       { label: "Text length", value: "8,192 words (tokens)", source: "llama-3-card" },
     ],
-    reasons: [LLAMA_3_TRANSFORMER, LLAMA_3_AUTOREGRESSIVE],
+    reasons: [LLAMA_3_TRANSFORMER, LLAMA_3_AUTOREGRESSIVE, LLAMA_3_PARTS_UNEXPLAINED],
   },
   explanation:
     "The whole model, released by Meta in 2024. Words go in as ids, and out comes one score for every word in its list. It has no position table: word order is added inside attention by RoPE. Everything inside is stored numbers, multiplied and added.",
@@ -132,7 +132,7 @@ const wordOrder: ModelPart = {
   facts: { shape: "nothing stored here", weightCount: 0, headline: { value: 0, unit: "numbers added here" }, input: "word vectors", output: "the same vectors", sources: LLAMA_3_SETTINGS, notes: [{ label: "Order comes in", value: "inside attention, by RoPE with θ 500,000", source: "llama-3-settings" }], reasons: [LLAMA_3_ROPE, LLAMA_3_NO_REASON] },
   tiny: { part: "position-table", level: "whole" },
   explanation:
-    "Ground zero. Nothing is added here: Llama 3 has no position table. Word order comes in later through RoPE, inside each attention head of step 3, which turns every query and key pair by an angle that grows with the word's place.",
+    "Nothing is added here: Llama 3 has no position table. Word order comes in later through RoPE, inside each attention head of step 3, which turns every query and key pair by an angle that grows with the word's place.",
   why: "Turning queries and keys makes their match depend on how far apart two words are, and adds no stored numbers.",
   story: {
     problem: "Attention looks at all the words at once, so without some sign of order \"dog bites man\" and \"man bites dog\" would look the same. Llama 3 gives that sign later, by turning queries and keys, so nothing is added here.",

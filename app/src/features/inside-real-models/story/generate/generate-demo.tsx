@@ -13,10 +13,15 @@ import { SamplingControls } from "./sampling-controls";
 const PLAIN: Sampling = { temperature: 1, topK: 0, topP: 1 };
 
 const NOTES = {
-  "gpt-2-small":
-    "The settings work as in GPT-2's released writing code: the scores are divided by the temperature, then the top k are kept, then the top p. One difference: GPT-2's top_p_logits keeps words only while their running total stays at or under p, so it keeps one word fewer than here. GPT-2's released code also never stops at its stop word, <|endoftext|> (ID 50,256): it writes a fixed number of words.",
-  "llama-3-8b":
-    "The settings work as in Llama 3's generation.py: temperature 0 takes the top word; otherwise the scores are divided by the temperature and top-p keeps the fewest top words whose chances pass p. Meta's code has no top-k; it is here for GPT-2. Llama 3 stops at <|end_of_text|> (ID 128,001) and, for the chat model, at <|eot_id|> (ID 128,009).",
+  "gpt-2-small": {
+    same: "The settings work as in GPT-2's released writing code: the scores are divided by the temperature, then the top k are kept, then the top p.",
+    differences:
+      "GPT-2's top_p_logits keeps words only while their running total stays at or under p, so it keeps one word fewer than here. GPT-2's released code also never stops at its stop word, <|endoftext|> (ID 50,256): it writes a fixed number of words.",
+  },
+  "llama-3-8b": {
+    same: "The settings work as in Llama 3's generation.py: temperature 0 takes the top word; otherwise the scores are divided by the temperature and top-p keeps the fewest top words whose chances pass p. Llama 3 stops at <|end_of_text|> (ID 128,001) and, for the chat model, at <|eot_id|> (ID 128,009).",
+    differences: "Meta's code has no top-k; it is here for GPT-2.",
+  },
 };
 
 function stopText(round: WriteRound, yourStop: string | null) {
@@ -96,7 +101,7 @@ export function GenerateDemo({ part, modelId, tiny }: DemoProps) {
 
   return (
     <div className="watch">
-      <p className="note">{`The page's own tiny model writes after your sentence, "${joinTokens(tiny.words)}", one word per round, live (training round ${tiny.lab.round}). Change a setting and the whole answer is written again.`}</p>
+      <p className="note">{`Tiny GPT writes after your sentence, "${joinTokens(tiny.words)}", one word per round, live (training round ${tiny.lab.round}). Change a setting and the whole answer is written again.`}</p>
       <SamplingControls modelId={modelId} sampling={sampling} yourStop={yourStop} onSampling={setSampling} onYourStop={setYourStop} />
       <div className="watch-controls">
         <button type="button" className="action action--strong" onClick={() => setShown(visible + 1)} disabled={visible >= rounds.length}>
@@ -130,10 +135,11 @@ export function GenerateDemo({ part, modelId, tiny }: DemoProps) {
         <div className="watch-box">
           <p className="section-title">The stop check, every round so far</p>
           <FactRows rows={rounds.slice(0, visible).map((each, i): [string, string] => [`Round ${i + 1}: "${showWord(each.picked.token)}"`, stopText(each, yourStop)])} />
-          <p className="card-lesson">{`Our tiny model's stop word is "${END_TOKEN}", ID ${END_ID}, and its text holds ${MAX_CONTEXT} words at most. It learned to pick the stop word after "." because every training sentence ends that way.`}</p>
+          <p className="card-lesson">{`Tiny GPT's stop word is "${END_TOKEN}", ID ${END_ID}, and its text holds ${MAX_CONTEXT} words at most. It learned to pick the stop word after "." because every training sentence ends that way.`}</p>
         </div>
       )}
-      <HonestNote>{`Written live by our tiny model, with one seeded random roll per round, so the same settings give the same answer (roll set ${seed}). ${NOTES[modelId]}`}</HonestNote>
+      <HonestNote>{`Written live by Tiny GPT, with one seeded random roll per round, so the same settings give the same answer (random draw #${seed}). ${NOTES[modelId].same}`}</HonestNote>
+      <HonestNote>{`Differences from the real code: ${NOTES[modelId].differences}`}</HonestNote>
     </div>
   );
 }

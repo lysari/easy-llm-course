@@ -14,7 +14,7 @@ interface SentenceBoxProps {
 
 function noteOf({ words, unknown, isSample, isCut }: Sentence) {
   const notes = [];
-  if (unknown.length > 0) notes.push(`Our tiny model doesn't know ${unknown.map((word) => `"${word}"`).join(", ")}, so it skips ${unknown.length === 1 ? "it" : "them"}.`);
+  if (unknown.length > 0) notes.push(`Tiny GPT doesn't know ${unknown.map((word) => `"${word}"`).join(", ")}, so it skips ${unknown.length === 1 ? "it" : "them"}.`);
   if (isSample) notes.push(`With no words it knows, this demo uses "${joinTokens(words)}".`);
   if (isCut) notes.push(`Only the last ${words.length} words fit, so the start is cut off.`);
   return notes.join(" ");
@@ -41,7 +41,7 @@ export function SentenceBox({ text, sentence, onChange }: SentenceBoxProps) {
         </select>
       </div>
       <p className="card-lesson" id={`${id}-use`}>
-        This demo runs our tiny model on these words. Change them and watch the result change.
+        Tiny GPT reads these words. Change them and watch the result change.
       </p>
       <p className="card-lesson sentence-note" id={`${id}-note`} aria-live="polite">
         {noteOf(sentence)}

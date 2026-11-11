@@ -10,7 +10,7 @@ const PRESETS: { label: string; sampling: Sampling; models: ModelId[] }[] = [
   { label: "Plain roll", sampling: { temperature: 1, topK: 0, topP: 1 }, models: ["gpt-2-small", "llama-3-8b"] },
   { label: "GPT-2 paper: top-k 40", sampling: { temperature: 1, topK: 40, topP: 1 }, models: ["gpt-2-small"] },
   { label: "Llama 3 default: temperature 0.6, top-p 0.9", sampling: { temperature: 0.6, topK: 0, topP: 0.9 }, models: ["llama-3-8b"] },
-  { label: "Greedy: temperature 0", sampling: { temperature: 0, topK: 0, topP: 1 }, models: ["gpt-2-small", "llama-3-8b"] },
+  { label: "Greedy (always the top word): temperature 0", sampling: { temperature: 0, topK: 0, topP: 1 }, models: ["gpt-2-small", "llama-3-8b"] },
 ];
 
 const STOP_CHOICES = VOCABULARY.filter((word) => word !== END_TOKEN);
@@ -34,6 +34,7 @@ export function SamplingControls({ modelId, sampling, yourStop, onSampling, onYo
   return (
     <div className="watch-box">
       <p className="section-title">How to pick each word</p>
+      <p className="card-lesson">Temperature: lower = safer, higher = more surprising. Top-k / top-p: only pick from the likeliest words.</p>
       <div className="watch-controls" role="group" aria-label="Settings published by the makers">
         {PRESETS.filter((preset) => preset.models.includes(modelId)).map((preset) => (
           <button key={preset.label} type="button" className={`word-chip${isPreset(preset.sampling) ? " is-picked" : ""}`} aria-pressed={isPreset(preset.sampling)} onClick={() => onSampling(preset.sampling)}>
@@ -58,7 +59,7 @@ export function SamplingControls({ modelId, sampling, yourStop, onSampling, onYo
           ))}
         </select>
       </div>
-      <p className="card-lesson">{`Temperature divides every score before softmax: below 1 the top words grow, above 1 the chances even out. Top-k keeps only the k likeliest words; our tiny list has ${VOCABULARY.length}, so 40 keeps them all. Top-p keeps the fewest top words whose chances add up to p or more. The kept chances are scaled back up to 100%.`}</p>
+      <p className="card-lesson">{`Temperature divides every score before softmax: below 1 the top words grow, above 1 the chances even out. Top-k keeps only the k likeliest words; Tiny GPT's list has ${VOCABULARY.length}, so 40 keeps them all. Top-p keeps the fewest top words whose chances add up to p or more. The kept chances are scaled back up to 100%.`}</p>
     </div>
   );
 }

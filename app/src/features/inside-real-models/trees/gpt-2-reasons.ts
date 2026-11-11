@@ -3,7 +3,9 @@ import type { RealNote, UseReasons } from "@/features/inside-real-models/interfa
 
 export const GPT_2_TRANSFORMER: RealNote = { label: "Built on", value: "\"We use a Transformer (Vaswani et al., 2017) based architecture for our LMs\"", source: "gpt-2-paper" };
 
-export const GPT_2_NO_REASON: RealNote = { label: "OpenAI's own reason", value: "Not published. The paper says the model \"largely follows the details of the OpenAI GPT model\" and does not say why each part is there.", source: "gpt-2-paper" };
+export const GPT_2_NO_REASON: RealNote = { label: "OpenAI's reason", value: "Not published.", source: "gpt-2-paper" };
+
+export const GPT_2_PARTS_UNEXPLAINED: RealNote = { label: "OpenAI's reasons for each part", value: "Not published. The paper says the model \"largely follows the details of the OpenAI GPT model\" and does not say why each part is there.", source: "gpt-2-paper" };
 
 export const GPT_2_SIZE_HELPS: RealNote = { label: "Why size matters", value: "\"The capacity of the language model is essential to the success of zero-shot task transfer and increasing it improves performance in a log-linear fashion across tasks\"", source: "gpt-2-paper" };
 

@@ -1,5 +1,5 @@
 import { type RefObject, useMemo, useRef } from "react";
-import type { ModelPart, RealModel } from "@/features/inside-real-models/interfaces/model-part.interface";
+import type { ModeId, ModelPart, RealModel } from "@/features/inside-real-models/interfaces/model-part.interface";
 import { FlowLinks } from "@/shared/components/flow-links";
 import { useFlowLinks } from "@/shared/hooks/use-flow-links";
 import { PartCard, titleOf } from "./part-card";
@@ -7,6 +7,7 @@ import { placeOf } from "./real-place";
 
 interface PartColumnProps {
   model: RealModel;
+  mode: ModeId;
   root: ModelPart;
   parent: ModelPart;
   parts: ModelPart[];
@@ -21,7 +22,11 @@ interface PartColumnProps {
   onDetails: (id: string) => void;
 }
 
-export function PartColumn({ model, root, parent, parts, selectedId, activeId, pathIds, openId, cards, hasLinks, width, onSelect, onDetails }: PartColumnProps) {
+const STEP_WORD: Record<ModeId, string> = { use: "step", build: "stage" };
+
+export const stepsTitleOf = (model: RealModel, mode: ModeId) => `${model.title}, ${STEP_WORD[mode]} by ${STEP_WORD[mode]}`;
+
+export function PartColumn({ model, mode, root, parent, parts, selectedId, activeId, pathIds, openId, cards, hasLinks, width, onSelect, onDetails }: PartColumnProps) {
   const columnRef = useRef<HTMLElement>(null);
   const partIds = useMemo(() => parts.map((part) => part.id), [parts]);
   const isSteps = parent === root;
@@ -29,12 +34,13 @@ export function PartColumn({ model, root, parent, parts, selectedId, activeId, p
     { flowRef: columnRef, childColumnRef: columnRef, parentCards: cards, childCards: cards },
     { parentId: parent.id, childIds: partIds, isShown: hasLinks && !isSteps, width },
   );
-  const title = isSteps ? `${root.title} in ${root.facts.shape}` : `Inside ${titleOf(parent, root)}`;
+  const title = isSteps ? stepsTitleOf(model, mode) : `Inside ${titleOf(parent, root)}`;
 
   return (
     <section className="column part-column inside-real-models-column" ref={columnRef} aria-label={title}>
       {!isSteps && <FlowLinks id={`inside-real-models-links-${parent.id}`} drawing={links} pathIds={pathIds} glowIds={[activeId]} />}
       <p className="section-title">{title}</p>
+      {isSteps && <p className="card-lesson">{`The ${parts.length} numbered cards are the whole story. Open deeper cards only if you're curious.`}</p>}
       {parts.map((part, i) => (
         <PartCard
           key={part.id}
@@ -43,7 +49,6 @@ export function PartColumn({ model, root, parent, parts, selectedId, activeId, p
             else cards.current.delete(part.id);
           }}
           root={root}
-          modelTitle={model.title}
           part={part}
           place={placeOf(model, root, part)}
           index={i}

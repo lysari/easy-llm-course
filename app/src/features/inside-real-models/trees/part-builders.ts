@@ -48,6 +48,8 @@ interface InOutDetail {
   outputDetail?: string;
 }
 
+export const TOKEN_TERM = "We call each piece a \"word\" here. The real name is token: a whole word, part of a word, or a symbol.";
+
 export const stepFacts = (facts: StepFacts, input: string, output: string, detail: InOutDetail = {}): RealFacts => ({
   shape: facts.shape,
   weightCount: 0,
@@ -72,7 +74,7 @@ export function projectionPart(spec: ProjectionSpec): ModelPart {
     copies: inSize,
     facts: { shape: "1 × 1", weightCount: 1, headline: { value: inSize, unit: "per output number", isComputed: true }, input: "1 input, 1 stored", output: "the running sum", inputDetail: "1 input number and 1 stored number", outputDetail: "the running sum, a little bigger or smaller", sources, reasons: codeReasons },
     tiny: { part: tinyPart, level: "multiply-add", missing },
-    explanation: `Ground zero. One input number times one stored number, added to a running sum. This happens ${sizeIn} times to make one output number.`,
+    explanation: `One input number times one stored number, added to a running sum. This happens ${sizeIn} times to make one output number.`,
     why: "There is nothing smaller inside. The whole part is this one line, repeated. No step here knows what a word means.",
     story: {
       problem: `This is the bottom of the ${spec.title.toLowerCase()}. A table of numbers can't do anything by itself; this one multiply and one add is how it touches the word's numbers. Without it nothing would come out at all.`,
@@ -93,7 +95,7 @@ export function projectionPart(spec: ProjectionSpec): ModelPart {
     copies: 1,
     facts: { shape: "1", weightCount: 1, headline: { value: 1, unit: "number", isComputed: true }, input: "the finished sum", output: "sum plus 1 number", outputDetail: "the sum plus one stored number", sources, reasons: codeReasons },
     tiny: { part: tinyPart, level: "multiply-add" },
-    explanation: "Ground zero. One stored number added at the end, the b in y = w × x + b. It lets the output move up or down even when every input is zero.",
+    explanation: "One stored number added at the end, the b in y = w × x + b. It lets the output move up or down even when every input is zero.",
     why: "It is a single learned number, nothing more. Training nudges it like every other number.",
     story: {
       problem: "Without a bias, a word whose numbers were all 0 could only ever give 0. The bias lets each output number start from its own level, up or down.",
@@ -153,7 +155,7 @@ export function tablePart(spec: TableSpec): ModelPart {
     copies: cols,
     facts: { shape: "1", weightCount: 1, headline: { value: rows * cols, unit: "in the table", isComputed: true }, input: "nothing, only read", output: "1 number", inputDetail: "nothing, it is only read", sources, reasons: codeReasons },
     tiny: { part: tinyPart, level: "number" },
-    explanation: "Ground zero. One stored number in the table. It started random, and training nudged it a tiny bit, round after round.",
+    explanation: "One stored number in the table. It started random, and training nudged it a tiny bit, round after round.",
     why: "There is no word inside, only this number. Meaning comes from where many such numbers sit next to each other.",
     story: {
       problem: "Each stored number is one dial that training can turn. Without dials there would be nothing to learn: the model's whole knowledge is the settings of numbers like this one.",
@@ -214,8 +216,8 @@ export function normPart(spec: NormSpec): ModelPart {
     facts: { shape: "1", weightCount: hasShift ? 2 : 1, headline: hasShift ? { value: 2, unit: "numbers", isComputed: true } : { value: 1, unit: "number", isComputed: true }, input: "1 rescaled number", output: "1 number", sources, reasons: codeReasons },
     tiny: { part: tinyPart, level: "number" },
     explanation: hasShift
-      ? "Ground zero. One rescaled number times its own scale number, plus its own shift number. One multiply-and-add with 2 stored numbers."
-      : "Ground zero. One rescaled number times its own scale number. A single multiply with 1 stored number.",
+      ? "One rescaled number times its own scale number, plus its own shift number. One multiply-and-add with 2 stored numbers."
+      : "One rescaled number times its own scale number. A single multiply with 1 stored number.",
     why: "Training picks the scale (and shift) so each of the numbers can grow back to the size that helps the next part.",
     story: {
       problem: "Rescaling makes every number the same size, which can throw away useful differences. Each number's own stored scale lets training give some of that size back where it helps.",

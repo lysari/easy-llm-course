@@ -39,6 +39,7 @@ export function InsideRealModelsPage({ isOpen }: { isOpen: boolean }) {
             <PartColumn
               key={`${model.id}-${root.id}-${parent.id}`}
               model={model}
+              mode={mode}
               root={root}
               parent={parent}
               parts={parts}
@@ -55,7 +56,7 @@ export function InsideRealModelsPage({ isOpen }: { isOpen: boolean }) {
           ))}
         </div>
       </div>
-      {openPart && <PartDrawer ref={insideRealModels.drawerRef} root={root} modelId={model.id} modelTitle={model.title} part={openPart} place={placeOf(model, root, openPart)} tiny={tiny} text={text} sentence={sentence} onTextChange={setText} nextPart={nextPart} onOpen={insideRealModels.showDetails} onClose={insideRealModels.closeDrawer} />}
+      {openPart && <PartDrawer ref={insideRealModels.drawerRef} mode={mode} root={root} modelId={model.id} modelTitle={model.title} part={openPart} place={placeOf(model, root, openPart)} tiny={tiny} text={text} sentence={sentence} onTextChange={setText} nextPart={nextPart} onOpen={insideRealModels.showDetails} onClose={insideRealModels.closeDrawer} />}
     </main>
   );
 }

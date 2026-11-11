@@ -4,7 +4,7 @@ import { LAYER_COUNT, VECTOR_SIZE } from "@/core/model/tiny-gpt";
 import { FactRows } from "@/features/inside-real-models/fact-rows";
 import type { DemoProps } from "@/features/inside-real-models/interfaces/model-part.interface";
 import { MODELS } from "@/features/inside-real-models/models";
-import { BeforeAfter, HonestNote, NumberRow, WordPicker } from "@/features/inside-real-models/story/watch-parts";
+import { BeforeAfter, HonestNote, NumberRow, NumbersNote, WordPicker } from "@/features/inside-real-models/story/watch-parts";
 import { count, showWord } from "@/shared/utils/format";
 import { cacheFor, cacheNumbers, realCacheOf, reuseGap, wordPasses } from "./kv-cache";
 
@@ -35,6 +35,7 @@ export function KvCacheDemo({ modelId, tiny }: DemoProps) {
   return (
     <div className="watch">
       <WordPicker label="What is saved for this word of your sentence:" words={tiny.words} picked={picked} onPick={setWord} />
+      <NumbersNote />
       <div className="watch-grid">
         {cache.map((layer, l) => (
           <div key={l} className="watch-box">
@@ -44,7 +45,7 @@ export function KvCacheDemo({ modelId, tiny }: DemoProps) {
           </div>
         ))}
       </div>
-      <p className="card-lesson">{`Our tiny model: 2 × ${VECTOR_SIZE} numbers per layer × ${LAYER_COUNT} layers = ${count(cacheNumbers(LAYER_COUNT, VECTOR_SIZE, 1))} numbers saved for each word.`}</p>
+      <p className="card-lesson">{`Tiny GPT: 2 × ${VECTOR_SIZE} numbers per layer × ${LAYER_COUNT} layers = ${count(cacheNumbers(LAYER_COUNT, VECTOR_SIZE, 1))} numbers saved for each word.`}</p>
       <BeforeAfter
         beforeLabel={`Keys and values of all ${tiny.ids.length} words, worked out once`}
         before={<p className="note">Each word's key and value only depend on that word and the words before it.</p>}
@@ -88,7 +89,7 @@ export function KvCacheDemo({ modelId, tiny }: DemoProps) {
           ]}
         />
       </div>
-      <HonestNote>{`Our tiny model keeps no cache: it runs the whole sentence again each round. The keys and values above are the ones it works out anyway, live on your sentence. The real sizes are counts worked out from the published settings; the bytes depend on the number format you run the model in. ${modelId === "llama-3-8b" ? "Llama 3 8B's numbers are published at 16 bits, and its code keeps the cache in the model's own format (\"self.cache_k = self.cache_k.to(xq)\"). Its 8 key-value groups, shared by 4 query heads each, are why it saves a quarter of what one per head would." : "GPT-2 gives every one of its 12 heads its own key and value, so it saves 768 + 768 numbers per word in each layer."}`}</HonestNote>
+      <HonestNote>{`Tiny GPT keeps no cache: it runs the whole sentence again each round. The keys and values above are the ones it works out anyway, live on your sentence. The real sizes are counts worked out from the published settings; the bytes depend on the number format you run the model in. ${modelId === "llama-3-8b" ? "Llama 3 8B's numbers are published at 16 bits, and its code keeps the cache in the model's own format (\"self.cache_k = self.cache_k.to(xq)\"). Its 8 key-value groups, shared by 4 query heads each, are why it saves a quarter of what one per head would." : "GPT-2 gives every one of its 12 heads its own key and value, so it saves 768 + 768 numbers per word in each layer."}`}</HonestNote>
     </div>
   );
 }

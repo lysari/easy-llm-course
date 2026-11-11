@@ -1,44 +1,28 @@
 import type { ModelPart } from "@/features/inside-real-models/interfaces/model-part.interface";
 import type { PartPlace } from "@/features/inside-real-models/interfaces/part-place.interface";
 import type { Headline } from "@/features/inside-real-models/interfaces/real-facts.interface";
-import { keyFactOf, showAmount } from "./real-place";
+import { amountOf, keyFactOf } from "./real-place";
 
-const COMPUTED = "Worked out from the sources";
-
-function RealHeadline({ headline, isExact }: { headline: Headline; isExact: boolean }) {
-  if ("text" in headline) return <dd>{headline.text}</dd>;
-  const isPercent = headline.unit.startsWith("%");
+function RealHeadline({ headline }: { headline: Headline }) {
+  if ("text" in headline) return <p>{headline.text}</p>;
+  const amount = amountOf(headline, false);
   return (
-    <dd>
-      <b>{`${showAmount(headline.value, isExact || Boolean(headline.isId))}${headline.isOver ? "+" : ""}${isPercent ? "%" : ""}`}</b>
-      {isPercent ? headline.unit.slice(1) : ` ${headline.unit}`}
-      {isExact && <span className="part-numbers-basis">{headline.isComputed ? COMPUTED : "As published"}</span>}
-    </dd>
+    <p>
+      <b>{amount.value}</b>
+      {amount.unit}
+    </p>
   );
 }
 
-interface PartNumbersProps {
-  modelTitle: string;
-  part: ModelPart;
-  place: PartPlace;
-  isExact: boolean;
-}
-
-export function PartNumbers({ modelTitle, part, place, isExact }: PartNumbersProps) {
-  const key = keyFactOf(part, place, isExact);
+export function PartNumbers({ part, place }: { part: ModelPart; place: PartPlace }) {
+  const key = keyFactOf(part, place, false);
   return (
-    <dl className="part-numbers">
-      <div>
-        <dt>{`Real ${modelTitle}`}</dt>
-        <RealHeadline headline={part.facts.headline} isExact={isExact} />
-      </div>
-      <div className="part-numbers-key">
-        <dt>{key.label}</dt>
-        <dd>
-          {key.value}
-          {isExact && key.isComputed && <span className="part-numbers-basis">{COMPUTED}</span>}
-        </dd>
-      </div>
-    </dl>
+    <div className="part-numbers">
+      <RealHeadline headline={part.facts.headline} />
+      <p className="part-numbers-key">
+        <span>{key.label}</span>
+        {key.value}
+      </p>
+    </div>
   );
 }

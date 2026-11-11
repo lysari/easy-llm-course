@@ -69,18 +69,18 @@ function projection(name: string, input: number[], table: Tensor, level: string,
   return step([{ label: `${input.length} numbers in`, values: input }], [{ label: `output number ${j + 1}`, values: [terms.total] }], `out ${j + 1} = in1 × w1 + in2 × w2 + … + in${input.length} × w${input.length}`, note, { terms, pick: { label: "Output number", count: table.cols } });
 }
 
-const TINY = "Live in our tiny model, on your sentence.";
+const TINY = "Live in Tiny GPT, on your sentence.";
 
 function normStep(isRms: boolean, input: number[], level: string, out: number, inName: string): TinyStep {
   const j = out % input.length;
   if (isRms) {
     const { rms, out: scaled } = rmsNormParts(input);
-    const note = "Llama 3's RMSNorm formula from its code, run on our tiny model's real numbers. Each scale number is 1, the value the code starts it at; Llama 3's trained scale numbers are in its weights, which this app does not ship.";
+    const note = "Llama 3's RMSNorm formula from its code, run on Tiny GPT's real numbers. Each scale number is 1, the value the code starts it at; Llama 3's trained scale numbers are in its weights, which this app does not ship.";
     if (level === "whole") return step([{ label: inName, values: input }], [{ label: "divided by their root mean square", values: scaled }], `out = x / ${fixed(rms)}, then × each scale number (1)`, note);
     return step([{ label: `number ${j + 1}`, values: [input[j]] }], [{ label: "rescaled, times its scale", values: [scaled[j]] }], `${fixed(input[j])} / ${fixed(rms)} × 1 = ${fixed(scaled[j])}`, note, { terms: termsOf("rescaled", "scale", [[scaled[j], 1]]), pick: { label: "Number", count: input.length } });
   }
   const { mean, spread, out: normed } = layerNormParts(input);
-  const note = "Our tiny model's own LayerNorm, live. It has no stored scale or shift; GPT-2's code starts its scale g at 1 and its shift b at 0, and its trained values are in its weights, which this app does not ship.";
+  const note = "Tiny GPT's own LayerNorm, live. It has no stored scale or shift; GPT-2's code starts its scale g at 1 and its shift b at 0, and its trained values are in its weights, which this app does not ship.";
   if (level === "whole") return step([{ label: inName, values: input }], [{ label: "average 0, spread 1", values: normed }], `out = (x − ${fixed(mean)}) / ${fixed(spread)}`, note);
   return step([{ label: `number ${j + 1}`, values: [input[j]] }], [{ label: "× g + b, with g = 1, b = 0", values: [normed[j]] }], `(${fixed(input[j])} − ${fixed(mean)}) / ${fixed(spread)} × 1 + 0 = ${fixed(normed[j])}`, note, { terms: termsOf("rescaled", "g", [[normed[j], 1]]), pick: { label: "Number", count: input.length } });
 }
@@ -88,19 +88,19 @@ function normStep(isRms: boolean, input: number[], level: string, out: number, i
 function embeddingStep(view: TinyView, w: number, isRms: boolean): TinyStep {
   const { trace } = view;
   const row = `the word row for ID ${view.ids[w]}, "${showWord(VOCABULARY[view.ids[w]])}"`;
-  if (isRms) return step([{ label: row, values: trace.tokenVectors[w] }], [{ label: "into layer 1 in Llama 3: the same row, nothing added", values: trace.tokenVectors[w] }, { label: `our tiny model adds its row for place ${w + 1} instead, like GPT-2`, values: trace.combined[w] }], "x = word table[id]", "Llama 3's step run on our tiny model's real word row: the row goes in as it is. Our tiny model itself adds a learned place row, like GPT-2, shown below it.");
+  if (isRms) return step([{ label: row, values: trace.tokenVectors[w] }], [{ label: "into layer 1 in Llama 3: the same row, nothing added", values: trace.tokenVectors[w] }, { label: `Tiny GPT adds its row for place ${w + 1} instead, like GPT-2`, values: trace.combined[w] }], "x = word table[id]", "Llama 3's step run on Tiny GPT's real word row: the row goes in as it is. Tiny GPT itself adds a learned place row, like GPT-2, shown below it.");
   return step([{ label: row, values: trace.tokenVectors[w] }, { label: `the place row for place ${w + 1}`, values: trace.positionVectors[w] }], [{ label: "added together: what goes into layer 1", values: trace.combined[w] }], "x = word row + place row", TINY);
 }
 
 function wordOrderStep(view: TinyView, w: number): TinyStep {
   const query = view.trace.layers[0].queries[w];
-  const note = `Nothing is added here. To show where order comes in, Llama 3's RoPE formula from its code (θ = 500,000) turns our tiny model's real query for word ${w + 1}; that query already holds our tiny model's own place row, since it has no RoPE.`;
+  const note = `Nothing is added here. To show where order comes in, Llama 3's RoPE formula from its code (θ = 500,000) turns Tiny GPT's real query for word ${w + 1}; that query already holds Tiny GPT's own place row, since it has no RoPE.`;
   return step([{ label: `the word row for "${showWord(VOCABULARY[view.ids[w]])}", the same at every place`, values: view.trace.tokenVectors[w] }], [{ label: "after this step: unchanged", values: view.trace.tokenVectors[w] }, { label: `later, inside attention: its query turned for place ${w + 1}`, values: rope(query, w) }], "x = word table[id]; order: q′ = rope(q, place)", note);
 }
 
 function ropeStep(query: number[], place: number, level: string, out: number): TinyStep {
   const turned = rope(query, place);
-  const note = `Llama 3's RoPE formula from its code (θ = 500,000), run on our tiny model's real query numbers for word ${place + 1}. Our tiny query has ${VECTOR_SIZE} numbers, Llama 3's has 128, so the angles differ from Llama's own.`;
+  const note = `Llama 3's RoPE formula from its code (θ = 500,000), run on Tiny GPT's real query numbers for word ${place + 1}. Tiny GPT's query has ${VECTOR_SIZE} numbers, Llama 3's has 128, so the angles differ from Llama's own.`;
   if (level === "whole") return step([{ label: "query numbers", values: query }], [{ label: `turned for place ${place + 1}`, values: turned }], `${VECTOR_SIZE / 2} pairs, each turned by place × 500000^(−2i / ${VECTOR_SIZE})`, note);
   const pair = Math.floor((out % VECTOR_SIZE) / 2);
   const angle = ropeAngle(pair, VECTOR_SIZE, place);
@@ -137,7 +137,7 @@ export function tinyStep(part: ModelPart, modelId: ModelId, view: TinyView, { wo
   if (part.id.endsWith("-bias")) {
     const found = tableOf[base];
     const sum = found ? (projection(found[0], found[1], found[2], "number", out, "").terms?.total ?? 0) : first.collected[w][out % VECTOR_SIZE];
-    return step([{ label: "the finished sum", values: [sum] }], [{ label: "plus the bias b", values: [sum + extra] }], `out = ${fixed(sum)} + ${fixed(extra)}`, `The sum is live from our tiny model${found ? "" : " (its head's mix, since it has no output projection)"}. It has no bias, so you set b with the slider. GPT-2's code starts every bias at 0; its trained biases are in its weights, which this app does not ship.`, { pick: { label: "Output number", count: found ? found[2].cols : VECTOR_SIZE } });
+    return step([{ label: "the finished sum", values: [sum] }], [{ label: "plus the bias b", values: [sum + extra] }], `out = ${fixed(sum)} + ${fixed(extra)}`, `The sum is live from Tiny GPT${found ? "" : " (its head's mix, since it has no output projection)"}. It has no bias, so you set b with the slider. GPT-2's code starts every bias at 0; its trained biases are in its weights, which this app does not ship.`, { pick: { label: "Output number", count: found ? found[2].cols : VECTOR_SIZE } });
   }
   const projected = tableOf[base];
   if (projected) return projection(projected[0], projected[1], projected[2], level, out, nearest);
@@ -149,13 +149,13 @@ export function tinyStep(part: ModelPart, modelId: ModelId, view: TinyView, { wo
   if (base.startsWith("rope")) return ropeStep(first.queries[w], w, part.id === "rope" ? "whole" : "number", out);
   if (base === "gelu") {
     const j = out % pre.length;
-    const note = "GPT-2's GELU formula from its code, run on our tiny model's real expanded numbers. Our tiny model itself uses ReLU, shown beside it.";
-    if (part.id === "gelu") return step([{ label: "expanded numbers", values: pre }], [{ label: "after GELU", values: pre.map(gelu) }, { label: "after our tiny model's ReLU", values: first.expanded[w] }], "gelu(x) = 0.5 × x × (1 + tanh(√(2/π) × (x + 0.044715 × x³)))", note);
+    const note = "GPT-2's GELU formula from its code, run on Tiny GPT's real expanded numbers. Tiny GPT itself uses ReLU, shown beside it.";
+    if (part.id === "gelu") return step([{ label: "expanded numbers", values: pre }], [{ label: "after GELU", values: pre.map(gelu) }, { label: "after Tiny GPT's ReLU", values: first.expanded[w] }], "gelu(x) = 0.5 × x × (1 + tanh(√(2/π) × (x + 0.044715 × x³)))", note);
     return step([{ label: `number ${j + 1}`, values: [pre[j]] }], [{ label: "after GELU", values: [gelu(pre[j])] }], `0.5 × ${fixed(pre[j])} × (1 + tanh(…)) = ${fixed(gelu(pre[j]))}`, note, { pick: { label: "Number", count: pre.length } });
   }
   if (["swiglu", "swiglu-number", "silu", "gate-times-up"].includes(part.id)) {
     const j = out % pre.length;
-    const note = "Llama 3's SiLU formula from its code, run on our tiny model's real expanded numbers as the gate. Our tiny model has no up table, so you set the up number with the slider.";
+    const note = "Llama 3's SiLU formula from its code, run on Tiny GPT's real expanded numbers as the gate. Tiny GPT has no up table, so you set the up number with the slider.";
     if (part.id === "swiglu") return step([{ label: "gate numbers (our expand table)", values: pre }], [{ label: "after SiLU", values: pre.map(silu) }], "silu(g) = g × sigmoid(g), then × the matching up number", note);
     if (part.id === "silu") return step([{ label: `gate number ${j + 1}`, values: [pre[j]] }], [{ label: "after SiLU", values: [silu(pre[j])] }], `${fixed(pre[j])} × sigmoid(${fixed(pre[j])}) = ${fixed(silu(pre[j]))}`, note, { terms: termsOf("gate", "sigmoid", [[pre[j], sigmoid(pre[j])]]), pick: { label: "Number", count: pre.length } });
     return step([{ label: `SiLU of gate ${j + 1}`, values: [silu(pre[j])] }, { label: "up number (you set it)", values: [extra] }], [{ label: "gate × up", values: [silu(pre[j]) * extra] }], `${fixed(silu(pre[j]))} × ${fixed(extra)} = ${fixed(silu(pre[j]) * extra)}`, note, { terms: termsOf("SiLU", "up", [[silu(pre[j]), extra]]), pick: { label: "Number", count: pre.length } });

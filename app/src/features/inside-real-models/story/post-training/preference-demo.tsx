@@ -9,6 +9,8 @@ import { answerChance, preferenceGap, pushPreference } from "./post-training-mat
 
 const ANSWERS = VOCABULARY.filter((word) => word !== END_TOKEN && /^\p{L}+$/u.test(word));
 
+const GAP_LABEL = "Gap (bigger = the model prefers your better answer more)";
+
 function WordSelect({ label, value, onChange }: { label: string; value: string; onChange: (word: string) => void }) {
   const id = useId();
   return (
@@ -75,12 +77,13 @@ export function PreferenceDemo({ part, modelId, tiny }: DemoProps) {
         </div>
       )}
       <BeforeAfter
-        beforeLabel="Our tiny model now"
-        before={<FactRows rows={[[`Chance of "${showWord(better)}"`, percent(answerChance(words, better, tiny.weights))], [`Chance of "${showWord(worse)}"`, percent(answerChance(words, worse, tiny.weights))], ["Gap: ln p(better) − ln p(worse)", gapBefore.toFixed(3)]]} />}
+        beforeLabel="Tiny GPT now"
+        before={<FactRows rows={[[`Chance of "${showWord(better)}"`, percent(answerChance(words, better, tiny.weights))], [`Chance of "${showWord(worse)}"`, percent(answerChance(words, worse, tiny.weights))], [GAP_LABEL, gapBefore.toFixed(3)]]} />}
         afterLabel={part.id === "preference" ? `After ${nudges} nudge${nudges === 1 ? "" : "s"}` : "The one number preference tuning grows"}
-        after={part.id === "preference" ? <FactRows rows={[[`Chance of "${showWord(better)}"`, percent(answerChance(words, better, copy))], [`Chance of "${showWord(worse)}"`, percent(answerChance(words, worse, copy))], ["Gap", gapNow.toFixed(3)]]} /> : <p className="term-big">{`ln ${answerChance(words, better, tiny.weights).toFixed(4)} − ln ${answerChance(words, worse, tiny.weights).toFixed(4)} = ${gapBefore.toFixed(3)}`}</p>}
+        after={part.id === "preference" ? <FactRows rows={[[`Chance of "${showWord(better)}"`, percent(answerChance(words, better, copy))], [`Chance of "${showWord(worse)}"`, percent(answerChance(words, worse, copy))], [GAP_LABEL, gapNow.toFixed(3)]]} /> : <p className="term-big">{`ln ${answerChance(words, better, tiny.weights).toFixed(4)} − ln ${answerChance(words, worse, tiny.weights).toFixed(4)} = ${gapBefore.toFixed(3)}`}</p>}
       />
-      <HonestNote>{`${part.id === "preference" ? "Live on a copy of our tiny model. Each nudge moves every number a small step along the slope that grows the gap, a bare version of preference tuning with no reward model and no reference model." : "Both chances are live from our tiny model's current numbers; which answer is better is your choice."} ${modelId === "gpt-2-small" ? "GPT-2 had no preference tuning." : "Meta used PPO and DPO for Llama 3 Instruct; its preference rankings are not published."}`}</HonestNote>
+      <p className="card-lesson">Gap = ln p(better) − ln p(worse)</p>
+      <HonestNote>{`${part.id === "preference" ? "Live on a copy of Tiny GPT. Each nudge moves every number a small step along the slope that grows the gap, a bare version of preference tuning with no reward model and no reference model." : "Both chances are live from Tiny GPT's current numbers; which answer is better is your choice."} ${modelId === "gpt-2-small" ? "GPT-2 had no preference tuning." : "Meta used PPO and DPO for Llama 3 Instruct; its preference rankings are not published."}`}</HonestNote>
     </div>
   );
 }

@@ -14,7 +14,7 @@ const layer: ModelPart = {
   title: "One layer",
   summary: "Looks back at earlier words, then picks out patterns, adding each result back on.",
   copies: LAYER_COUNT,
-  facts: { shape: "norm, attention, norm, feed-forward", weightCount: 7_087_872, headline: { value: 7_087_872, unit: "numbers", isComputed: true }, input: "768 per word", output: "768 per word", inputDetail: "768 numbers per word", outputDetail: "768 numbers per word", sources: [...GPT_2_SETTINGS, "gpt-2-paper"], reasons: [GPT_2_ADD_BACK, GPT_2_NORM_PLACE] },
+  facts: { shape: "norm, attention, norm, feed-forward", weightCount: 7_087_872, headline: { value: 7_087_872, unit: "numbers", isComputed: true }, input: "768 per word", output: "768, updated", inputDetail: "768 numbers per word", outputDetail: "768 numbers per word, with attention's and the feed-forward's results added on", sources: [...GPT_2_SETTINGS, "gpt-2-paper"], reasons: [GPT_2_ADD_BACK, GPT_2_NORM_PLACE] },
   tiny: { part: "layer", level: "whole" },
   explanation:
     "One of 12 identical layers. A norm, then attention, added back on; a second norm, then the feed-forward, added back on. GPT-2 puts each norm before its part, not after.",
@@ -81,7 +81,7 @@ const layer: ModelPart = {
 export const gpt2Layers: ModelPart = {
   id: "layers",
   icon: "layers",
-  title: "Layers × 12",
+  title: "Stack of 12 layers",
   summary: "Runs every word through 12 layers of the same shape, one after another.",
   copies: 1,
   facts: { shape: "12 layers", weightCount: 85_054_464, headline: { value: 85_054_464, unit: "numbers", isComputed: true }, input: "word vectors", output: "updated word vectors", sources: GPT_2_SETTINGS, reasons: [GPT_2_LAYER_LOOP, GPT_2_DEPTH, GPT_2_SIZE_HELPS] },

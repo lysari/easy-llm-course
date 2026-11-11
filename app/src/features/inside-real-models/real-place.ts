@@ -1,6 +1,6 @@
 import type { ModelPart, RealModel } from "@/features/inside-real-models/interfaces/model-part.interface";
 import type { PartPlace } from "@/features/inside-real-models/interfaces/part-place.interface";
-import type { KeyFact } from "@/features/inside-real-models/interfaces/real-facts.interface";
+import type { Amount, KeyFact } from "@/features/inside-real-models/interfaces/real-facts.interface";
 import { count } from "@/shared/utils/format";
 import { pathTo } from "./models";
 
@@ -8,10 +8,23 @@ const COMPACT = new Intl.NumberFormat("en-US", { notation: "compact", maximumSig
 const COMPACT_FROM = 100_000;
 const SHARE = new Intl.NumberFormat("en-US", { style: "percent", maximumSignificantDigits: 3 });
 
-export const SHARE_LABEL = "Share of all numbers";
-export const RUNS_LABEL = "Runs per word";
+const TABLE_SIZE = /^[\d,]+ × [\d,]+( \+ [\d,]+ × [\d,]+)*$/;
+
+export const isTableSize = (shape: string) => TABLE_SIZE.test(shape);
+
+export const RUNS_LABEL = "Done for each word";
 
 export const showAmount = (value: number, isExact: boolean) => (!isExact && value >= COMPACT_FROM ? COMPACT.format(value) : count(value));
+
+export const shareLabelOf = (place: PartPlace) => `Part of the model's ${showAmount(place.total, false)} learned numbers`;
+
+export function amountOf(headline: Amount, isExact: boolean) {
+  const isPercent = headline.unit.startsWith("%");
+  return {
+    value: `${showAmount(headline.value, isExact || Boolean(headline.isId))}${headline.isOver ? "+" : ""}${isPercent ? "%" : ""}`,
+    unit: isPercent ? headline.unit.slice(1) : ` ${headline.unit}`,
+  };
+}
 
 export function placeOf(model: RealModel, root: ModelPart, part: ModelPart): PartPlace {
   const path = pathTo(root, part.id);
@@ -46,6 +59,6 @@ export function keyFactOf(part: ModelPart, place: PartPlace, isExact: boolean): 
   const runs = runsOf(part, place, isExact);
   if (runs) return { label: RUNS_LABEL, value: runs, source, isComputed: true };
   const share = shareOf(part, place, isExact);
-  if (share) return { label: SHARE_LABEL, value: share, source, isComputed: true };
+  if (share) return { label: shareLabelOf(place), value: share, source, isComputed: true };
   return { label: "Shape", value: part.facts.shape, source, isComputed: false };
 }

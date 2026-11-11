@@ -1,47 +1,49 @@
 import "./story.css";
 import { Suspense } from "react";
 import { type ModelLab, TARGET_ROUNDS } from "@/core/model/lab";
-import type { DemoProps, ModelPart, PartStory } from "@/features/inside-real-models/interfaces/model-part.interface";
+import { LAYER_COUNT, VECTOR_SIZE } from "@/core/model/tiny-gpt";
+import type { DemoProps, ModeId, ModelPart, PartStory } from "@/features/inside-real-models/interfaces/model-part.interface";
 import type { RealNote } from "@/features/inside-real-models/interfaces/real-facts.interface";
 import type { Sentence } from "@/features/inside-real-models/interfaces/sentence.interface";
 import { SOURCES } from "@/features/inside-real-models/trees/sources";
 import { SentenceBox } from "./sentence-box";
 import { DEMOS, isUsedOn } from "./story-demos";
 
-interface StoryInfoProps {
-  story: PartStory;
-  reasons: RealNote[];
-  nextPart: ModelPart | undefined;
-  onOpen: (id: string) => void;
+const WHEN_TITLE: Record<ModeId, string> = { use: "When it runs", build: "When you'd do this" };
+
+export function ReasonList({ reasons }: { reasons: RealNote[] }) {
+  if (reasons.length === 0) return null;
+  return (
+    <ul className="reason-list">
+      {reasons.map((reason) => (
+        <li key={reason.value}>
+          <b>{reason.label}:</b> {reason.value}{" "}
+          <a className="card-lesson" href={SOURCES[reason.source].url} target="_blank" rel="noreferrer">
+            {SOURCES[reason.source].title}
+          </a>
+        </li>
+      ))}
+    </ul>
+  );
 }
 
-export function StoryInfo({ story, reasons, nextPart, onOpen }: StoryInfoProps) {
+export function StoryInfo({ mode, part, reasons }: { mode: ModeId; part: ModelPart; reasons: RealNote[] }) {
+  const { story } = part;
   return (
     <>
       <section className="section">
         <p className="section-title">Why it exists</p>
-        <p className="note">{story.problem}</p>
-        <ul className="reason-list">
-          {reasons.map((reason) => (
-            <li key={reason.value}>
-              <b>{reason.label}:</b> {reason.value}{" "}
-              <a className="card-lesson" href={SOURCES[reason.source].url} target="_blank" rel="noreferrer">
-                {SOURCES[reason.source].title}
-              </a>
-            </li>
-          ))}
-        </ul>
+        {story && <p className="note">{story.problem}</p>}
+        <p className="note">{part.why}</p>
+        <ReasonList reasons={reasons} />
       </section>
-      <section className="section">
-        <p className="section-title">When you'd do this</p>
-        <p className="note">{story.when}</p>
-        <p className="why">{story.feeds}</p>
-        {nextPart && (
-          <button type="button" className="action story-next" onClick={() => onOpen(nextPart.id)}>
-            Next step: {nextPart.title} <span aria-hidden="true">›</span>
-          </button>
-        )}
-      </section>
+      {story && (
+        <section className="section">
+          <p className="section-title">{WHEN_TITLE[mode]}</p>
+          <p className="note">{story.when}</p>
+          <p className="note">{story.feeds}</p>
+        </section>
+      )}
     </>
   );
 }
@@ -54,13 +56,12 @@ interface StoryDemoProps extends DemoProps {
   onTextChange: (text: string) => void;
 }
 
-function DemoModelLine({ lab, modelTitle }: { lab: ModelLab; modelTitle: string }) {
-  const who = `Our tiny demo model, not ${modelTitle},`;
-  if (lab.latestLoss === null) return <p className="card-lesson">{`${who} is starting to learn.`}</p>;
+function TinyGptLine({ lab }: { lab: ModelLab }) {
+  if (lab.latestLoss === null) return <p className="card-lesson">Tiny GPT is starting to learn.</p>;
   const loss = lab.latestLoss.toFixed(2);
   return (
     <p className="card-lesson">
-      {`${who} ${lab.isTrained ? "finished learning" : "is learning"}: `}
+      {`Tiny GPT ${lab.isTrained ? "finished learning" : "is learning"}: `}
       <span className="demo-model-numbers">{lab.isTrained ? `${lab.round} rounds · loss ${loss}` : `round ${lab.round} of ${TARGET_ROUNDS} · loss ${loss}`}</span>
       {" (lower loss = better guesses)"}
     </p>
@@ -69,12 +70,19 @@ function DemoModelLine({ lab, modelTitle }: { lab: ModelLab; modelTitle: string 
 
 export function StoryDemo({ story, modelTitle, text, sentence, onTextChange, ...props }: StoryDemoProps) {
   const { component: Demo, usesSentence, usesTraining } = DEMOS[story.demo];
+  const runsTinyGpt = isUsedOn(usesTraining, props.modelId);
   return (
     <section className="section watch-section" aria-label="Watch it happen">
       <h3 className="watch-heading">Watch it happen</h3>
-      <p className="card-lesson">Try it here while you read. Everything below runs live in your browser on real data.</p>
+      {runsTinyGpt ? (
+        <>
+          <p className="card-lesson">{`This demo runs Tiny GPT, our small practice model (${VECTOR_SIZE} numbers per word, ${LAYER_COUNT} layers). ${modelTitle}'s own trained numbers aren't in this app; its real sizes are in this part's facts.`}</p>
+          <TinyGptLine lab={props.tiny.lab} />
+        </>
+      ) : (
+        <p className="card-lesson">Try it here while you read. It runs live in your browser.</p>
+      )}
       {isUsedOn(usesSentence, props.modelId) && <SentenceBox text={text} sentence={sentence} onChange={onTextChange} />}
-      {isUsedOn(usesTraining, props.modelId) && <DemoModelLine lab={props.tiny.lab} modelTitle={modelTitle} />}
       <Suspense fallback={<p className="note">Loading the demo…</p>}>
         <Demo {...props} />
       </Suspense>

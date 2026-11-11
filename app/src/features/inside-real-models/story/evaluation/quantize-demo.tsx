@@ -40,7 +40,7 @@ export function QuantizeDemo({ part, modelId, tiny }: DemoProps) {
       </div>
       {part.id === "round-number" ? (
         <BeforeAfter
-          beforeLabel={`First number of "${VOCABULARY[0]}" in our tiny word table, full size`}
+          beforeLabel={`First number of "${VOCABULARY[0]}" in Tiny GPT's word table, full size`}
           before={<p className="term-big">{table[0].toFixed(6)}</p>}
           afterLabel={`Stored in ${bits} bits`}
           after={<FactRows rows={[["Scale (biggest number ÷ " + levelsFor(bits) + ")", scale.toFixed(6)], ["Number ÷ scale, rounded", `${count(one.level)}`], ["Read back: whole number × scale", one.back.toFixed(6)], ["Lost by rounding", one.error.toFixed(6)]]} />}
@@ -57,7 +57,7 @@ export function QuantizeDemo({ part, modelId, tiny }: DemoProps) {
       )}
       {part.id === "quantization" && <p className="card-lesson">{`Next-word chances after "${joinTokens(TEST_WORDS)}", from the full-size and the rounded numbers.`}</p>}
       <FactRows rows={[[`Real ${real.title}: ${count(realCount)} numbers at 16 bits`, sizeOf(realCount, 16)], [`… at ${bits} bits`, sizeOf(realCount, bits)]]} />
-      <HonestNote>{`Rounded live: every table of our tiny model, each with its own scale (its biggest number ÷ ${levelsFor(bits)}). The real sizes are worked out from the published number count, ${modelId === "gpt-2-small" ? "not from a file OpenAI published at that size; no quantization of GPT-2 is published in its paper or model card." : "and Llama 3 8B was released at 16 bits (bfloat16); Meta published no quantized version in its model card or blog."}`}</HonestNote>
+      <HonestNote>{`Rounded live: every table of Tiny GPT, each with its own scale (its biggest number ÷ ${levelsFor(bits)}). The real sizes are worked out from the published number count, ${modelId === "gpt-2-small" ? "not from a file OpenAI published at that size; no quantization of GPT-2 is published in its paper or model card." : "and Llama 3 8B was released at 16 bits (bfloat16); Meta published no quantized version in its model card or blog."}`}</HonestNote>
     </div>
   );
 }

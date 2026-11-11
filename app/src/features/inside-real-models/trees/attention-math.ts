@@ -39,7 +39,7 @@ export function attentionMathParts({ headSize, context, sources, scoreReasons, m
           id: "score",
           icon: "number",
           title: "One score",
-          summary: "How well this word's question matches one earlier word's label, as one number.",
+          summary: "How well this word's query matches one earlier word's key (its name tag), as one number.",
           copies: context,
           facts: { shape: "1", weightCount: 0, headline: { value: headSize, unit: "pairs multiplied", isComputed: true }, input: `${size} query, ${size} key`, output: "1 score", inputDetail: `${size} query numbers and ${size} key numbers`, sources, reasons: scoreReasons, isPerEarlierWord: true },
           tiny: { part: "scores", level: "number" },
@@ -63,7 +63,7 @@ export function attentionMathParts({ headSize, context, sources, scoreReasons, m
               copies: headSize,
               facts: { shape: "1 × 1", weightCount: 0, headline: { value: headSize, unit: "per score", isComputed: true }, input: "1 query, 1 key", output: "the running sum", inputDetail: "1 query number and 1 key number", sources, reasons: scoreReasons },
               tiny: { part: "scores", level: "multiply-add" },
-              explanation: "Ground zero. One query number times one key number, added to the running sum. Neither is a stored number: both were made a moment ago from the words.",
+              explanation: "One query number times one key number, added to the running sum. Neither is a stored number: both were made a moment ago from the words.",
               why: "The smallest piece of attention is the same multiply-and-add as everywhere else.",
               story: {
                 problem: "A score is built from these and nothing else. Without this step, a query and a key could not be compared at all.",
@@ -127,7 +127,7 @@ export function attentionMathParts({ headSize, context, sources, scoreReasons, m
               copies: context,
               facts: { shape: "1 × 1", weightCount: 0, headline: { value: context, unit: "per mixed number" }, input: "1 share, 1 value", output: "the running sum", inputDetail: "1 share and 1 value number", sources, reasons: mixReasons, isPerEarlierWord: true },
               tiny: { part: "mix", level: "multiply-add" },
-              explanation: "Ground zero. One share times one value number, added to the running sum.",
+              explanation: "One share times one value number, added to the running sum.",
               why: "No stored number is used here. The shares and values were both made from the words a moment ago.",
               story: {
                 problem: "This is the bottom of the mix. Without it a share could not weigh a value at all.",

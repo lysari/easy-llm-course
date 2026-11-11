@@ -17,11 +17,11 @@ function BaseModelView({ tiny }: Pick<DemoProps, "tiny">) {
         </a>
         ). So there is nothing of GPT-2's to run here.
       </HonestNote>
-      <p className="note">What a model without post-training does instead: it only continues text. Watch our tiny model, which is also only pre-trained, carry on from your sentence (change it in the box above). It never answers; it writes what usually comes next.</p>
+      <p className="note">What a model without post-training does instead: it only continues text. Watch Tiny GPT, which is also only pre-trained, carry on from your sentence (change it in the box above). It never answers; it writes what usually comes next.</p>
       <BeforeAfter
         beforeLabel="Your sentence"
         before={<p className="watch-text">{joinTokens(tiny.words)}</p>}
-        afterLabel="What the tiny model writes next, live"
+        afterLabel="What Tiny GPT writes next, live"
         after={<p className="watch-text">{written.length > 0 ? `… ${written.join(" ")}` : "It stops right away."}</p>}
       />
     </div>

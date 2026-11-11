@@ -1,6 +1,6 @@
 import type { ModeId, RealModel } from "@/features/inside-real-models/interfaces/model-part.interface";
 import { count } from "@/shared/utils/format";
-import { MODELS } from "./models";
+import { DEFAULT_MODEL, MODELS } from "./models";
 
 interface InsideRealModelsHeaderProps {
   model: RealModel;
@@ -32,10 +32,12 @@ export function InsideRealModelsHeader({ model, mode, onSwitchModel, onSwitchMod
             ))}
           </select>
         </label>
+        <span className="card-lesson">{`New here? Start with ${DEFAULT_MODEL.modes.use.title} on ${DEFAULT_MODEL.title}.`}</span>
       </div>
       <p className="top-stats">
-        <span>{`${count(model.root.facts.weightCount)} numbers`}</span>
+        <span>{`${count(model.root.facts.weightCount)} learned numbers (parameters)`}</span>
       </p>
+      <p className="top-lead">Take a real, published model apart piece by piece. Every number comes from its paper or code. Start with card 1.</p>
     </header>
   );
 }

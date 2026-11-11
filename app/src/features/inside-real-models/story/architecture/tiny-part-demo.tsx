@@ -1,7 +1,9 @@
 import "./architecture.css";
 import { useId, useState } from "react";
 import type { DemoProps } from "@/features/inside-real-models/interfaces/model-part.interface";
-import { BeforeAfter, HonestNote, NumberRow, WordPicker } from "@/features/inside-real-models/story/watch-parts";
+import { DEFAULT_MODEL, findModel } from "@/features/inside-real-models/models";
+import { isTableSize } from "@/features/inside-real-models/real-place";
+import { BeforeAfter, HonestNote, NumberRow, NumbersNote, WordPicker } from "@/features/inside-real-models/story/watch-parts";
 import { count } from "@/shared/utils/format";
 import { type Terms, tinyStep } from "./tiny-steps";
 
@@ -60,6 +62,7 @@ export function TinyPartDemo({ part, modelId, tiny }: DemoProps) {
   const pickId = useId();
   const extraId = useId();
   const shown = tinyStep(part, modelId, tiny, { word, out, extra });
+  const modelTitle = (findModel(modelId) ?? DEFAULT_MODEL).title;
   const isStepping = part.id.endsWith("multiply-add");
   const hasExtra = part.id.endsWith("-bias") || part.id === "gate-times-up" || part.id === "swiglu-number";
 
@@ -78,6 +81,7 @@ export function TinyPartDemo({ part, modelId, tiny }: DemoProps) {
           <input id={extraId} type="range" min={EXTRA_RANGE.min} max={EXTRA_RANGE.max} step={EXTRA_RANGE.step} value={extra} onChange={(event) => setExtra(Number(event.target.value))} />
         </div>
       )}
+      <NumbersNote />
       <BeforeAfter
         before={shown.before.map((list) => <NumberRow key={list.label} label={list.label} values={list.values} picked={isStepping && list.values.length === shown.terms?.pairs.length ? Math.min(term, list.values.length - 1) : undefined} />)}
         after={shown.after.map((list) => <NumberRow key={list.label} label={list.label} values={list.values} />)}
@@ -85,7 +89,7 @@ export function TinyPartDemo({ part, modelId, tiny }: DemoProps) {
       <p className="formula-line">{shown.formula}</p>
       {shown.terms && isStepping && <OneTerm terms={shown.terms} index={term} onIndex={setTerm} />}
       {shown.terms && !isStepping && <AllTerms terms={shown.terms} />}
-      <HonestNote>{`${shown.note} The real ${part.title} in this model: ${part.facts.shape}.`}</HonestNote>
+      <HonestNote>{`${shown.note} In ${modelTitle}, ${isTableSize(part.facts.shape) ? "this table is" : "this part's shape is"} ${part.facts.shape}.`}</HonestNote>
     </div>
   );
 }

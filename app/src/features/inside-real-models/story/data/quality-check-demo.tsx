@@ -36,7 +36,7 @@ export function QualityCheckDemo({ modelId }: DemoProps) {
         <div className="watch-box">
           <p className="section-title">GPT-2's real rule, from its paper</p>
           <p className="note">
-            Keep a web page only if the Reddit post that linked to it got at least {GPT_2_KARMA} karma. The rule looks at the link, not at the words, so type a karma number. This app can't reach Reddit.
+            Keep a web page only if the Reddit post that linked to it got at least {GPT_2_KARMA} karma. Karma: the score a Reddit post gets from people's up-votes. The rule looks at the link, not at the words, so type a karma number. This app can't reach Reddit.
           </p>
           <div className="watch-slider">
             <label htmlFor={karmaId}>Karma of the post</label>

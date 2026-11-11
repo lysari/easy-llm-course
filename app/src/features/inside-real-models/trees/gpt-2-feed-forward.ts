@@ -35,7 +35,7 @@ const gelu: ModelPart = {
       copies: EXPANDED,
       facts: { shape: "1", weightCount: 0, headline: { value: EXPANDED, unit: "per word", isComputed: true }, input: "1 number", output: "1 number", sources: GPT_2_SETTINGS, reasons: [GPT_2_GELU] },
       tiny: { part: "relu", level: "number" },
-      explanation: "Ground zero. The number times its own chance Φ(x): one multiply on two numbers.",
+      explanation: "The number times its own chance Φ(x): one multiply on two numbers.",
       why: "Even the bend is a multiply. Φ(x) comes from a fixed formula, not from training.",
       story: {
         problem: "The bend works on each number on its own. Big positive numbers pass almost unchanged and negative ones shrink toward 0; without it the number would pass through straight.",
@@ -56,7 +56,7 @@ export const gpt2FeedForward: ModelPart = {
   title: "Feed-forward",
   summary: "Works on each word alone, picking out patterns stored in its tables.",
   copies: 1,
-  facts: { shape: "768 × 3,072 + 3,072 × 768", weightCount: 4_722_432, headline: { value: 4_722_432, unit: "numbers", isComputed: true }, input: "768 per word", output: "768 per word", inputDetail: "768 numbers per word", outputDetail: "768 numbers per word", sources: GPT_2_SETTINGS, reasons: [GPT_2_MLP, GPT_2_NO_REASON] },
+  facts: { shape: "768 × 3,072 + 3,072 × 768", weightCount: 4_722_432, headline: { value: 4_722_432, unit: "numbers", isComputed: true }, input: "768 per word", output: "768 new per word", inputDetail: "768 numbers per word", outputDetail: "768 new numbers per word, added back onto the word", sources: GPT_2_SETTINGS, reasons: [GPT_2_MLP, GPT_2_NO_REASON] },
   tiny: { part: "feed-forward", level: "whole" },
   explanation: "Works on each word on its own: expand 768 numbers to 3,072, bend them with GELU, and contract back to 768. The result is added back onto the word's numbers.",
   why: "About two thirds of each layer's numbers live here: 4,722,432 of its 7,087,872.",

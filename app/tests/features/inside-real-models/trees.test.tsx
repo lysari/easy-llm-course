@@ -5,6 +5,7 @@ import { ModelLab } from "@/core/model/lab";
 import type { ModeId, ModelPart } from "@/features/inside-real-models/interfaces/model-part.interface";
 import { MODELS, activeIdOf, matchingPath, openPath, pathIdsOf, pathUrl, readPath } from "@/features/inside-real-models/models";
 import { PartCard } from "@/features/inside-real-models/part-card";
+import { stepsTitleOf } from "@/features/inside-real-models/part-column";
 import { PartDrawer } from "@/features/inside-real-models/part-drawer";
 import { RUNS_LABEL, keyFactOf, placeOf, runsOf, shareOf, showAmount } from "@/features/inside-real-models/real-place";
 import { readSentence } from "@/features/inside-real-models/sentence";
@@ -20,10 +21,11 @@ const SUMMARY_LIMIT = 90;
 const CHIP_LIMIT = 21;
 const IN_OUT_LIMIT = 35;
 const KEY_FACT_LIMIT = 100;
-const TINY_COMPARISON = /tiny model|our tiny|tiny corpus|lesson model/i;
+const TINY_COMPARISON = /tiny model|our tiny|tiny corpus|lesson model|tiny gpt/i;
 const SENTENCES = ["my dog is hungry , so i give it a", "My ELEPHANT is hungry, so", ""];
 
 const allParts = (part: ModelPart): ModelPart[] => [part, ...(part.children ?? []).flatMap(allParts)];
+const escaped = (text: string) => text.replaceAll("'", "&#x27;").replaceAll('"', "&quot;");
 const urlOf = (modelIndex: number, ids: string[]) => pathUrl(MODELS[modelIndex].id, readPath(MODELS[modelIndex], ids));
 
 function trainedLab() {
@@ -59,7 +61,7 @@ describe.each(MODELS)("$title", (model) => {
       expect(sum).toBe(part.facts.weightCount);
     });
 
-    test("every branch ends at ground zero", () => {
+    test("every branch ends at a smallest step", () => {
       for (const part of parts) {
         expect(Boolean(part.children?.length) !== Boolean(part.groundZero), part.id).toBe(true);
       }
@@ -138,20 +140,24 @@ describe.each(MODELS)("$title", (model) => {
         const tiny = viewTiny(lab, sentence.words);
         for (const part of parts) {
           const place = placeOf(model, root, part);
-          const card = renderToStaticMarkup(<PartCard ref={null} root={root} modelTitle={model.title} part={part} place={place} index={0} isSelected={false} isActive={false} isOpen={false} onSelect={() => {}} onDetails={() => {}} />);
-          const drawer = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelId={model.id} modelTitle={model.title} part={part} place={place} tiny={tiny} text={text} sentence={sentence} onTextChange={() => {}} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
+          const card = renderToStaticMarkup(<PartCard ref={null} root={root} part={part} place={place} index={0} isSelected={false} isActive={false} isOpen={false} onSelect={() => {}} onDetails={() => {}} />);
+          const drawer = renderToStaticMarkup(<PartDrawer ref={null} mode={mode} root={root} modelId={model.id} modelTitle={model.title} part={part} place={place} tiny={tiny} text={text} sentence={sentence} onTextChange={() => {}} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
           const info = drawer.split('<div class="drawer-panel">')[0];
-          for (const html of [card, drawer]) {
-            expect(html, `${part.id} on "${text}"`).not.toMatch(/undefined|NaN|Infinity|\[object|\$\{/);
-            expect(html, part.id).toContain(part.summary.replaceAll("'", "&#x27;").replaceAll('"', "&quot;"));
-            expect(html, part.id).toContain(`<dt>Real ${model.title}</dt>`);
-          }
+          for (const html of [card, drawer]) expect(html, `${part.id} on "${text}"`).not.toMatch(/undefined|NaN|Infinity|\[object|\$\{/);
+          expect(card, part.id).toContain(escaped(part.summary));
+          expect(info, part.id).toContain(escaped(part.explanation));
+          expect(card, part.id).not.toContain(`Real ${model.title}`);
           expect(card, part.id).not.toMatch(/tiny/i);
           expect(info, part.id).not.toMatch(TINY_COMPARISON);
-          expect(info, part.id).toContain("<span>Where</span>");
+          expect(info, part.id).toContain("<span>Goes in</span>");
         }
       }
     });
+  });
+
+  test("the steps column names the model once, step by step to use it and stage by stage to build it", () => {
+    expect(stepsTitleOf(model, "use")).toBe(`${model.title}, step by step`);
+    expect(stepsTitleOf(model, "build")).toBe(`${model.title}, stage by stage`);
   });
 
   test("tokenization and generation hold no numbers", () => {
@@ -190,7 +196,9 @@ describe("where a part sits in the real model", () => {
     const table = placeIn(gpt2, "use", "word-table");
     expect(shareOf(table.part, table.place, true)).toBe("38,597,376 of 124,439,808 (31%)");
     const layer = placeIn(gpt2, "use", "layer");
-    expect(keyFactOf(layer.part, layer.place, false).value).toBe("68.3% for all 12");
+    expect(keyFactOf(layer.part, layer.place, false)).toMatchObject({ label: "Part of the model's 124M learned numbers", value: "68.3% for all 12" });
+    const llamaTable = placeIn(llama, "use", "word-table");
+    expect(keyFactOf(llamaTable.part, llamaTable.place, false).label).toBe("Part of the model's 8.03B learned numbers");
     expect(shareOf(layer.part, layer.place, true)).toBe("85,054,464 of 124,439,808 (68.3%), all 12 together");
     const architecture = placeIn(llama, "build", "architecture");
     expect(shareOf(architecture.part, architecture.place, true)).toBeNull();
@@ -219,7 +227,7 @@ describe("paths", () => {
     expect(urlOf(0, ["build", "architecture", "model", "word-table"])).toBe("/inside-real-models/gpt-2-small/build/architecture/model/word-table");
   });
 
-  test("a wrong id or a ground-zero part stops at the last level with parts", () => {
+  test("a wrong id or a smallest-step part stops at the last level with parts", () => {
     expect(urlOf(0, ["use", "layers", "nope", "attention"])).toBe("/inside-real-models/gpt-2-small/use/layers");
     expect(urlOf(0, ["use", "tokenize", "lookup"])).toBe("/inside-real-models/gpt-2-small/use/tokenize");
   });

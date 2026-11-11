@@ -10,7 +10,7 @@ import { DEMOS, isUsedOn } from "@/features/inside-real-models/story/story-demos
 import { viewTiny } from "@/features/inside-real-models/tiny-parts";
 import { SOURCES } from "@/features/inside-real-models/trees/sources";
 
-const INFO_TITLES = ["What it does", "Why it exists", "When you&#x27;d do this", "What goes in and out"];
+const WHEN_TITLES = { use: "When it runs", build: "When you&#x27;d do this" };
 
 const allParts = (part: ModelPart): ModelPart[] => [part, ...(part.children ?? []).flatMap(allParts)];
 
@@ -49,18 +49,23 @@ describe.each(MODELS)("$title why, watch and when", (model) => {
     }
   });
 
-  test.each(["use", "build"] as const)("in %s mode the wide drawer puts why and when after What it does, and the demo in its own column", (mode) => {
+  test.each(["use", "build"] as const)("in %s mode the wide drawer puts why and when after What it does, the real facts and the next step after them, and the demo in its own column", (mode) => {
     const root = model.modes[mode];
+    const infoTitles = ["What it does", "Why it exists", WHEN_TITLES[mode], `The real part in ${model.title}`];
     for (const part of allParts(root).filter((each) => each.story)) {
       const nextPart = parts.find((each) => each.id === part.story?.nextId);
-      const html = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelId={model.id} modelTitle={model.title} part={part} place={placeOf(model, root, part)} tiny={tiny} text="" sentence={sentence} onTextChange={() => {}} nextPart={nextPart} onOpen={() => {}} onClose={() => {}} />);
-      const places = INFO_TITLES.map((title) => html.indexOf(`<p class="section-title">${title}</p>`));
+      const html = renderToStaticMarkup(<PartDrawer ref={null} mode={mode} root={root} modelId={model.id} modelTitle={model.title} part={part} place={placeOf(model, root, part)} tiny={tiny} text="" sentence={sentence} onTextChange={() => {}} nextPart={nextPart} onOpen={() => {}} onClose={() => {}} />);
+      const places = infoTitles.map((title) => html.indexOf(`<p class="section-title">${title}</p>`));
       const panel = html.indexOf('<div class="drawer-panel">');
       expect(html, part.id).toContain('class="drawer drawer--wide"');
       expect(places.every((place) => place >= 0 && place < panel), part.id).toBe(true);
       expect([...places].sort((a, b) => a - b), part.id).toEqual(places);
       expect(html.indexOf("Watch it happen", panel), part.id).toBeGreaterThan(panel);
-      if (nextPart) expect(html, part.id).toContain(`Next step: ${nextPart.title.replaceAll("'", "&#x27;")}`);
+      if (nextPart) {
+        const next = html.indexOf(`Next step: ${nextPart.title.replaceAll("'", "&#x27;")}`);
+        expect(next, part.id).toBeGreaterThan(places[places.length - 1]);
+        expect(next, part.id).toBeLessThan(panel);
+      }
     }
   });
 
@@ -69,16 +74,17 @@ describe.each(MODELS)("$title why, watch and when", (model) => {
     for (const part of allParts(root)) {
       if (!part.story) continue;
       const demo = DEMOS[part.story.demo];
-      const html = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelId={model.id} modelTitle={model.title} part={part} place={placeOf(model, root, part)} tiny={tiny} text="" sentence={sentence} onTextChange={() => {}} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
+      const html = renderToStaticMarkup(<PartDrawer ref={null} mode={mode} root={root} modelId={model.id} modelTitle={model.title} part={part} place={placeOf(model, root, part)} tiny={tiny} text="" sentence={sentence} onTextChange={() => {}} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
       const panel = html.slice(html.indexOf('<div class="drawer-panel">'));
       expect(panel.includes("Your sentence"), part.id).toBe(isUsedOn(demo.usesSentence, model.id));
-      expect(panel.includes(`Our tiny demo model, not ${model.title},`), part.id).toBe(isUsedOn(demo.usesTraining, model.id));
+      expect(panel.includes("This demo runs Tiny GPT, our small practice model"), part.id).toBe(isUsedOn(demo.usesTraining, model.id));
+      expect(panel.includes("Tiny GPT is starting to learn."), part.id).toBe(isUsedOn(demo.usesTraining, model.id));
     }
   });
 
   test("a part with no story keeps the narrow drawer", () => {
     const part: ModelPart = { ...(model.modes.use.children?.[0] ?? model.modes.use), story: undefined };
-    const html = renderToStaticMarkup(<PartDrawer ref={null} root={model.modes.use} modelId={model.id} modelTitle={model.title} part={part} place={placeOf(model, model.modes.use, part)} tiny={tiny} text="" sentence={sentence} onTextChange={() => {}} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
+    const html = renderToStaticMarkup(<PartDrawer ref={null} mode="use" root={model.modes.use} modelId={model.id} modelTitle={model.title} part={part} place={placeOf(model, model.modes.use, part)} tiny={tiny} text="" sentence={sentence} onTextChange={() => {}} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
     expect(html).toContain('class="drawer"');
     expect(html).not.toContain("drawer-panel");
   });
@@ -100,5 +106,38 @@ describe("Copy one document in", () => {
     expect(gpt2Reasons.map((reason) => reason.value).join(" ")).toContain("mostly unintelligible");
     const llamaReasons = gatherOf(llama.modes.build)?.facts.reasons ?? [];
     expect(llamaReasons.find((reason) => reason.label === "How text was copied out of pages")?.value).toStartWith("Not published");
+  });
+});
+
+describe("reasons in the drawer", () => {
+  const sentence = readSentence("");
+  const tiny = viewTiny(new ModelLab(), sentence.words);
+  const drawerOf = (model: (typeof MODELS)[number], mode: "use" | "build", id: string) => {
+    const root = model.modes[mode];
+    const part = allParts(root).find((each) => each.id === id);
+    if (!part) throw new Error(id);
+    return renderToStaticMarkup(<PartDrawer ref={null} mode={mode} root={root} modelId={model.id} modelTitle={model.title} part={part} place={placeOf(model, root, part)} tiny={tiny} text="" sentence={sentence} onTextChange={() => {}} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />).split('<div class="drawer-panel">')[0];
+  };
+
+  test("a reason already shown as a fact row is not repeated", () => {
+    const html = drawerOf(MODELS[0], "use", "apply-merge");
+    expect(html.split("counted line by line").length - 1).toBe(1);
+  });
+
+  test.each(MODELS)("$title: the makers' reasons sit under Why it exists and quotes from the code under From the source code", (model) => {
+    const html = drawerOf(model, "use", "word-table");
+    const why = html.indexOf("<p class=\"section-title\">Why it exists</p>");
+    const code = html.indexOf("<p class=\"section-title\">From the source code</p>");
+    const notPublished = html.indexOf("<b>" + (model.id === "gpt-2-small" ? "OpenAI&#x27;s reason" : "Meta&#x27;s reason") + ":</b> Not published.");
+    expect(why).toBeGreaterThan(0);
+    expect(notPublished).toBeGreaterThan(why);
+    expect(code).toBeGreaterThan(notPublished);
+    expect(html.indexOf(model.id === "gpt-2-small" ? "In GPT-2&#x27;s code" : "In Llama 3&#x27;s code")).toBeGreaterThan(code);
+  });
+
+  test.each(MODELS)("$title: the long Not published reason shows only on the whole model", (model) => {
+    const parts = [model.modes.use, model.modes.build].flatMap(allParts);
+    const withLong = parts.filter((part) => (part.facts.reasons ?? []).some((reason) => reason.label.endsWith("reasons for each part")));
+    expect([...new Set(withLong.map((part) => part.id))].sort()).toEqual(["architecture", "model"]);
   });
 });

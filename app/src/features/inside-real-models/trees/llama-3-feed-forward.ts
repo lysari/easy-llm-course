@@ -54,7 +54,7 @@ const swiglu: ModelPart = {
           copies: 1,
           facts: { shape: "1 × 1", weightCount: 0, headline: { value: 1, unit: "multiply", isComputed: true }, input: "1 gate, its sigmoid", output: "1 number", inputDetail: "1 gate number and its sigmoid", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_FEED_FORWARD] },
           tiny: { part: "relu", level: "number" },
-          explanation: "Ground zero. The gate number times its own sigmoid, a number from 0 to 1. One multiply on two numbers.",
+          explanation: "The gate number times its own sigmoid, a number from 0 to 1. One multiply on two numbers.",
           why: "Sigmoid comes from a fixed formula, not from training.",
           story: {
             problem: "The gate number has to become a soft on-off amount. SiLU squashes it: big positive numbers pass, negative ones drop to near 0.",
@@ -75,7 +75,7 @@ const swiglu: ModelPart = {
           copies: 1,
           facts: { shape: "1 × 1", weightCount: 0, headline: { value: 1, unit: "multiply", isComputed: true }, input: "1 SiLU, 1 up", output: "1 number", inputDetail: "1 SiLU number and 1 up number", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_FEED_FORWARD] },
           tiny: { part: "relu", level: "number" },
-          explanation: "Ground zero. The SiLU number times the matching up number. One multiply on two numbers.",
+          explanation: "The SiLU number times the matching up number. One multiply on two numbers.",
           why: "When the gate is near 0, the up number is shut out.",
           story: {
             problem: "This multiply is where the gate does its job: a gate near 0 shuts its up number out, a big one lets it through.",
@@ -98,7 +98,7 @@ export const llama3FeedForward: ModelPart = {
   title: "Feed-forward",
   summary: "Works on each word alone, picking out patterns stored in its tables.",
   copies: 1,
-  facts: { shape: "3 tables of 4,096 × 14,336", weightCount: 176_160_768, headline: { value: 176_160_768, unit: "numbers", isComputed: true }, input: "4,096 per word", output: "4,096 per word", inputDetail: "4,096 numbers per word", outputDetail: "4,096 numbers per word", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_FEED_FORWARD, LLAMA_3_NO_REASON] },
+  facts: { shape: "3 tables of 4,096 × 14,336", weightCount: 176_160_768, headline: { value: 176_160_768, unit: "numbers", isComputed: true }, input: "4,096 per word", output: "4,096 new per word", inputDetail: "4,096 numbers per word", outputDetail: "4,096 new numbers per word, added back onto the word", sources: LLAMA_3_SETTINGS, reasons: [LLAMA_3_FEED_FORWARD, LLAMA_3_NO_REASON] },
   tiny: { part: "feed-forward", level: "whole" },
   explanation: "Works on each word on its own: two tables expand 4,096 numbers to 14,336 (gate and up), SwiGLU mixes them, and the down table contracts back to 4,096.",
   why: "About four fifths of each layer's numbers live here: 176,160,768 of its 218,112,000.",
@@ -126,7 +126,7 @@ export const llama3FeedForward: ModelPart = {
       inputDetail: "4,096 numbers for one word",
       tinyPart: "expand",
       sources: LLAMA_3_SETTINGS,
-      missing: "Our tiny model has no gate table. Its one expand table is the nearest part.",
+      missing: "Tiny GPT has no gate table. Its one expand table is the nearest part.",
       explanation: "Spreads a word's 4,096 numbers out to 14,336 gate numbers, which decide how much of each up number gets through.",
       why: "It is a second expand table, used only to switch the first one's numbers on and off.",
       story: {

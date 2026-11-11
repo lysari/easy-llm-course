@@ -41,6 +41,10 @@ export function NumberRow({ label, values, picked, onPick }: NumberRowProps) {
   );
 }
 
+export function NumbersNote() {
+  return <p className="card-lesson">These numbers mean nothing alone: training sets them. Watch how they change, not their exact values.</p>;
+}
+
 export function BeforeAfter({ before, after, beforeLabel = "Before", afterLabel = "After" }: { before: ReactNode; after: ReactNode; beforeLabel?: string; afterLabel?: string }) {
   return (
     <div className="before-after">

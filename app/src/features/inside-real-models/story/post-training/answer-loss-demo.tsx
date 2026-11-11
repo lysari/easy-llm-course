@@ -51,7 +51,7 @@ export function AnswerLossDemo({ part, modelId, tiny }: DemoProps) {
           />
         }
       />
-      <HonestNote>{`Each loss is live from our tiny model's current numbers. The split into question and answer is yours, made by hand here; our tiny model was never fine-tuned. ${modelId === "gpt-2-small" ? "GPT-2 had no fine-tuning at all." : "Meta's own SFT examples for Llama 3 are not published."}`}</HonestNote>
+      <HonestNote>{`Each loss is live from Tiny GPT's current numbers. The split into question and answer is yours, made by hand here; Tiny GPT was never fine-tuned. ${modelId === "gpt-2-small" ? "GPT-2 had no fine-tuning at all." : "Meta's own SFT examples for Llama 3 are not published."}`}</HonestNote>
     </div>
   );
 }

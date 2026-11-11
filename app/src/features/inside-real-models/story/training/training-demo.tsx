@@ -34,7 +34,7 @@ export function TrainingDemo({ part, modelId }: DemoProps) {
 
   return (
     <div className="watch">
-      <p className="note">{`A fresh copy of our tiny model, trained by you, one round at a time. Each round runs all ${count(TRAINING_LINES.length)} hand-written sentences, ${count(TRAINING_LINES.reduce((sum, each) => sum + each.times, 0))} with repeats.`}</p>
+      <p className="note">{`A fresh copy of Tiny GPT, our small practice model, separate from the one in the other demos. You train it here, one round at a time. Each round runs all ${count(TRAINING_LINES.length)} hand-written sentences, ${count(TRAINING_LINES.reduce((sum, each) => sum + each.times, 0))} with repeats.`}</p>
       <div className="watch-controls">
         <button type="button" className="action action--strong" onClick={() => train(1)} disabled={lab.isTrained}>
           Run one round
@@ -95,7 +95,7 @@ export function TrainingDemo({ part, modelId }: DemoProps) {
           after={<FactRows rows={[["Value", change ? fixed(change.after) : "–"], ["Step worked out from m and v", change ? fixed(-adam.step, 5) : "–"], ["Step the model really took", change ? fixed(change.after - change.before, 5) : "–"]]} />}
         />
       )}
-      <HonestNote>{`This is our tiny model training live: ${count(TRAINING_LINES.length)} hand-written sentences, Adam, ${TARGET_ROUNDS} rounds. ${modelId === "gpt-2-small" ? "GPT-2's optimizer, rounds and loss values are not published." : "Llama 3's optimizer, batch size and loss values are not published for the 8B model."} The real model's published numbers are on the left.`}</HonestNote>
+      <HonestNote>{`This is Tiny GPT training live: ${count(TRAINING_LINES.length)} hand-written sentences, Adam, ${TARGET_ROUNDS} rounds. ${modelId === "gpt-2-small" ? "GPT-2's optimizer, rounds and loss values are not published." : "Llama 3's optimizer, batch size and loss values are not published for the 8B model."} The real model's published numbers are in this part's facts.`}</HonestNote>
     </div>
   );
 }

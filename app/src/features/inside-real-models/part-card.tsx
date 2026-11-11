@@ -15,7 +15,6 @@ export const DRAWER_ID = "inside-real-models-drawer";
 interface PartCardProps {
   ref: Ref<HTMLElement>;
   root: ModelPart;
-  modelTitle: string;
   part: ModelPart;
   place: PartPlace;
   index: number;
@@ -28,13 +27,11 @@ interface PartCardProps {
 
 export const tagOf = (part: ModelPart): Status | undefined => (part.groundZero ? "ground-zero" : undefined);
 
-const nameOf = (part: ModelPart) => (part.copies > 1 ? `${part.title} × ${count(part.copies)}` : part.title);
-
 const stepOf = (part: ModelPart, root: ModelPart) => (root.children?.indexOf(part) ?? -1) + 1;
 
 export function titleOf(part: ModelPart, root: ModelPart) {
   const step = stepOf(part, root);
-  return step > 0 ? `${step} ${nameOf(part)}` : nameOf(part);
+  return step > 0 ? `${step} ${part.title}` : part.title;
 }
 
 export const partsOf = (children: ModelPart[]) => `${children.length} ${children.length === 1 ? "part" : "parts"}`;
@@ -42,7 +39,7 @@ export const partsOf = (children: ModelPart[]) => `${children.length} ${children
 export const numbersOf = (part: ModelPart) =>
   part.copies > 1 && part.facts.weightCount > 0 ? `${count(part.facts.weightCount)} each · ${count(part.facts.weightCount * part.copies)} in all` : count(part.facts.weightCount);
 
-export function PartCard({ ref, root, modelTitle, part, place, index, isSelected, isActive, isOpen, onSelect, onDetails }: PartCardProps) {
+export function PartCard({ ref, root, part, place, index, isSelected, isActive, isOpen, onSelect, onDetails }: PartCardProps) {
   const step = stepOf(part, root);
   const tag = tagOf(part);
   return (
@@ -63,16 +60,29 @@ export function PartCard({ ref, root, modelTitle, part, place, index, isSelected
       <div className="part-card-head">
         {step > 0 ? <span className="step-badge">{step}</span> : <ConceptIcon name={part.icon} size="card" />}
         <div className="part-card-name">
-          <h3 className="card-title">{nameOf(part)}</h3>
+          <h3 className="card-title">{part.title}</h3>
           {tag && <StatusPill status={tag} />}
+          {part.copies > 1 && <span className="part-card-copies">{`${count(part.copies)} of these`}</span>}
         </div>
       </div>
       <div className="card-body">
         <p className="part-summary">{part.summary}</p>
-        <InOut facts={part.facts} isDetailed={false} />
-        <PartNumbers modelTitle={modelTitle} part={part} place={place} isExact={false} />
+        {part.term && <p className="card-lesson">{part.term}</p>}
+        <InOut facts={part.facts} />
+        <PartNumbers part={part} place={place} />
         <div className="part-card-foot">
-          {part.children && <span>{partsOf(part.children)} <span aria-hidden="true">›</span></span>}
+          {part.children && (
+            <button
+              type="button"
+              className="action"
+              onClick={(event) => {
+                event.stopPropagation();
+                onSelect();
+              }}
+            >
+              {`Look inside (${partsOf(part.children)})`} <span aria-hidden="true">›</span>
+            </button>
+          )}
           <button
             type="button"
             className="action"
@@ -81,7 +91,7 @@ export function PartCard({ ref, root, modelTitle, part, place, index, isSelected
               onDetails();
             }}
           >
-            Details <span aria-hidden="true">›</span>
+            Explain this <span aria-hidden="true">›</span>
           </button>
         </div>
       </div>
