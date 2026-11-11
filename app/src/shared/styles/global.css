@@ -65,7 +65,7 @@ a:where(:hover) {
 }
 
 :focus-visible {
-  outline: var(--border-thick) solid var(--link);
+  outline: var(--border-thick) solid var(--focus);
   outline-offset: var(--space-edge);
 }
 
@@ -185,6 +185,10 @@ a:where(:hover) {
   font-size: var(--text-micro);
   font-weight: var(--weight-medium);
   white-space: nowrap;
+}
+
+.pill-mark {
+  display: var(--pill-mark-display);
 }
 
 .pill::before {

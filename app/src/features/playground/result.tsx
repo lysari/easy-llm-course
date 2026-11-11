@@ -20,9 +20,9 @@ interface ResultProps {
 function StatusPill({ state: { run, isStale, isAutoTrain } }: { state: PlaygroundState }) {
   if (run?.isBroken) return <span className="pill pill--needs">Numbers blew up</span>;
   if (isStale && !isAutoTrain) return <span className="pill pill--needs">Settings changed</span>;
-  if (!run) return <span className="pill pill--queued">• Not trained</span>;
-  if (run.isDone) return <span className="pill pill--done">✓ Trained</span>;
-  return <span className="pill pill--running"><i className="spinner" /> Training</span>;
+  if (!run) return <span className="pill pill--queued"><span className="pill-mark" aria-hidden="true">• </span>Not trained</span>;
+  if (run.isDone) return <span className="pill pill--done"><span className="pill-mark" aria-hidden="true">✓ </span>Trained</span>;
+  return <span className="pill pill--running"><span className="pill-mark" aria-hidden="true"><i className="spinner" /></span>Training</span>;
 }
 
 function resultNote(activeRun: PlaygroundRun) {

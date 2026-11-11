@@ -333,7 +333,7 @@
 }
 
 .sentence-field:has(:focus-visible) {
-  outline: var(--border-thick) solid var(--link);
+  outline: var(--border-thick) solid var(--focus);
   outline-offset: var(--space-edge);
 }
 
