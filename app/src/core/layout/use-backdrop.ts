@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 
-export type Backdrop = "wash" | "photo";
+export type Backdrop = "wash" | "meadow" | "sky" | "citrus" | "photo";
 
 const STORAGE_KEY = "backdrop";
 
+export function parseBackdrop(saved: string | null): Backdrop {
+  return saved === "meadow" || saved === "sky" || saved === "citrus" || saved === "photo" ? saved : "wash";
+}
+
 function savedBackdrop(): Backdrop {
   try {
-    return localStorage.getItem(STORAGE_KEY) === "photo" ? "photo" : "wash";
+    return parseBackdrop(localStorage.getItem(STORAGE_KEY));
   } catch {
     return "wash";
   }

@@ -148,12 +148,17 @@
   padding: 0 var(--space-item);
 }
 
-.side-switch {
+.side-switch,
+.side-swatches {
   display: flex;
   align-items: center;
   gap: var(--space-tight);
   color: var(--ink-soft);
   font-size: var(--text-micro);
+}
+
+.side-swatches {
+  flex-wrap: wrap;
 }
 
 .side-switch-label {
@@ -178,6 +183,51 @@
   border-color: var(--glass-edge);
   background: var(--side-active);
   color: var(--ink);
+}
+
+.side-swatch-row {
+  display: flex;
+  flex-basis: 100%;
+  gap: var(--space-item);
+  padding: var(--space-tight) var(--space-tight) 0;
+}
+
+.side-swatch {
+  width: var(--swatch-size);
+  height: var(--swatch-size);
+  padding: 0;
+  border: var(--border-thin) solid var(--glass-edge);
+  border-radius: var(--radius-circle);
+  box-shadow: var(--shadow-button);
+  transition: box-shadow var(--motion-fast);
+}
+
+.side-swatch[aria-pressed="true"] {
+  box-shadow: 0 0 0 var(--border-thick) var(--side-active), 0 0 0 var(--swatch-ring) var(--ink);
+}
+
+.side-swatch:focus-visible {
+  outline-offset: var(--swatch-focus-offset);
+}
+
+.side-swatch--wash {
+  background: var(--mesh-wash);
+}
+
+.side-swatch--meadow {
+  background: var(--mesh-meadow);
+}
+
+.side-swatch--sky {
+  background: var(--mesh-sky);
+}
+
+.side-swatch--citrus {
+  background: var(--mesh-citrus);
+}
+
+.side-swatch--photo {
+  background: var(--photo-blur) center / cover;
 }
 
 .photo-credit {

@@ -4,10 +4,12 @@ import { INSIDE_REAL_MODELS_PATH } from "@/features/inside-real-models/inside-re
 import type { StageId } from "@/features/lessons/interfaces/story.interface";
 import { ConceptIcon } from "@/shared/components/concept-icon";
 import { Logo } from "./logo";
-import { useBackdrop } from "./use-backdrop";
+import { type Backdrop, useBackdrop } from "./use-backdrop";
 import { useLook } from "./use-look";
 
 const PHOTO_URL = "https://unsplash.com/photos/blue-ocean-water-surface-is-calm-and-serene-yWCfIqyUapk";
+
+const BACKDROP_LABELS: Record<Backdrop, string> = { wash: "Default", meadow: "Meadow", sky: "Sky", citrus: "Citrus", photo: "Photo" };
 
 interface SidebarProps {
   isLessons: boolean;
@@ -71,10 +73,50 @@ export function Sidebar({ isLessons, stageId, onSelectStage }: SidebarProps) {
           <button type="button" aria-pressed={look === "dark"} onClick={() => setLook("dark")}>Dark</button>
           <button type="button" aria-pressed={look === "fresh"} onClick={() => setLook("fresh")}>Fresh</button>
         </div>
-        <div className="side-switch" role="group" aria-label="Background">
-          <span className="side-switch-label" aria-hidden="true">Background</span>
-          <button type="button" aria-pressed={backdrop === "wash"} onClick={() => setBackdrop("wash")}>Wash</button>
-          <button type="button" aria-pressed={backdrop === "photo"} onClick={() => setBackdrop("photo")}>Photo</button>
+        <div className="side-swatches" role="group" aria-label="Background">
+          <span className="side-switch-label" aria-hidden="true">Background · {BACKDROP_LABELS[backdrop]}</span>
+          <div className="side-swatch-row">
+            <button
+              type="button"
+              className="side-swatch side-swatch--wash"
+              aria-label={BACKDROP_LABELS.wash}
+              aria-pressed={backdrop === "wash"}
+              title={BACKDROP_LABELS.wash}
+              onClick={() => setBackdrop("wash")}
+            />
+            <button
+              type="button"
+              className="side-swatch side-swatch--meadow"
+              aria-label={BACKDROP_LABELS.meadow}
+              aria-pressed={backdrop === "meadow"}
+              title={BACKDROP_LABELS.meadow}
+              onClick={() => setBackdrop("meadow")}
+            />
+            <button
+              type="button"
+              className="side-swatch side-swatch--sky"
+              aria-label={BACKDROP_LABELS.sky}
+              aria-pressed={backdrop === "sky"}
+              title={BACKDROP_LABELS.sky}
+              onClick={() => setBackdrop("sky")}
+            />
+            <button
+              type="button"
+              className="side-swatch side-swatch--citrus"
+              aria-label={BACKDROP_LABELS.citrus}
+              aria-pressed={backdrop === "citrus"}
+              title={BACKDROP_LABELS.citrus}
+              onClick={() => setBackdrop("citrus")}
+            />
+            <button
+              type="button"
+              className="side-swatch side-swatch--photo"
+              aria-label={BACKDROP_LABELS.photo}
+              aria-pressed={backdrop === "photo"}
+              title={BACKDROP_LABELS.photo}
+              onClick={() => setBackdrop("photo")}
+            />
+          </div>
         </div>
         {backdrop === "photo" && (
           <p className="photo-credit">
