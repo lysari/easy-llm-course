@@ -40,7 +40,9 @@ body::after {
 p,
 h1,
 h2,
-h3 {
+h3,
+h4,
+h5 {
   margin: 0;
 }
 
@@ -50,7 +52,8 @@ button {
   cursor: pointer;
 }
 
-button:disabled {
+button:disabled,
+button[aria-disabled="true"] {
   cursor: default;
   opacity: var(--opacity-dim);
 }

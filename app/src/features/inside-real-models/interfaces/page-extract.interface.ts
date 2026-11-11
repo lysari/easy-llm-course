@@ -1,3 +1,5 @@
+import type { ReadabilityTrace } from "./readability-trace.interface";
+
 export interface PageExtract {
   title: string;
   text: string;
@@ -9,4 +11,5 @@ export interface PageExtract {
   scriptCount: number;
   styleCount: number;
   droppedText: string[];
+  trace: ReadabilityTrace | null;
 }

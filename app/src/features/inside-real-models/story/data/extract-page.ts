@@ -1,6 +1,7 @@
 import { Readability } from "@mozilla/readability";
 import type { PageExtract } from "@/features/inside-real-models/interfaces/page-extract.interface";
 import { count } from "@/shared/utils/format";
+import { traceReadability } from "./readability-trace";
 
 export const READABILITY_VERSION = "0.6.0";
 
@@ -46,7 +47,9 @@ export function extractPage(doc: Document, html: string): PageExtract {
   const scriptCount = scripts.length;
   const styleCount = styles.length;
   const codeLength = codeLengthOf(scripts) + codeLengthOf(styles);
-  const article = new Readability<Node>(doc, { serializer: (node) => node }).parse();
+  const reader = new Readability<Node>(doc, { serializer: (node) => node });
+  const finishTrace = traceReadability(reader);
+  const article = reader.parse();
   const text = blockText(article?.content);
   const otherTextLength = Math.max(0, pageText.length - text.length);
   const droppedText = [...new Set(pieces.map(plainLine).filter((piece) => piece && !text.includes(piece)))];
@@ -61,5 +64,6 @@ export function extractPage(doc: Document, html: string): PageExtract {
     scriptCount,
     styleCount,
     droppedText,
+    trace: finishTrace(article?.content ?? null),
   };
 }

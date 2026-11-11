@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { PageExtract } from "@/features/inside-real-models/interfaces/page-extract.interface";
 import { count, percent } from "@/shared/utils/format";
+import { HowItWorks } from "./how-it-works";
 
 type ShareKind = "kept" | "text" | "code" | "markup";
 
@@ -21,11 +22,17 @@ function Share({ kind, label, length, total }: { kind: ShareKind; label: string;
 
 export function PageExtractResult({ extract }: { extract: PageExtract }) {
   const headlineRef = useRef<HTMLParagraphElement>(null);
+  const keptRef = useRef<HTMLPreElement>(null);
   const total = extract.pageLength;
 
   useEffect(() => {
     headlineRef.current?.focus();
   }, [extract]);
+
+  function showKept() {
+    keptRef.current?.scrollIntoView({ block: "center" });
+    keptRef.current?.focus({ preventScroll: true });
+  }
 
   return (
     <div className="extract">
@@ -44,6 +51,7 @@ export function PageExtractResult({ extract }: { extract: PageExtract }) {
         <Share kind="code" label={`Thrown away: code, ${plural(extract.scriptCount, "script")} and ${plural(extract.styleCount, "style block")}`} length={extract.codeLength} total={total} />
         <Share kind="markup" label="Thrown away: HTML tags, settings and spacing" length={extract.markupLength} total={total} />
       </ul>
+      {extract.trace ? <HowItWorks trace={extract.trace} onShowKept={showKept} /> : <p className="card-lesson">No step-by-step view for this page: Readability did not pick one box as the article here, so there are no real steps to show.</p>}
       <p className="section-title extract-label extract-colour--text">
         <span className="extract-swatch" />
         {`Thrown away: ${plural(extract.droppedText.length, "piece")} of page text`}
@@ -62,7 +70,7 @@ export function PageExtractResult({ extract }: { extract: PageExtract }) {
           Title found: <b>{extract.title}</b> (kept apart from the text)
         </p>
       )}
-      <pre className="extract-text" tabIndex={0} role="region" aria-label="The plain text that is kept">
+      <pre ref={keptRef} className="extract-text" tabIndex={0} role="region" aria-label="The plain text that is kept">
         {extract.text || "Nothing. Readability found no main text on this page, so nothing would go into the pile."}
       </pre>
     </div>
