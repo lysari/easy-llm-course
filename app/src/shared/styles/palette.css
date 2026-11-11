@@ -256,7 +256,7 @@
   --ink-soft: light-dark(var(--mist-700), var(--ocean-300));
   --ink-faint: light-dark(var(--mist-500), var(--ocean-450));
   --on-backdrop-soft: light-dark(var(--mist-700), var(--ocean-300));
-  --on-backdrop-faint: light-dark(var(--mist-500), var(--ocean-450));
+  --on-backdrop-faint: light-dark(var(--mist-700), var(--ocean-300));
   --link: light-dark(var(--blue-700), var(--blue-400));
   --focus: light-dark(var(--blue-700), var(--blue-400));
   --link-quiet: light-dark(var(--mist-350), var(--ocean-600));
