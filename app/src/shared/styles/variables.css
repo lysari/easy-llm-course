@@ -105,10 +105,6 @@
   --shadow-button: 0 1px 2px var(--shadow);
   --shadow-group: 0 1px 4px var(--shadow);
   --shadow-result: 0 2px 10px var(--shadow);
-  --strip: none;
-  --shadow-strip: none;
-  --strip-filter: none;
-  --strip-pad: 0px;
   --opacity-dim: 0.5;
   --opacity-glow: 0.5;
   --motion-fast: 150ms ease-out;
@@ -149,15 +145,6 @@
   --part-width: 390px;
   --column-gap: 84px;
   --sub-gap: 52px;
-}
-
-:root[data-backdrop="meadow"],
-:root[data-backdrop="sky"],
-:root[data-backdrop="citrus"] {
-  --strip: var(--grain), linear-gradient(var(--strip-fill), var(--strip-fill));
-  --shadow-strip: inset 0 0 0 var(--border-thin) var(--glass-edge), var(--shadow-card);
-  --strip-filter: var(--blur-glass);
-  --strip-pad: var(--space-block);
 }
 
 :root[data-backdrop="meadow"] {

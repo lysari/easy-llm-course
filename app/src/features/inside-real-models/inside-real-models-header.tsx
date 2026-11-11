@@ -11,7 +11,7 @@ interface InsideRealModelsHeaderProps {
 
 export function InsideRealModelsHeader({ model, mode, onSwitchModel, onSwitchMode }: InsideRealModelsHeaderProps) {
   return (
-    <header className="top strip">
+    <header className="top on-backdrop">
       <div className="top-title">
         <h1 className="page-title">Inside real models</h1>
         <div className="mode-switch" role="group" aria-label="Mode">

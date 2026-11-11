@@ -262,13 +262,9 @@ a:where(:hover) {
   font-size: var(--text-small);
 }
 
-.strip {
-  padding: var(--strip-pad);
-  border-radius: var(--radius-group);
-  background: var(--strip);
-  box-shadow: var(--shadow-strip);
-  -webkit-backdrop-filter: var(--strip-filter);
-  backdrop-filter: var(--strip-filter);
+.on-backdrop {
+  --ink-soft: var(--on-backdrop-soft);
+  --ink-faint: var(--on-backdrop-faint);
 }
 
 .top {
@@ -278,7 +274,7 @@ a:where(:hover) {
   justify-content: space-between;
   gap: var(--space-item) var(--space-section);
   margin-bottom: var(--space-section);
-  padding: var(--strip-pad) calc(var(--space-control) + var(--strip-pad));
+  padding: 0 var(--space-control);
 }
 
 .top-stats {

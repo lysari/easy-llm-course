@@ -226,7 +226,7 @@ export function Builder({ settings, addedRows, openMenuId, onToggleMenu, onChang
   const addLayer = () => onChange({ ...settings, layers: [...settings.layers, { hasAttention: true, hasFeedForward: true }] }, true);
   return (
     <>
-      <p className="pg-section strip">Build</p>
+      <p className="pg-section on-backdrop">Build</p>
       <Bracket
         rows={[
           <TextRow key="text" settings={settings} menu={menu} onChange={onChange} />,
@@ -240,7 +240,7 @@ export function Builder({ settings, addedRows, openMenuId, onToggleMenu, onChang
           <Icon name="plus" /> Add layer
         </button>
       </div>
-      <p className="pg-section strip">Run</p>
+      <p className="pg-section on-backdrop">Run</p>
       <p className="pg-badge pg-badge--orange"><Icon name="repeat" /> While training</p>
       <Bracket
         rows={[

@@ -233,7 +233,6 @@
   --panel: light-dark(var(--white-84), var(--night-86));
   --panel-fallback: light-dark(var(--white-96), var(--night-97));
   --sidebar-glass: light-dark(var(--white-50), var(--night-55));
-  --strip-fill: light-dark(var(--white-62), var(--slate-60));
   --link-dot: light-dark(var(--white), var(--ocean-850));
   --photo-veil: light-dark(var(--white-76), var(--night-72));
   --side-active: light-dark(var(--white-75), var(--frost-10));
@@ -256,6 +255,8 @@
   --ink: light-dark(var(--navy-950), var(--ocean-50));
   --ink-soft: light-dark(var(--mist-700), var(--ocean-300));
   --ink-faint: light-dark(var(--mist-500), var(--ocean-450));
+  --on-backdrop-soft: light-dark(var(--mist-700), var(--ocean-300));
+  --on-backdrop-faint: light-dark(var(--mist-500), var(--ocean-450));
   --link: light-dark(var(--blue-700), var(--blue-400));
   --focus: light-dark(var(--blue-700), var(--blue-400));
   --link-quiet: light-dark(var(--mist-350), var(--ocean-600));
@@ -369,4 +370,11 @@
   --ink-soft: light-dark(var(--navy-700), var(--ocean-300));
   --link: light-dark(var(--blue-850), var(--blue-400));
   --focus: light-dark(var(--blue-950), var(--blue-400));
+  --on-backdrop-soft: light-dark(var(--navy-700), var(--ocean-300));
+  --on-backdrop-faint: light-dark(var(--mist-700), var(--ocean-300));
+}
+
+:root[data-backdrop="citrus"] {
+  --on-backdrop-soft: light-dark(var(--navy-800), var(--ocean-300));
+  --on-backdrop-faint: light-dark(var(--navy-700), var(--ocean-300));
 }

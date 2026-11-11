@@ -69,7 +69,7 @@
   align-items: center;
   gap: var(--space-tight) var(--space-item);
   margin: 0 0 var(--space-region);
-  padding: var(--strip-pad) calc(var(--space-control) + var(--strip-pad));
+  padding: 0 var(--space-control);
   list-style: none;
   font-size: var(--text-small);
 }
