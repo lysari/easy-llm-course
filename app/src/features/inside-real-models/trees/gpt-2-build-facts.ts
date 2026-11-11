@@ -26,7 +26,7 @@ const NO_FINE_TUNING: RealNote = { label: "No post-training", value: "\"No train
 
 const FINE_TUNING_LATER: RealNote = { label: "Left for later", value: "\"it is not clear where the ceiling is with finetuning\"", source: "gpt-2-paper" };
 
-const LARGEST_LAMBADA: RealNote = { label: "Largest size", value: "LAMBADA 63.24% right (the paper lists this size as 1542M numbers)", source: "gpt-2-paper" };
+const LARGEST_LAMBADA: RealNote = { label: "Largest size", value: "LAMBADA 63.24% right with a stop-word filter, which stops common words like \"the\" being picked as the last word; 52.66% without it (the paper lists this size as 1542M numbers)", source: "gpt-2-paper" };
 
 const STEP_SIZE: RealNote ={ label: "Step size", value: "\"The learning rate of each model was manually tuned for the best perplexity\", measured on 5% of WebText held back", source: "gpt-2-paper" };
 
