@@ -39,8 +39,10 @@ export function PartColumn({ model, mode, root, parent, parts, selectedId, activ
   return (
     <section className="column part-column inside-real-models-column" ref={columnRef} aria-label={title}>
       {!isSteps && <FlowLinks id={`inside-real-models-links-${parent.id}`} drawing={links} pathIds={pathIds} glowIds={[activeId]} />}
-      <p className="section-title">{title}</p>
-      {isSteps && <p className="card-lesson">{`The ${parts.length} numbered cards are the whole story. Open deeper cards only if you're curious.`}</p>}
+      <header className="column-head strip">
+        <p className="section-title">{title}</p>
+        {isSteps && <p className="card-lesson">{`The ${parts.length} numbered cards are the whole story. Open deeper cards only if you're curious.`}</p>}
+      </header>
       {parts.map((part, i) => (
         <PartCard
           key={part.id}

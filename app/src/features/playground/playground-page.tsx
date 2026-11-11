@@ -27,7 +27,7 @@ export function PlaygroundPage({ isOpen }: { isOpen: boolean }) {
     >
       <div className="pg">
         <div className="pg-main">
-          <header className="pg-head">
+          <header className="pg-head strip">
             <div>
               <h1 className="page-title">Playground</h1>
               <p className="pg-sub">Tiny GPT, the model from Lessons, trains in your browser. Change a setting and watch the loss and the writing change.</p>

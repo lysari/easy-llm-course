@@ -6,7 +6,7 @@ export function Breadcrumb({ path, onShow }: { path: ModelPart[]; onShow: (id: s
   const last = parts.length - 1;
   return (
     <nav className="breadcrumb" aria-label="Selected path">
-      <ol>
+      <ol className="strip">
         <li aria-current={last < 0 ? "location" : undefined}>{root.title}</li>
         {parts.map((part, i) => (
           <li key={part.id}>

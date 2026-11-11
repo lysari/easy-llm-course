@@ -5,6 +5,7 @@ import type { StageId } from "@/features/lessons/interfaces/story.interface";
 import { ConceptIcon } from "@/shared/components/concept-icon";
 import { Logo } from "./logo";
 import { useBackdrop } from "./use-backdrop";
+import { useLook } from "./use-look";
 
 const PHOTO_URL = "https://unsplash.com/photos/blue-ocean-water-surface-is-calm-and-serene-yWCfIqyUapk";
 
@@ -18,11 +19,12 @@ const pageLinkClass = ({ isActive }: { isActive: boolean }) => `side-link side-l
 
 export function Sidebar({ isLessons, stageId, onSelectStage }: SidebarProps) {
   const { backdrop, setBackdrop } = useBackdrop();
+  const { look, setLook } = useLook();
   return (
     <aside className="sidebar">
       <p className="brand">
         <Logo />
-        <span>LLM <span className="brand-soft">Lessons</span></span>
+        <span>Open<span className="brand-soft">Course</span></span>
       </p>
       <nav className="side-nav" aria-label="Pages">
         <NavLink className={pageLinkClass} id="nav-lessons" to="/">
@@ -62,8 +64,15 @@ export function Sidebar({ isLessons, stageId, onSelectStage }: SidebarProps) {
         </NavLink>
       </nav>
       <footer className="side-foot">
-        <div className="backdrop-switch" role="group" aria-label="Background">
-          <span className="backdrop-label" aria-hidden="true">Background</span>
+        <div className="side-switch" role="group" aria-label="Look">
+          <span className="side-switch-label" aria-hidden="true">Look</span>
+          <button type="button" aria-pressed={look === "auto"} onClick={() => setLook("auto")}>Auto</button>
+          <button type="button" aria-pressed={look === "light"} onClick={() => setLook("light")}>Light</button>
+          <button type="button" aria-pressed={look === "dark"} onClick={() => setLook("dark")}>Dark</button>
+          <button type="button" aria-pressed={look === "fresh"} onClick={() => setLook("fresh")}>Fresh</button>
+        </div>
+        <div className="side-switch" role="group" aria-label="Background">
+          <span className="side-switch-label" aria-hidden="true">Background</span>
           <button type="button" aria-pressed={backdrop === "wash"} onClick={() => setBackdrop("wash")}>Wash</button>
           <button type="button" aria-pressed={backdrop === "photo"} onClick={() => setBackdrop("photo")}>Photo</button>
         </div>

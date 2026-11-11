@@ -69,7 +69,7 @@
   align-items: center;
   gap: var(--space-tight) var(--space-item);
   margin: 0 0 var(--space-region);
-  padding: 0 var(--space-control);
+  padding: var(--strip-pad) calc(var(--space-control) + var(--strip-pad));
   list-style: none;
   font-size: var(--text-small);
 }
@@ -316,6 +316,11 @@
 .inside-real-models-column {
   align-content: start;
   width: var(--inside-real-models-column-width);
+}
+
+.column-head {
+  display: grid;
+  gap: var(--space-card);
 }
 
 @media (max-width: 960px) {

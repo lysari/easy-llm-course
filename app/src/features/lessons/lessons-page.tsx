@@ -72,7 +72,7 @@ export function LessonsPage({ isOpen, stageId, onSelectStage }: LessonsPageProps
   return (
     <main className="page" id="lessons" hidden={!isOpen}>
       <div className="fleet">
-        <header className="top">
+        <header className="top strip">
           <h1 className="page-title">Lessons</h1>
           <p className="top-stats" id="top-stats">
             <span>{`${STAGES.length} stages, ${STEPS.length} parts`}</span>

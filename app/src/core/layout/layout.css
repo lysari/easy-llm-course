@@ -14,7 +14,7 @@
   overflow-y: auto;
   padding: var(--page-pad-top) var(--sidebar-pad) var(--space-region) max(var(--sidebar-pad), env(safe-area-inset-left, 0px));
   border-right: var(--border-thin) solid var(--glass-edge);
-  background: var(--grain), var(--sidebar-glass);
+  background: var(--grain), var(--glass-gloss), var(--sidebar-glass);
   -webkit-backdrop-filter: var(--blur-glass);
   backdrop-filter: var(--blur-glass);
 }
@@ -148,7 +148,7 @@
   padding: 0 var(--space-item);
 }
 
-.backdrop-switch {
+.side-switch {
   display: flex;
   align-items: center;
   gap: var(--space-tight);
@@ -156,11 +156,11 @@
   font-size: var(--text-micro);
 }
 
-.backdrop-label {
+.side-switch-label {
   margin-right: auto;
 }
 
-.backdrop-switch button {
+.side-switch button {
   padding: var(--space-edge) var(--space-item);
   border: var(--border-thin) solid transparent;
   border-radius: var(--radius-round);
@@ -170,11 +170,11 @@
   transition: background var(--motion-fast), color var(--motion-fast);
 }
 
-.backdrop-switch button:hover {
+.side-switch button:hover {
   background: var(--side-hover);
 }
 
-.backdrop-switch [aria-pressed="true"] {
+.side-switch [aria-pressed="true"] {
   border-color: var(--glass-edge);
   background: var(--side-active);
   color: var(--ink);
@@ -239,7 +239,7 @@
   }
 
   .brand,
-  .backdrop-label {
+  .side-switch-label {
     display: none;
   }
 

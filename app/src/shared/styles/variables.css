@@ -56,18 +56,28 @@
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
   --photo: url("/backgrounds/ocean.webp");
   --photo-blur: url("/backgrounds/ocean-blur.webp");
+  --photo-backing: linear-gradient(var(--photo-veil), var(--photo-veil)) fixed, var(--photo-blur) center / cover no-repeat fixed;
   --glass-backing: none;
+  --nested-backing: none;
   --blur-glass: blur(22px) saturate(140%);
-  --shadow-card: inset 0 1px 0 var(--glass-shine), 0 1px 2px var(--shadow), 0 6px 18px var(--shadow-wide);
-  --shadow-card-hover: inset 0 1px 0 var(--glass-shine), 0 2px 6px var(--shadow-strong), 0 10px 26px var(--shadow-wide);
-  --shadow-card-active: inset 0 1px 0 var(--glass-shine), 0 2px 8px var(--shadow-strong), 0 12px 30px var(--shadow-wide);
+  --glass-gloss-height: 48px;
+  --glass-gloss: linear-gradient(180deg, var(--gloss-top), transparent var(--glass-gloss-height));
+  --shadow-card: inset 0 1px 0 var(--glass-shine), inset 0 -1px 0 var(--glass-low), 0 1px 2px var(--shadow), 0 6px 18px var(--shadow-wide);
+  --shadow-card-hover: inset 0 1px 0 var(--glass-shine), inset 0 -1px 0 var(--glass-low), 0 2px 6px var(--shadow-strong), 0 10px 26px var(--shadow-wide);
+  --shadow-card-active: inset 0 1px 0 var(--glass-shine), inset 0 -1px 0 var(--glass-low), 0 2px 8px var(--shadow-strong), 0 12px 30px var(--shadow-wide);
   --shadow-card-body: inset 0 1px 0 var(--glass-shine), 0 1px 2px var(--shadow);
   --shadow-band-pill: inset 0 0 0 var(--border-thin) var(--band-line), 0 1px 3px var(--band-shadow);
-  --shadow-float: inset 0 1px 0 var(--glass-shine), 0 8px 28px var(--shadow-strong), 0 24px 60px var(--shadow-wide);
+  --shadow-float: inset 0 1px 0 var(--glass-shine), inset 0 -1px 0 var(--glass-low), 0 8px 28px var(--shadow-strong), 0 24px 60px var(--shadow-wide);
   --shadow-chip: 0 1px 2px var(--shadow-strong);
   --shadow-button: 0 1px 2px var(--shadow);
   --shadow-group: 0 1px 4px var(--shadow);
   --shadow-result: 0 2px 10px var(--shadow);
+  --strip: none;
+  --shadow-strip: none;
+  --strip-filter: none;
+  --strip-pad: 0px;
+  --pill-dot-display: none;
+  --pill-dot-size: 6px;
   --opacity-dim: 0.5;
   --opacity-glow: 0.5;
   --motion-fast: 150ms ease-out;
@@ -107,9 +117,32 @@
   --sub-gap: 52px;
 }
 
+:root[data-look="fresh"] {
+  --backdrop:
+    radial-gradient(30% 22% at 100% 0%, var(--backdrop-haze), transparent),
+    radial-gradient(38% 26% at 24% 100%, var(--backdrop-peach), transparent),
+    radial-gradient(20% 30% at 0% 90%, var(--backdrop-dusk), transparent),
+    radial-gradient(22% 26% at 100% 100%, var(--backdrop-mauve), transparent),
+    radial-gradient(44% 30% at 24% 70%, var(--backdrop-mist), transparent),
+    radial-gradient(70% 34% at 34% 0%, var(--backdrop-top), transparent),
+    linear-gradient(180deg, transparent 55%, var(--backdrop-floor) 100%),
+    linear-gradient(90deg, var(--backdrop-sky) 0%, var(--backdrop-sky) 22%, var(--backdrop-blue) 40%, var(--backdrop-periwinkle) 60%, var(--backdrop-lilac) 78%, var(--backdrop-violet) 96%);
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
+  --strip: var(--grain), var(--glass-gloss), linear-gradient(var(--strip-fill), var(--strip-fill));
+  --shadow-strip: inset 0 0 0 var(--border-thin) var(--glass-edge), var(--shadow-card);
+  --strip-filter: var(--blur-glass);
+  --strip-pad: var(--space-block);
+  --pill-dot-display: inline-block;
+}
+
 :root[data-backdrop="photo"] {
   --backdrop: linear-gradient(var(--photo-veil), var(--photo-veil)), var(--photo) center / cover no-repeat, var(--backdrop-base);
-  --glass-backing: linear-gradient(var(--photo-veil), var(--photo-veil)) fixed, var(--photo-blur) center / cover no-repeat fixed;
+  --glass-backing: var(--photo-backing);
+  --nested-backing: var(--photo-backing);
+}
+
+:root[data-look="fresh"][data-backdrop="photo"] {
+  --nested-backing: none;
 }
 
 @media (max-width: 1700px) {

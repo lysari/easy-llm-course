@@ -31,7 +31,7 @@
 .score-table thead th {
   position: sticky;
   top: 0;
-  background: var(--card-raised);
+  background: var(--table-head);
   color: var(--ink-soft);
   font-family: var(--font);
   font-weight: var(--weight-medium);
