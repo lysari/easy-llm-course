@@ -6,6 +6,7 @@ import { MODELS } from "@/features/inside-real-models/models";
 import { PartDrawer } from "@/features/inside-real-models/part-drawer";
 import { placeOf } from "@/features/inside-real-models/real-place";
 import { readSentence } from "@/features/inside-real-models/sentence";
+import { DEMOS, isUsedOn } from "@/features/inside-real-models/story/story-demos";
 import { viewTiny } from "@/features/inside-real-models/tiny-parts";
 import { SOURCES } from "@/features/inside-real-models/trees/sources";
 
@@ -16,7 +17,8 @@ const allParts = (part: ModelPart): ModelPart[] => [part, ...(part.children ?? [
 const missingStory = (step: ModelPart) => [...new Set(allParts(step).filter((part) => !part.story).map((part) => part.id))];
 
 describe.each(MODELS)("$title why, watch and when", (model) => {
-  const tiny = viewTiny(new ModelLab(), readSentence("").words);
+  const sentence = readSentence("");
+  const tiny = viewTiny(new ModelLab(), sentence.words);
   const parts = [model.modes.use, model.modes.build].flatMap(allParts);
   const told = parts.filter((part) => part.story);
 
@@ -51,7 +53,7 @@ describe.each(MODELS)("$title why, watch and when", (model) => {
     const root = model.modes[mode];
     for (const part of allParts(root).filter((each) => each.story)) {
       const nextPart = parts.find((each) => each.id === part.story?.nextId);
-      const html = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelId={model.id} modelTitle={model.title} part={part} place={placeOf(model, root, part)} tiny={tiny} nextPart={nextPart} onOpen={() => {}} onClose={() => {}} />);
+      const html = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelId={model.id} modelTitle={model.title} part={part} place={placeOf(model, root, part)} tiny={tiny} text="" sentence={sentence} onTextChange={() => {}} nextPart={nextPart} onOpen={() => {}} onClose={() => {}} />);
       const places = INFO_TITLES.map((title) => html.indexOf(`<p class="section-title">${title}</p>`));
       const panel = html.indexOf('<div class="drawer-panel">');
       expect(html, part.id).toContain('class="drawer drawer--wide"');
@@ -62,9 +64,21 @@ describe.each(MODELS)("$title why, watch and when", (model) => {
     }
   });
 
+  test.each(["use", "build"] as const)("in %s mode the demo column shows the sentence box and the demo model's learning only for demos that use them", (mode) => {
+    const root = model.modes[mode];
+    for (const part of allParts(root)) {
+      if (!part.story) continue;
+      const demo = DEMOS[part.story.demo];
+      const html = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelId={model.id} modelTitle={model.title} part={part} place={placeOf(model, root, part)} tiny={tiny} text="" sentence={sentence} onTextChange={() => {}} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
+      const panel = html.slice(html.indexOf('<div class="drawer-panel">'));
+      expect(panel.includes("Your sentence"), part.id).toBe(isUsedOn(demo.usesSentence, model.id));
+      expect(panel.includes(`Our tiny demo model, not ${model.title},`), part.id).toBe(isUsedOn(demo.usesTraining, model.id));
+    }
+  });
+
   test("a part with no story keeps the narrow drawer", () => {
     const part: ModelPart = { ...(model.modes.use.children?.[0] ?? model.modes.use), story: undefined };
-    const html = renderToStaticMarkup(<PartDrawer ref={null} root={model.modes.use} modelId={model.id} modelTitle={model.title} part={part} place={placeOf(model, model.modes.use, part)} tiny={tiny} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
+    const html = renderToStaticMarkup(<PartDrawer ref={null} root={model.modes.use} modelId={model.id} modelTitle={model.title} part={part} place={placeOf(model, model.modes.use, part)} tiny={tiny} text="" sentence={sentence} onTextChange={() => {}} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
     expect(html).toContain('class="drawer"');
     expect(html).not.toContain("drawer-panel");
   });

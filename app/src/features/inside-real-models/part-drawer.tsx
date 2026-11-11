@@ -1,6 +1,7 @@
 import type { Ref } from "react";
 import type { ModelId, ModelPart, TinyView } from "@/features/inside-real-models/interfaces/model-part.interface";
 import type { PartPlace } from "@/features/inside-real-models/interfaces/part-place.interface";
+import type { Sentence } from "@/features/inside-real-models/interfaces/sentence.interface";
 import { CodeBlock } from "@/shared/components/code-block";
 import { Drawer } from "@/shared/components/drawer";
 import { FormulaBlock } from "@/shared/components/formula-block";
@@ -26,12 +27,15 @@ interface PartDrawerProps {
   part: ModelPart;
   place: PartPlace;
   tiny: TinyView;
+  text: string;
+  sentence: Sentence;
+  onTextChange: (text: string) => void;
   nextPart: ModelPart | undefined;
   onOpen: (id: string) => void;
   onClose: () => void;
 }
 
-export function PartDrawer({ ref, root, modelId, modelTitle, part, place, tiny, nextPart, onOpen, onClose }: PartDrawerProps) {
+export function PartDrawer({ ref, root, modelId, modelTitle, part, place, tiny, text, sentence, onTextChange, nextPart, onOpen, onClose }: PartDrawerProps) {
   const notes = part.facts.notes ?? [];
   const sources = [...new Set([...part.facts.sources, ...notes.map((note) => note.source)])];
   const share = shareOf(part, place, true);
@@ -49,7 +53,7 @@ export function PartDrawer({ ref, root, modelId, modelTitle, part, place, tiny, 
   ];
 
   return (
-    <Drawer ref={ref} id={DRAWER_ID} icon={part.icon} title={titleOf(part, root)} status={tagOf(part)} bodyKey={part.id} onClose={onClose} panel={part.story && <StoryDemo story={part.story} part={part} modelId={modelId} tiny={tiny} />}>
+    <Drawer ref={ref} id={DRAWER_ID} icon={part.icon} title={titleOf(part, root)} status={tagOf(part)} bodyKey={part.id} onClose={onClose} panel={part.story && <StoryDemo story={part.story} part={part} modelId={modelId} modelTitle={modelTitle} tiny={tiny} text={text} sentence={sentence} onTextChange={onTextChange} />}>
       <section className="section">
         <p className="section-title">What it does</p>
         <p className="part-summary">{part.summary}</p>

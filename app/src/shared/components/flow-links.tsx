@@ -23,10 +23,8 @@ export function FlowLinks({ id, drawing, pathIds, glowIds }: FlowLinksProps) {
           (path) =>
             isGradient(path) && (
               <linearGradient key={path.toId} id={`${id}-gradient-${path.toId}`} gradientUnits="userSpaceOnUse" x1={path.startX} y1={0} x2={path.endX} y2={0}>
-                <stop className="link-stop-indigo" offset={0} />
-                <stop className="link-stop-sky" offset={0.38} />
-                <stop className="link-stop-lavender" offset={0.64} />
-                <stop className="link-stop-pink" offset={1} />
+                <stop className="link-stop-deep" offset={0} />
+                <stop className="link-stop-sky" offset={1} />
               </linearGradient>
             ),
         )}

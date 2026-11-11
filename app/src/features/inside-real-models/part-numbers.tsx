@@ -6,7 +6,7 @@ import { keyFactOf, showAmount } from "./real-place";
 const COMPUTED = "Worked out from the sources";
 
 function RealHeadline({ headline, isExact }: { headline: Headline; isExact: boolean }) {
-  if ("text" in headline) return <dd className="is-muted">{headline.text}</dd>;
+  if ("text" in headline) return <dd>{headline.text}</dd>;
   const isPercent = headline.unit.startsWith("%");
   return (
     <dd>

@@ -7,20 +7,12 @@
   pointer-events: none;
 }
 
-.link-stop-indigo {
-  stop-color: var(--link-indigo);
+.link-stop-deep {
+  stop-color: var(--link-deep);
 }
 
 .link-stop-sky {
   stop-color: var(--link-sky);
-}
-
-.link-stop-lavender {
-  stop-color: var(--link-lavender);
-}
-
-.link-stop-pink {
-  stop-color: var(--link-pink);
 }
 
 .link-path {
@@ -49,7 +41,7 @@
 }
 
 .link-dot.is-active {
-  stroke: var(--link-indigo);
+  stroke: var(--link-deep);
 }
 
 @keyframes draw {

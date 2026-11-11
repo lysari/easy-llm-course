@@ -27,6 +27,10 @@
   border-bottom: var(--border-thin) solid var(--card-line);
 }
 
+.drawer-head .card-title {
+  font-size: var(--text-heading);
+}
+
 .drawer-close {
   grid-column: -2;
   display: grid;
@@ -49,11 +53,15 @@
   display: grid;
   flex: 1;
   align-content: start;
-  gap: var(--space-block);
+  gap: var(--space-section);
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: var(--space-region) var(--space-section) var(--space-section);
+  padding: var(--space-section);
+}
+
+.drawer-body .note {
+  font-size: var(--text-body);
 }
 
 .drawer-columns {
@@ -75,7 +83,7 @@
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: var(--space-region) var(--space-section) var(--space-section);
+  padding: var(--space-section);
   background: var(--canvas);
 }
 

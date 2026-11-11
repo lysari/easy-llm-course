@@ -41,7 +41,7 @@
   background: transparent;
   color: var(--ink-soft);
   font-size: var(--text-small);
-  line-height: var(--leading-link);
+  line-height: var(--leading-title);
   text-align: left;
   text-decoration: none;
 }
@@ -56,7 +56,6 @@
 
 .side-link--page {
   font-size: var(--text-body);
-  font-weight: var(--weight-medium);
 }
 
 .side-link.is-on {
@@ -70,7 +69,6 @@
 .side-link.is-selected {
   background: var(--group);
   color: var(--ink);
-  font-weight: var(--weight-medium);
 }
 
 .page {
@@ -85,7 +83,7 @@
   align-items: center;
   gap: var(--space-item);
   font-size: var(--text-heading);
-  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-title);
 }
 
 .brand svg {

@@ -17,11 +17,12 @@
 
 .card-foot b {
   color: var(--ink);
-  font-weight: var(--weight-medium);
+  font-weight: var(--weight-regular);
 }
 
 .foot-value {
   overflow: hidden;
+  font-variant-numeric: tabular-nums;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

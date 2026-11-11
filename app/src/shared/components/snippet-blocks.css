@@ -21,7 +21,7 @@
 
 .copy-status {
   color: var(--done-ink);
-  font-size: var(--text-caption);
+  font-size: var(--text-micro);
   font-weight: var(--weight-medium);
 }
 
@@ -63,7 +63,7 @@
   padding: var(--space-item) 0;
   overflow-x: auto;
   color: var(--code-identifier);
-  font: var(--weight-regular) var(--text-caption) / var(--leading-code) var(--font-mono);
+  font: var(--weight-regular) var(--text-micro) / var(--leading-code) var(--font-mono);
 }
 
 .snippet-code code {

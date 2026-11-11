@@ -76,12 +76,13 @@ describe.each(MODELS)("$title real facts", (model) => {
   });
 
   test("a part with no stored numbers says None to learn, never 0", () => {
-    const tiny = viewTiny(new ModelLab(), readSentence("").words);
+    const sentence = readSentence("");
+    const tiny = viewTiny(new ModelLab(), sentence.words);
     const root = model.modes.build;
     for (const id of ["gather", "tokenizer", "pre-training"]) {
       const part = partIn(root, id);
       if (!part) throw new Error(id);
-      const html = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelId={model.id} modelTitle={model.title} part={part} place={placeOf(model, root, part)} tiny={tiny} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
+      const html = renderToStaticMarkup(<PartDrawer ref={null} root={root} modelId={model.id} modelTitle={model.title} part={part} place={placeOf(model, root, part)} tiny={tiny} text="" sentence={sentence} onTextChange={() => {}} nextPart={undefined} onOpen={() => {}} onClose={() => {}} />);
       expect(html, id).toContain("<span>Numbers</span><span>None to learn</span>");
       expect(html, id).not.toContain("<span>Numbers</span><span>0</span>");
     }

@@ -9,7 +9,6 @@ import { PartColumn } from "./part-column";
 import { PartDrawer } from "./part-drawer";
 import { placeOf } from "./real-place";
 import { START_TEXTS, readSentence } from "./sentence";
-import { SentenceBar } from "./sentence-bar";
 import { InsideRealModelsHeader } from "./inside-real-models-header";
 import { viewTiny } from "./tiny-parts";
 
@@ -32,8 +31,7 @@ export function InsideRealModelsPage({ isOpen }: { isOpen: boolean }) {
   return (
     <main className="page" id="inside-real-models" hidden={!isOpen}>
       {insideRealModels.redirect && <Navigate to={insideRealModels.redirect} replace />}
-      <InsideRealModelsHeader model={model} mode={mode} lab={lab} onSwitchModel={insideRealModels.switchModel} onSwitchMode={insideRealModels.switchMode} />
-      <SentenceBar text={text} sentence={sentence} onChange={setText} />
+      <InsideRealModelsHeader model={model} mode={mode} onSwitchModel={insideRealModels.switchModel} onSwitchMode={insideRealModels.switchMode} />
       <Breadcrumb path={path} onShow={insideRealModels.showCard} />
       <div className="column-scroll" ref={insideRealModels.scrollerRef}>
         <div className="column-track" ref={insideRealModels.trackRef}>
@@ -57,7 +55,7 @@ export function InsideRealModelsPage({ isOpen }: { isOpen: boolean }) {
           ))}
         </div>
       </div>
-      {openPart && <PartDrawer ref={insideRealModels.drawerRef} root={root} modelId={model.id} modelTitle={model.title} part={openPart} place={placeOf(model, root, openPart)} tiny={tiny} nextPart={nextPart} onOpen={insideRealModels.showDetails} onClose={insideRealModels.closeDrawer} />}
+      {openPart && <PartDrawer ref={insideRealModels.drawerRef} root={root} modelId={model.id} modelTitle={model.title} part={openPart} place={placeOf(model, root, openPart)} tiny={tiny} text={text} sentence={sentence} onTextChange={setText} nextPart={nextPart} onOpen={insideRealModels.showDetails} onClose={insideRealModels.closeDrawer} />}
     </main>
   );
 }

@@ -1,20 +1,30 @@
 .reason-list {
   display: grid;
-  gap: var(--space-hair);
   margin: 0;
-  padding: var(--space-stack);
+  padding: 0;
+  overflow: hidden;
+  border: var(--border-thin) solid var(--card-line);
   border-radius: var(--radius-group);
-  background: var(--group);
+  background: var(--card-shell);
   list-style: none;
   font-size: var(--text-small);
 }
 
 .reason-list li {
-  padding: var(--space-stack) var(--space-word);
+  padding: var(--space-block) var(--space-surface);
+}
+
+.reason-list li + li {
+  border-top: var(--border-thin) solid var(--card-line);
+}
+
+.reason-list b {
+  font-weight: var(--weight-medium);
 }
 
 .reason-list a {
   display: block;
+  margin-top: var(--space-tight);
   color: var(--link);
 }
 
@@ -34,10 +44,6 @@
   display: grid;
   gap: var(--space-block);
   min-width: 0;
-}
-
-.watch a {
-  color: var(--link);
 }
 
 .watch-pane {
@@ -66,7 +72,7 @@
   background: var(--card);
   color: var(--ink);
   font-family: var(--font-mono);
-  font-size: var(--text-caption);
+  font-size: var(--text-micro);
   line-height: var(--leading-code);
   resize: vertical;
 }
@@ -100,16 +106,18 @@
 
 .watch-heading {
   font-size: var(--text-heading);
-  font-weight: var(--weight-medium);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-title);
+  letter-spacing: var(--tracking-title);
 }
 
 .watch-honest {
-  padding: var(--space-item) var(--space-card);
+  padding: var(--space-block) var(--space-surface);
   border: var(--border-thin) solid var(--card-line);
   border-radius: var(--radius-group);
   background: var(--card);
   color: var(--ink-soft);
-  font-size: var(--text-caption);
+  font-size: var(--text-small);
 }
 
 .watch-box {
@@ -218,11 +226,12 @@
 .word-chip,
 .piece-chip {
   padding: var(--space-edge) var(--space-item);
-  border: var(--border-thin) solid var(--card-line);
+  border: 0;
   border-radius: var(--radius-pill);
-  background: var(--chip);
+  background: var(--button);
   color: var(--ink);
   font-size: var(--text-small);
+  transition: background var(--motion-fast);
 }
 
 .word-chip:hover {
@@ -231,7 +240,6 @@
 
 .word-chip.is-picked,
 .piece-chip.is-picked {
-  border-color: var(--link);
   background: var(--selected-bg);
   color: var(--selected-ink);
 }
@@ -307,4 +315,59 @@
   align-items: center;
   gap: var(--space-item);
   font-size: var(--text-small);
+}
+
+.sentence-box {
+  display: grid;
+  gap: var(--space-tight);
+}
+
+.sentence-field {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+  border: var(--border-thin) solid var(--card-line);
+  border-radius: var(--radius-pill);
+  background: var(--card);
+  box-shadow: var(--shadow-button);
+}
+
+.sentence-field:has(:focus-visible) {
+  outline: var(--border-thick) solid var(--link);
+  outline-offset: var(--space-edge);
+}
+
+.sentence-field input,
+.sentence-field select {
+  border: 0;
+  outline: none;
+  background: transparent;
+  font: inherit;
+}
+
+.sentence-field input {
+  flex: 1;
+  color: var(--ink);
+  min-width: 0;
+  padding: var(--space-control) var(--space-block);
+  font-size: var(--text-body);
+}
+
+.sentence-field select {
+  flex: none;
+  field-sizing: content;
+  padding: 0 var(--space-block);
+  border-left: var(--border-thin) solid var(--card-line);
+  color: var(--ink-soft);
+  font-size: var(--text-small);
+  cursor: pointer;
+}
+
+.sentence-note:empty {
+  display: none;
+}
+
+.demo-model-numbers {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
 }

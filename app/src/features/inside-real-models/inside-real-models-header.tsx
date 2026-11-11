@@ -1,4 +1,3 @@
-import { TARGET_ROUNDS, type ModelLab } from "@/core/model/lab";
 import type { ModeId, RealModel } from "@/features/inside-real-models/interfaces/model-part.interface";
 import { count } from "@/shared/utils/format";
 import { MODELS } from "./models";
@@ -6,12 +5,11 @@ import { MODELS } from "./models";
 interface InsideRealModelsHeaderProps {
   model: RealModel;
   mode: ModeId;
-  lab: ModelLab;
   onSwitchModel: (id: string) => void;
   onSwitchMode: (mode: ModeId) => void;
 }
 
-export function InsideRealModelsHeader({ model, mode, lab, onSwitchModel, onSwitchMode }: InsideRealModelsHeaderProps) {
+export function InsideRealModelsHeader({ model, mode, onSwitchModel, onSwitchMode }: InsideRealModelsHeaderProps) {
   return (
     <header className="top">
       <div className="top-title">
@@ -37,8 +35,6 @@ export function InsideRealModelsHeader({ model, mode, lab, onSwitchModel, onSwit
       </div>
       <p className="top-stats">
         <span>{`${count(model.root.facts.weightCount)} numbers`}</span>
-        <span>{`Tiny model round ${lab.round}/${TARGET_ROUNDS}`}</span>
-        <strong>{lab.latestLoss === null ? "Tiny model starting" : `Loss ${lab.latestLoss.toFixed(2)}`}</strong>
       </p>
     </header>
   );
